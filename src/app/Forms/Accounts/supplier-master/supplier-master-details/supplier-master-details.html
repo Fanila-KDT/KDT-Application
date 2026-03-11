@@ -1,0 +1,157 @@
+
+<div class="container-fluid">
+  <form ngForm #SupplierMasterForm="ngForm" name="form" (ngSubmit)="SupplierMasterForm.form.valid && onSubmit(SupplierMasterForm)" novalidate>
+    <div class="fieldset-wrapper">
+        <fieldset class="boaderinner-fieldset"> 
+            <legend class="legend-left">Supplier Info</legend>
+            <div class="row">
+                <!-- Supplier Code -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="ac_code" class="form-label">Supplier Code</label>
+                    </div>
+                    <input type="text" class="label-input" id="ac_code" [disabled]="true"
+                        name="ac_code" [(ngModel)]="supplierMasterModel.ac_code" #ac_code="ngModel">
+                </div>
+                <!-- Supplier Name -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="account_name" class="form-label">Supplier Name
+                            <span class="required-star">*</span>
+                        </label>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="text" class="label-input" id="account_name" [disabled]="itemDisable" [ngClass]="{'is-invalid': isSupNameInvalid}"
+                            name="account_name" [(ngModel)]="supplierMasterModel.account_name" #account_name="ngModel">
+                    </div>
+                </div>
+                <!-- Currency -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="sub" class="form-label">Foreign Currency</label>
+                    </div>
+                    <select class="label-input" id="cur_no"
+                        name="cur_no" [(ngModel)]="supplierMasterModel.cur_no" #cur_no="ngModel" [disabled]="itemDisable" >
+                        <option *ngFor="let cur of curList" [value]="cur.cur_no">{{ cur.cur_name }}</option>
+                    </select>
+                </div>
+                <div class="col-md-1 spacing-left">
+                    <!--Active -->
+                    <div class="col-md-9"> 
+                        <div class="form-group">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" class="checkbox style-0" [(ngModel)]="supplierMasterModel.account_status" 
+                                    name="account_status" #account_status="ngModel" [disabled]="itemDisable" style="padding-right: 52px;"> 
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label">Active</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <!-- Main Group -->
+                <div class="col-md-2">
+                    <div class="label-wrapper d-flex align-items-center">
+                        <label for="productClass" class="form-label  mb-0">Main Group</label>
+                    </div>
+                    <select class="label-input" id="main_group_code"
+                    name="main_group_code" [(ngModel)]="supplierMasterModel.main_group_code" #main_group_code="ngModel" [disabled]="true" >
+                        <option [value]="51">{{ 'SUNDRY CREDITORS' }}</option>
+                    </select>
+                </div>
+                <!-- sub -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="sub" class="form-label">Sub Group</label>
+                    </div>
+                    <select class="label-input" id="sub_group_code"
+                        name="sub_group_code" [(ngModel)]="supplierMasterModel.sub_group_code" #sub_group_code="ngModel" [disabled]="itemDisable" >
+                        <option *ngFor="let sub of subList" [value]="sub.sub_group_code">{{ sub.sub_group_name }}</option>
+                    </select>
+                </div>
+                <!-- Description -->
+                <div class="col-md-4">
+                    <div class="label-wrapper">
+                        <label for="account_description" class="form-label">Description</label>
+                    </div>
+                    <textarea class="label-input" id="account_description" name="account_description" rows="2" 
+                        [(ngModel)]="supplierMasterModel.account_description" #account_description="ngModel" [disabled]="itemDisable" ></textarea>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="fieldset-wrapper">
+        <fieldset class="boaderinner-fieldset"> 
+            <legend class="legend-left">Address Info</legend>
+            <div class="row">
+                <!-- Address -->
+                <div class="col-md-3">
+                    <div class="label-wrapper">
+                        <label for="Address" class="form-label">Address</label>
+                    </div>
+                    <textarea class="label-input" id="address" name="address" rows="2"
+                        [(ngModel)]="supplierAddressModel.address" #address="ngModel" [disabled]="itemDisable" ></textarea>
+                </div>
+                <!-- Address 1 -->
+                <div class="col-md-3">
+                    <div class="label-wrapper">
+                        <label for="address1" class="form-label">Address 1</label>
+                    </div>
+                    <textarea class="label-input" id="address1" name="address1" rows="2"
+                        [(ngModel)]="supplierAddressModel.address1" #address1="ngModel" [disabled]="itemDisable" ></textarea>
+                </div>
+                <!-- Address 2 -->
+                <div class="col-md-3">
+                    <div class="label-wrapper">
+                        <label for="address2" class="form-label">Address 2</label>
+                    </div>
+                    <textarea class="label-input" id="address2" name="address2" rows="2"
+                        [(ngModel)]="supplierAddressModel.address2" #address2="ngModel" [disabled]="itemDisable" ></textarea>
+                </div>
+                <!-- Concerned Person -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="concerned_person" class="form-label">Concerned Person</label>
+                    </div>
+                    <input type="text" class="label-input" id="concerned_person" [disabled]="itemDisable"
+                        name="concerned_person" [(ngModel)]="supplierAddressModel.concerned_person" #concerned_person="ngModel">
+                </div>
+            </div>
+            <div class="row">
+                <!-- Telephone -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="telephone1" class="form-label fw-bold text-primary">
+                        Telephone
+                        </label>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <input type="text" class="label-input" id="telephone1" [disabled]="itemDisable"
+                        name="telephone1" [(ngModel)]="supplierAddressModel.telephone1" #telephone1="ngModel"
+                        placeholder="Primary phone number">
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" class="label-input" id="telephone2" [disabled]="itemDisable"
+                        name="telephone2" [(ngModel)]="supplierAddressModel.telephone2" #telephone2="ngModel"
+                        placeholder="Secondary phone number">
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer">
+      <div class="btn-group">
+        <button type="submit" class="btn btn-primary" [disabled]="saveDisable">
+          <i class="fa fa-save"></i> Save
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+          <i class="fa fa-ban"></i> Cancel
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

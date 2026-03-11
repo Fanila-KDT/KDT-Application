@@ -1,0 +1,778 @@
+<div class="container-fluid">
+  <form ngForm #ProductMasterForm="ngForm" name="form" (ngSubmit)="ProductMasterForm.form.valid && onSubmit(ProductMasterForm)" novalidate>
+      <div class="row">
+        <!-- Item Code -->
+        <div class="col-md-2">
+          <div class="label-wrapper d-flex align-items-center">
+            <label for="item_code" class="form-label">Item Code</label>
+          </div>
+          <input type="text" class="form-control" id="item_code"
+          name="item_code" [(ngModel)]="productMasterModel.item_code" #itemCode="ngModel" [disabled]="itemDisable" >
+        </div>
+        <!-- Model Name -->
+        <div class="col-md-3">
+          <div class="label-wrapper d-flex align-items-center">
+            <label for="item_name_abbr" class="form-label">Model Name 
+              <span class="required-star">*</span>
+            </label>
+          </div>
+          <input type="text" class="form-control label-input" id="item_name_abbr" [ngClass]="{'is-invalid': isModelNameInvalid}"
+          name="item_name_abbr" [(ngModel)]="productMasterModel.item_name_abbr" #item_name_abbr="ngModel" [disabled]="itemDisable" >
+        </div>
+        <!-- Description -->
+        <div class="col-md-4">
+          <div class="label-wrapper d-flex align-items-center">
+            <label for="item_name" class="form-label">Description
+              <span class="required-star">*</span>
+            </label>
+          </div>
+          <textarea class="form-control label-input" id="item_name" name="item_name" rows="1" [ngClass]="{'is-invalid': isDescriptionInvalid}"
+                    [(ngModel)]="productMasterModel.item_name" #item_name="ngModel" [disabled]="itemDisable" ></textarea>
+        </div>
+        <!-- Product Class -->
+        <div class="col-md-3">
+          <div class="label-wrapper d-flex align-items-center">
+            <label for="category_code" class="form-label mb-0">Product Class
+              <span class="required-star">*</span>
+            </label> 
+            <button type="button"  class="btn btn-sm btn-outline-success ms-2" (click)="onAddProductClass()" style="padding: 2px; font-size: 0.5rem;">
+              <i class="fa fa-plus me-1"></i>
+            </button>
+          </div>
+          <select class="form-control label-input" id="category_code" [ngClass]="{'is-invalid': isProductClassInvalid}"
+          name="category_code" [(ngModel)]="productMasterModel.category_code" #category_code="ngModel" [disabled]="itemDisable" >
+            <option *ngFor="let pro of productClassList" [value]="pro.category_code">{{ pro.category_name }}</option>
+          </select>
+        </div>
+      </div>
+      <!-- Nav tabs -->
+        <ul class="nav nav-tabs" id="componentTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="product-tab" data-bs-toggle="tab" data-bs-target="#product" type="button" role="tab"(click)="setActiveTab('ProductDetails')">
+              Product Details
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="features-tab" data-bs-toggle="tab" data-bs-target="#features" type="button" role="tab"(click)="setActiveTab('OtherFeatures')">
+              Specs
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="accessories-tab" data-bs-toggle="tab" data-bs-target="#accessories" type="button" role="tab"(click)="setActiveTab('Accessories')">
+              Accessories
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="consumable-tab" data-bs-toggle="tab" data-bs-target="#consumable" type="button" role="tab" (click)="setActiveTab('Consumable')">
+              Consumable
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="prev_code-tab" data-bs-toggle="tab" data-bs-target="#prev_code" type="button" role="tab">
+              Prev Code
+            </button>
+          </li>
+        </ul>
+      <!-- Nav tabs -->
+   
+      <!-- Tab content -->
+        <div class="tab-content p-3 border border-top-0" id="componentTabsContent">
+          <div class="tab-pane fade show active" id="product" role="tabpanel">
+            <div class="row">
+              <!-- Brand -->
+              <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="productClass" class="form-label  mb-0">Brand</label>
+                  <button type="button" class="btn btn-sm btn-outline-success ms-2" (click)="onAddBrand()"  style="padding: 2px ; font-size: 0.5rem;">
+                    <i class="fa fa-plus me-1"></i> 
+                  </button>
+                </div>
+                <select class="form-control" id="brand_id"
+                name="brand_id" [(ngModel)]="productMasterModel.brand_id" #itemCode="ngModel" [disabled]="itemDisable" >
+                  <option *ngFor="let brand of brandList" [value]="brand.brand_id">{{ brand.brand_name }}</option>
+                </select>
+              </div>
+              <!-- unit -->
+              <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="unit" class="form-label">Unit
+                    <span class="required-star">*</span>
+                  </label>
+                </div>
+                <select class="form-control" id="unitid"  [ngClass]="{'is-invalid': isUnitInvalid}"
+                  name="unitid" [(ngModel)]="productMasterModel.unitid" #unitid="ngModel" [disabled]="itemDisable" >
+                  <option *ngFor="let unit of unitList" [value]="unit.unit_id">{{ unit.unit_name }}</option>
+                </select>
+              </div>
+              <!-- Product Type -->
+              <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="product_type" class="form-label">Product Type</label>
+                </div>
+                <select class="form-control" id="product_type" [ngClass]="{'is-invalid': isProductYeildInvalid}"
+                name="product_type" [(ngModel)]="productMasterModel.product_type" #itemCode="ngModel" [disabled]="itemDisable" >
+                  <option *ngFor="let productType of productTypeList" [value]="productType">{{ productType }}</option>
+                </select>
+              </div>
+              <!-- Color -->
+              <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="type_id" class="form-label">Color</label>
+                </div>
+                <select class="form-control" id="type_id" [ngClass]="{'is-invalid': isProductColourInvalid}"
+                name="type_id" [(ngModel)]="productMasterModel.type_id" #type_id="ngModel" [disabled]="itemDisable" >
+                  <option *ngFor="let type of productColorList" [value]="type.type_id">{{ type.item_type }}</option>
+                </select>
+              </div>
+              <!-- Bin Location -->
+              <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="bin_location" class="form-label">Bin Location</label>
+                </div>
+                <input type="text" class="form-control" id="modelName" [ngClass]="{'is-invalid': isBinLocationInvalid}"
+                name="bin_location" [(ngModel)]="productMasterModel.bin_location" #itemCode="ngModel" [disabled]="itemDisable" >
+              </div>
+              <!-- Product Yield -->
+              <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="product_yield" class="form-label">Yield(Life)</label>
+                </div>
+                <input type="number" class="form-control" id="product_yield"
+                name="product_yield" [(ngModel)]="productMasterModel.product_yield" #product_yield="ngModel" [disabled]="itemDisable" (wheel)="onScrollChange($event)">
+              </div>
+            </div>
+            <div class="row">
+              <!-- Warranty -->
+              <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="warranty" class="form-label">Warranty(Months)</label>
+                </div>
+                <input type="number" class="form-control" id="warranty"  [ngClass]="{'is-invalid': isWarrantyInvalid}"
+                name="warranty" [(ngModel)]="productMasterModel.warranty" #warranty="ngModel" [disabled]="itemDisable" (wheel)="onScrollChange($event)">
+              </div>
+              <!-- List Price -->
+              <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="retail_rate" class="form-label">List Price</label>
+                </div>
+                <input type="number" class="form-control" id="retail_rate"  [ngClass]="{'is-invalid': isRetailRateInvalid}"
+                name="retail_rate" [(ngModel)]="productMasterModel.retail_rate" #itemCode="ngModel" [disabled]="itemDisable" (wheel)="onScrollChange($event)">
+              </div>
+              <!-- Wholesale Price -->
+              <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="final_rate" class="form-label">Wholesale Price</label>
+                </div>
+                <input type="number" class="form-control" id="final_rate"  [ngClass]="{'is-invalid': isFinalRateInvalid}"
+                name="final_rate" [(ngModel)]="productMasterModel.final_rate" #final_rate="ngModel" [disabled]="itemDisable" (wheel)="onScrollChange($event)">
+              </div>
+              <!--Tag Item -->
+              <div class="col-md-2"> 
+                <div class="form-group">
+                  <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="productMasterModel.tag_item" 
+                        name="tag_item" #tag_item="ngModel" [disabled]="itemDisable"  style="margin-top:45px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Hardware</span>
+                  </label>
+                </div>
+              </div>
+              <!--Service Item -->
+              <div class="col-md-2">
+                <div class="form-group ">
+                  <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="productMasterModel.service_item" 
+                    name="service_item" #service_item="ngModel" [disabled]="itemDisable" style="margin-top:45px">
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Service Item</span> 
+                  </label>
+                </div>
+              </div>
+              <!--Inactive-->
+              <div class="col-md-2">
+                <div class="form-group ">
+                  <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="productMasterModel.inactive_item" 
+                    name="inactive_item" #inactive_item="ngModel" [disabled]="itemDisable" style="margin-top:45px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Inactive</span> 
+                  </label>
+                </div>
+              </div>
+            </div>
+            <fieldset class="boader inner-fieldset"> 
+              <div class="row">
+              <!-- Last Landing Cost (KD) -->
+                <div class="col-md-3">
+                  <div class="label-wrapper d-flex align-items-center">
+                    <label for="cost_price" class="form-label">Last Landing Cost (KD)</label>
+                  </div>
+                  <input type="number" class="form-control" id="cost_price"
+                  name="cost_price" [(ngModel)]="productMasterModel.cost_price" #cost_price="ngModel"  disabled  (wheel)="onScrollChange($event)">
+                </div>
+                <!-- Curr Landing Cost(KD) -->
+                <div class="col-md-3">
+                  <div class="label-wrapper d-flex align-items-center">
+                    <label for="avG_COST" class="form-label">Curr Landing Cost(KD)</label>
+                  </div>
+                  <input type="number" class="form-control" id="avG_COST"
+                  name="avG_COST" [(ngModel)]="productMasterModel.avG_COST" #avG_COST="ngModel"  disabled  (wheel)="onScrollChange($event)">
+                </div>
+                <!-- Last Invoice No. -->
+                <div class="col-md-2">
+                  <div class="label-wrapper d-flex align-items-center">
+                    <label for="last_invoice" class="form-label">Last Invoice No.</label>
+                  </div>
+                  <input type="number" class="form-control" id="last_invoice"
+                  name="last_invoice" [(ngModel)]="productMasterModel.last_invoice" #last_invoice="ngModel"  disabled  (wheel)="onScrollChange($event)">
+                </div>
+                <!-- Cpp Wc-->
+                <div class="col-md-2">
+                  <div class="label-wrapper d-flex align-items-center">
+                    <label for="cpP_Bw" class="form-label">Cpp (Wc) -BW</label>
+                  </div>
+                  <input type="number" class="form-control" id="cpP_Bw"
+                  name="cpP_Bw" [(ngModel)]="productMasterModel.cpP_Bw" #cpP_Bw="ngModel" [disabled]="itemDisable" (wheel)="onScrollChange($event)">
+                </div>
+                <!--  Cpp (Wc) - Clr-->
+                <div class="col-md-2">
+                  <div class="label-wrapper d-flex align-items-center">
+                    <label for="cpP_Clr" class="form-label"> Cpp (Wc) - Clr</label>
+                  </div>
+                  <input type="number" class="form-control" id="cpP_Clr"
+                  name="cpP_Clr" [(ngModel)]="productMasterModel.cpP_Clr" #cpP_Clr="ngModel"  [disabled]="itemDisable"  (wheel)="onScrollChange($event)">
+                </div>
+              </div>
+
+              <div class="row">
+                 <!-- Prev Landing Cost (KD) -->
+                <div class="col-md-3">
+                  <div class="label-wrapper d-flex align-items-center">
+                    <label for="prev_pur" class="form-label">Prev Landing Cost (KD)</label>
+                  </div>
+                  <!-- <input type="text" class="form-control" id="prev_pur"
+                  name="prev_pur" [(ngModel)]="productMasterModel.prev_pur" #prev_pur="ngModel"  disabled  (wheel)="onScrollChange($event)"> -->
+                  <input type="text" class="form-control" id="prev_pur"
+                  name="prev_pur" [value]="0"  disabled  (wheel)="onScrollChange($event)">
+                </div>
+                <!-- Curr FOB -->
+                <div class="col-md-3">
+                  <div class="label-wrapper d-flex align-items-center">
+                    <label for="last_pur_rate" class="form-label">Curr FOB (KD)</label>
+                  </div>
+                  <input type="number" class="form-control" id="last_pur_rate"
+                  name="last_pur_rate" [(ngModel)]="productMasterModel.last_pur_rate" #last_pur_rate="ngModel" disabled  (wheel)="onScrollChange($event)">
+                </div>
+                <!-- Fgn Curr FOB (USD) -->
+                <div class="col-md-2">
+                  <div class="label-wrapper d-flex align-items-center">
+                    <label for="fgn_last_pur_rate" class="form-label">Fgn Curr FOB (USD)</label>
+                  </div>
+                  <input type="number" class="form-control" id="fgn_last_pur_rate"
+                  name="fgn_last_pur_rate" [(ngModel)]="productMasterModel.fgn_last_pur_rate" #fgn_last_pur_rate="ngModel" disabled  (wheel)="onScrollChange($event)">
+                </div>
+
+                <!-- Cpp Woc-->
+                <div class="col-md-2">
+                  <div class="label-wrapper d-flex align-items-center">
+                    <label for="cpP_Bw_woc" class="form-label">Cpp (Woc) -BW</label>
+                  </div>
+                  <input type="number" class="form-control" id="cpP_Bw_woc"
+                  name="cpP_Bw_woc" [(ngModel)]="productMasterModel.cpP_Bw_woc" #cpP_Bw_woc="ngModel" [disabled]="itemDisable"  (wheel)="onScrollChange($event)">
+                </div>
+                <!-- Cpp (Woc) - Clr-->
+                <div class="col-md-2">
+                  <div class="label-wrapper d-flex align-items-center">
+                    <label for="cpP_Clr_woc" class="form-label">Cpp (Woc) - Clr</label>
+                  </div>
+                  <input type="number" class="form-control" id="cpP_Clr_woc"
+                  name="cpP_Clr_woc" [(ngModel)]="productMasterModel.cpP_Clr_woc" #cpP_Clr_woc="ngModel" [disabled]="itemDisable"  (wheel)="onScrollChange($event)">
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div class="tab-pane fade" id="features" role="tabpanel">
+            <div class="row">
+              <!-- General Feature -->
+              <div class="col-md-4">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="general_features" class="form-label" class="form-label text-start d-block">General Feature</label>
+                </div>
+                <textarea class="form-control" id="general_features" name="general_features" rows="5"
+                  [(ngModel)]="machineFeaturesList.general_features" #general_features="ngModel" [disabled]="itemDisable"></textarea>
+              </div>
+              <!-- Copier Feature-->
+              <div class="col-md-4">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="copier_features" class="form-label" class="form-label text-start d-block">Copier Feature</label>
+                </div>
+                <textarea class="form-control" id="copier_features" name="copier_features" rows="5"
+                  [(ngModel)]="machineFeaturesList.copier_features" #copier_features="ngModel" [disabled]="itemDisable"></textarea>
+              </div>
+              <!-- Printer Feature-->
+              <div class="col-md-4">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="printer_features" class="form-label" class="form-label text-start d-block">Printer Feature</label>
+                </div>
+                <textarea class="form-control" id="printer_features" name="printer_features" rows="5"
+                  [(ngModel)]="machineFeaturesList.printer_features" #printer_features="ngModel" [disabled]="itemDisable"></textarea>
+              </div>
+            </div>
+            <div class="row">
+              <!-- Scanner Feature-->
+              <div class="col-md-6">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="scanner_features" class="form-label" class="form-label text-start d-block">Scanner Feature</label>
+                </div>
+                <textarea class="form-control" id="scanner_features" name="scanner_features" rows="5"
+                  [(ngModel)]="machineFeaturesList.scanner_features" #scanner_features="ngModel" [disabled]="itemDisable"></textarea>
+              </div>
+              <!-- Paper Handling-->
+              <div class="col-md-6">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="paper_handling" class="form-label" class="form-label text-start d-block">Paper Handling</label>
+                </div>
+                <textarea class="form-control" id="paper_handling" name="paper_handling" rows="5"
+                  [(ngModel)]="machineFeaturesList.paper_handling" #paper_handling="ngModel" [disabled]="itemDisable"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="accessories" role="tabpanel">
+            <div class="container-fluid">
+              <div id="content">
+                <div class="row">
+                  <article class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="widget-body no-padding">
+                      <div class="lightest-gray-bg">
+                        <ngx-datatable
+                          class="table table-bordered styled-grid"
+                          [rows]="AccessoryRows"
+                          [scrollbarV]="scroll"
+                          [style.height.px]="GridHeight"
+                          [columnMode]="'force'"
+                          [headerHeight]="50"
+                          [footerHeight]="60"
+                          [rowHeight]="40"
+                          [limit]="controls.pageSize"
+                          [externalPaging]="false"
+                          [selected]="selected"
+                          [messages]="{ emptyMessage: 'No data to display' }"
+                          [reorderable]="reorderable"
+                          [selectionType]="SelectionType.single"
+                          (select)="onRowSelectAcc($event)"
+                        >
+
+                          <!-- Sl No -->
+                          <ngx-datatable-column name="Sl No">
+                            <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              {{ rowIndex + 1 }}
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                          <!-- Item Code -->
+                          <ngx-datatable-column name="Item Code" prop="item_code">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              <input
+                                class="custom-input"
+                                [(ngModel)]="row.item_code"
+                                name="item_code_{{rowIndex}}"
+                                placeholder="Item Code"
+                                [disabled]="isEditable"
+                              />
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                          <!-- Item Name -->
+                          <ngx-datatable-column name="Item Name" prop="item_name">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              <input
+                                class="custom-input"
+                                [(ngModel)]="row.item_name"
+                                name="item_name_{{rowIndex}}"
+                                placeholder="Item Name"
+                                [disabled]="isEditable"
+                              />
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                          <!-- Quantity -->
+                          <ngx-datatable-column name="Qty" prop="quantity">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              <input
+                                class="custom-input"
+                                type="number"
+                                [(ngModel)]="row.quantity"
+                                name="quantity_{{rowIndex}}"
+                                placeholder="Qty"
+                                [disabled]="isEditable" 
+                              />
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                          <!-- Compulsory -->
+                          <ngx-datatable-column name="Compulsory" prop="compulsory">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              <label class="toggle-switch">
+                                <input
+                                  type="checkbox"
+                                  [(ngModel)]="row.compulsory"
+                                  name="compulsory_{{rowIndex}}"
+                                  [disabled]="isEditable"
+                                  class="custom-input"
+                                />
+                                <span class="slider"></span>
+                              </label>
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                          <!-- Delete -->
+                          <ngx-datatable-column name="Delete">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              <button
+                                class="custom-btn custom-btn-danger custom-btn-sm delete-btn"
+                                (click)="deleteRowAcc(rowIndex)" type="button"
+                                [disabled]="isEditable"
+                              >
+                                🗑️
+                              </button>
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                        </ngx-datatable>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <!-- Footer -->
+                <div class="inbox-compose-footer">
+                  <div class="btn-group">
+                    <button
+                      class="custom-btn custom-btn-add"
+                      (click)="addRowAcc()" type="button"
+                      [disabled]="isEditable"
+                    >
+                      ➕ Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="consumable" role="tabpanel">
+            <div class="container-fluid">
+              <div id="content">
+                <div class="row">
+                  <article class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="widget-body no-padding">
+                      <div class="lightest-gray-bg">
+                        <ngx-datatable
+                          class="table table-bordered styled-grid"
+                          [rows]="ConsumableRows"
+                          [scrollbarV]="scroll"
+                          [style.height.px]="GridHeight"
+                          [columnMode]="'force'"
+                          [headerHeight]="50"
+                          [footerHeight]="60"
+                          [rowHeight]="40"
+                          [limit]="controls.pageSize"
+                          [externalPaging]="false"
+                          [selected]="selected"
+                          [messages]="{ emptyMessage: 'No data to display' }"
+                          [reorderable]="reorderable"
+                          [selectionType]="SelectionType.single"
+                        >
+
+                          <!-- Sl No -->
+                          <ngx-datatable-column name="Sl No">
+                            <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              {{ rowIndex + 1 }}
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                          <!-- Item Code -->
+                          <ngx-datatable-column name="Item Code" prop="item_code">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              <input
+                                class="custom-input"
+                                [(ngModel)]="row.item_code"
+                                name="item_code_{{rowIndex}}"
+                                placeholder="Item Code"
+                                [disabled]="isEditable"
+                              />
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                          <!-- Item Name -->
+                          <ngx-datatable-column name="Item Name" prop="item_name">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              <input
+                                class="custom-input"
+                                [(ngModel)]="row.item_name"
+                                name="item_name_{{rowIndex}}"
+                                placeholder="Item Name"
+                                [disabled]="isEditable"
+                              />
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                          <!-- Quantity -->
+                          <ngx-datatable-column name="Qty" prop="quantity">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              <input
+                                class="custom-input"
+                                type="number"
+                                [(ngModel)]="row.quantity"
+                                name="quantity_{{rowIndex}}"
+                                placeholder="Qty"
+                                [disabled]="isEditable"  (wheel)="onScrollChange($event)"
+                              />
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                          <!-- Compulsory -->
+                          <ngx-datatable-column name="Compulsory" prop="compulsory">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              <label class="toggle-switch">
+                                <input
+                                  type="checkbox"
+                                  [(ngModel)]="row.compulsory"
+                                  name="compulsory_{{rowIndex}}"
+                                  [disabled]="isEditable"
+                                  class="custom-input"
+                                />
+                                <span class="slider"></span>
+                              </label>
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                          <!-- Delete -->
+                          <ngx-datatable-column name="Delete">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                              <button
+                                class="custom-btn custom-btn-danger custom-btn-sm delete-btn"
+                                (click)="deleteRowCon(rowIndex)" type="button"
+                                [disabled]="isEditable"
+                              >
+                                🗑️
+                              </button>
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                        </ngx-datatable>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <!-- Footer -->
+                <div class="inbox-compose-footer">
+                  <div class="btn-group">
+                    <button
+                      class="custom-btn custom-btn-add" type="button"
+                      (click)="addRowCon()"
+                      [disabled]="isEditable"
+                    >
+                      ➕ Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="prev_code" role="tabpanel">
+            <div class="code-save-full">
+              <ul class="list-group">
+                <li
+                  class="list-group-item d-flex justify-content-between align-items-center"
+                  *ngFor="let item of prevCodeSave"
+                >
+                  <div class="text-start">
+                    <strong>Prev Code:</strong> {{ item.prev_code }}<br>
+                    <strong>Updated Date:</strong> {{ item.updated_date }}
+                  </div>
+                </li>
+
+                <!-- Fallback message when no data -->
+                <li
+                  class="list-group-item d-flex justify-content-between align-items-center"
+                  *ngIf="prevCodeSave.length === 0"
+                >
+                  No data available.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      <!-- Tab content -->
+       <br>
+      <!-- Footer Buttons -->
+      <div class="inbox-compose-footer">
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary" [disabled]="saveDisable">
+            <i class="fa fa-save"></i> Save
+          </button>
+          <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+            <i class="fa fa-ban"></i> Cancel
+          </button>
+        </div>
+      </div>
+      <!-- Footer Buttons -->
+  </form>
+</div>
+
+<!------------------------------------------------------------- Modal Sections------------------------------------------------------------------------------------------>
+
+<div *ngIf="ShowProductClass" class="modal fade show d-block" tabindex="-1" role="dialog" aria-labelledby="customModalLabel" aria-hidden="true">
+  <div class="custom-modal-dialog">
+    <div class="custom-modal-content">
+      <div class="custom-modal-header">
+        <h5 class="custom-modal-title">➕ Add Product Class Here...</h5>
+        <button type="button" class="custom-close-btn" (click)="addProductClassCancel()" aria-label="Close" title="Close">
+          <i class="fas fa-times text-danger"></i>
+        </button>
+      </div>
+      <div class="custom-modal-body">
+        <div class="row g-3">
+          <div class="col-md-10">
+            <div class="label-wrapper d-flex align-items-center">
+              <label for="category_name" class="custom-label">Product Class</label>
+            </div>
+            <input type="text" class="form-control shadow-sm" id="category_name" name="category_name" [(ngModel)]="productClassItems.category_name" #category_name="ngModel"
+              placeholder="Enter Product Class" required [class.is-invalid]="category_name.invalid && category_name.touched"/>
+          </div>
+          <div class="col-md-10">
+            <div class="label-wrapper d-flex align-items-center">
+              <label for="deptno" class="form-label">Sub Category</label>
+            </div>
+            <select class="form-control shadow-sm" id="deptno" [(ngModel)]="productClassItems.deptno" name="deptno" #deptno="ngModel" 
+              required [class.is-invalid]="deptno.invalid && deptno.touched">
+              <option *ngFor="let dept of departmentList" [value]="dept.deptno" >
+                {{ dept.deptname }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="custom-modal-footer">
+        <button class="custom-btn-primary" [disabled]="deptno.invalid || category_name.invalid" (click)="addProductClassOk()">Ok</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="ShowAddBrand" class="modal fade show d-block" tabindex="-1" role="dialog" aria-labelledby="customModalLabel" aria-hidden="true">
+  <div class="custom-modal-dialog">
+    <div class="custom-modal-content">
+      <div class="custom-modal-header">
+        <h5 class="custom-modal-title">➕ Add Brand Here...</h5>
+        <button type="button" class="custom-close-btn" (click)="addBrandCancel()" aria-label="Close" title="Close">
+          <i class="fas fa-times text-danger"></i>
+        </button>
+      </div>
+      <div class="custom-modal-body">
+        <div class="row g-3">
+          <div class="col-md-10">
+              <div class="label-wrapper d-flex align-items-center">
+                <label for="category_name" class="custom-label">Brand Name</label>
+              </div>
+              <input type="text" class="form-control shadow-sm" id="brand_name" name="brand_name" [(ngModel)]="brandItems.brand_name" #brand_name="ngModel"
+              placeholder="Enter Brand name" required [class.is-invalid]="brand_name.invalid && brand_name.touched"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="custom-modal-footer">
+        <button class="custom-btn-primary" [disabled]="brand_name.invalid" (click)="addBrandOk()">Ok</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showModalAccessory" class="modal fade show d-block" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg" style="width: 40%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">➕ Add New Item</h5>
+                </div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto; overflow-x: hidden">
+            <div class="form-group">
+                <input
+                type="text"
+                class="custom-input"
+                placeholder="Search by Item Code or Name"
+                [(ngModel)]="filterText"
+                />
+            </div>
+
+            <ul class="list-group mt-3">
+                <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+                *ngFor="let item of filteredListAcc"
+                >
+                <div class="text-start">
+                    <strong>{{ item.item_code }}</strong> - {{ item.item_name }}
+                </div>
+                <div>
+                    <input
+                    type="checkbox"
+                    [(ngModel)]="item.selected"
+                    (change)="onCheckboxChangeAcc(item, $event)"
+                    />
+                </div>
+                </li>
+            </ul>
+            </div>
+            <div class="modal-footer">
+                    <div class="text-muted">
+                        Total: {{ modalListAccessory.length }} | Selected: {{ selectedCountAcc }}
+                    </div>
+                <button class="btn btn-primary" (click)="modalOkAcc()">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="showModalConsumable" class="modal fade show d-block" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg" style="width: 40%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">➕ Add New Item</h5>
+                </div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto; overflow-x: hidden">
+            <div class="form-group">
+                <input
+                type="text"
+                class="custom-input"
+                placeholder="Search by Item Code or Name"
+                [(ngModel)]="filterText"
+                />
+            </div>
+
+            <ul class="list-group mt-3">
+                <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+                *ngFor="let item of filteredListCon"
+                >
+                <div class="text-start">
+                    <strong>{{ item.item_code }}</strong> - {{ item.item_name }}
+                </div>
+                <div>
+                    <input
+                    type="checkbox"
+                    [(ngModel)]="item.selected"
+                    (change)="onCheckboxChangeCon(item, $event)"
+                    />
+                </div>
+                </li>
+            </ul>
+            </div>
+            <div class="modal-footer">
+                    <div class="text-muted">
+                        Total: {{ modalListConsumable.length }} | Selected: {{ selectedCountCon }}
+                    </div>
+                <button class="btn btn-primary" (click)="modalOkCon()">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+<div class="login-container">
+  <div class="login-wrapper d-flex">
+    <div class="login-content">
+      <h1>Kuwait Digital Technology</h1>
+      <p>Kuwait Digital Technologies Co. is a Business Supplies & Equipment.
+        Company located in block 1, street 6,
+        Shuwaikh industrial area, Shuwaikh, Kuwait, 2122, KW
+      </p>
+    </div>
+    <div class="login-card">
+      <div class="login-header">
+         <img [src]="logoPath" alt="Logo" class="logo" />
+        <h2>Welcome Back</h2>
+        <p>Please sign in to continue</p>
+      </div>
+
+       <!-- Error message -->
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <form (ngSubmit)="login()" class="login-form">
+        <div class="form-group">
+          <i class="fas fa-user"></i>
+          <input type="text" placeholder="Username" [(ngModel)]="loginModel.user_id" name="username" required />
+        </div>
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" placeholder="Password" [(ngModel)]="loginModel.password" name="password" required />
+        </div>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
+</div>

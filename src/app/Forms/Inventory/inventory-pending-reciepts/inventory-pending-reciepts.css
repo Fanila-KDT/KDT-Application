@@ -1,0 +1,195 @@
+/* Outer wrapper for the grid */
+.table-wrapper {
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  padding: 12px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Grid container */
+::ng-deep .styled-grid {
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 13px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Header cells */
+::ng-deep .styled-grid .datatable-header-cell {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+  padding: 6px 10px;
+  border-right: 1px solid #ddd;
+  vertical-align: top;
+}
+
+/* Body cells */
+::ng-deep .styled-grid .datatable-body-cell {
+  padding: 6px 10px;
+  border-right: 1px solid #eee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Row styling */
+::ng-deep .styled-grid .datatable-row-wrapper {
+  border-bottom: 1px solid #eee;
+  min-height: 30px;
+}
+
+::ng-deep .styled-grid .datatable-body-row:hover {
+  background-color: #f1f1f1;
+}
+
+::ng-deep .styled-grid .datatable-body-row.active {
+  background-color: #e3f2fd;
+}
+
+/* Unified filter + label styling */
+.datatable-heading {
+  font-size: 12px;
+  font-weight: 500;
+  color: #555;
+  text-align: center;
+}
+
+.search {
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-bottom: 4px;
+}
+
+/* Footer styling */
+.datatable-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  font-size: 13px;
+  padding: 10px;
+}
+
+.datatable-footer .btn {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.datatable-footer select {
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .datatable-footer .row {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Outer border around the entire ngx-datatable */
+::ng-deep .styled-grid {
+  border: 1px solid #bbb;         /* Outer border */
+  border-radius: 6px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 0;
+}
+
+/* Add bottom border to the header section */
+::ng-deep .styled-grid .datatable-header {
+  border-bottom: 1px solid #ccc;
+}
+
+.ngx-datatable .datatable-body {
+  width: 100%;
+  height: auto;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+/**************************************************************/
+button.active {
+  font-weight: bold;
+  border-color: #007bff;
+  background-color: #e7f1ff;
+}
+
+/*************************Footer Boarder******************************/
+.datatable-footer-border {
+  border-top: 1px solid #dee2e6; /* Light gray border */
+  padding-top: 10px; /* Optional: adds spacing above the border */
+}
+
+/**************************Footer Boarder*****************************/
+::ng-deep .text-left {
+  text-align: left !important;
+}
+
+/*--------------------------List Loader----------------------------------------------*/
+.spinner_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4); /* semi-transparent dark overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* ensure it's above everything */
+}
+
+.loader {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #3498db; /* spinner color */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.btn-book {
+  margin-top: -4px;   /* adjust upward */
+  font-size: 0.85rem; /* optional smaller size */
+}
+
+/*---------------------------------- Alert Styles ----------------------------------*/
+
+/* Base snackbar style */
+::ng-deep .custom-snackbar {
+  color: #ffffff !important;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 14px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(4, 145, 150, 0.2);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* Info Snackbar */
+::ng-deep .custom-snackbar.info {
+  background: linear-gradient(135deg, #1976d2, #21cbf3); /* Blue tones */
+}
+
+/* Success Snackbar */
+::ng-deep .custom-snackbar.success {
+  background: linear-gradient(135deg, #2e7d32, #74b377); /* Green tones */
+}
+
+/* Error Snackbar */
+::ng-deep .custom-snackbar.error {
+  background: linear-gradient(135deg, #d32f2f, #bb5e5e); /* Red tones */
+}

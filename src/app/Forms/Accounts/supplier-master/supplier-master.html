@@ -1,0 +1,77 @@
+<div class="bg-body-secondary text-center py-5 rounded-2"> 
+  <h2 class="display-6 fw-bold">Supplier Master</h2> 
+  <div class="container-fluid" >
+    <fieldset class="fieldset-custom">
+      <div class="row g-3">
+
+        <!-- Button Group -->
+        <div class="col-md-12 col-12">
+          <div class="btn-toolbar flex-wrap gap-1 justify-content-start" style="margin-top:2px">
+            <button type="button" class="btn btn-primary" (click)="buttonClick('N')" [disabled]="newDisable">
+              <i class="fa fa-plus me-1"></i> New
+            </button>
+            <button type="button" class="btn btn-info" (click)="buttonClick('M')" [disabled]="modifyDisable">
+              <i class="fa fa-edit me-1"></i> Modify
+            </button>
+            <button type="button" class="btn btn-danger" (click)="buttonClick('D')" [disabled]="deleteDisable">
+              <i class="fa fa-trash me-1"></i> Delete
+            </button>
+            <button type="button" class="btn btn-secondary" [disabled]="searchDisable" (click)="Search()">
+              <i class="fa fa-search me-1"></i> Search
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="Refresh()" [disabled]="refreshDisable">
+              <i class="fa fa-refresh me-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+  <!-- List Section -->
+    <supplier-master-list></supplier-master-list> 
+    <fieldset class="border  mb-4">
+      <supplier-master-details></supplier-master-details> 
+    </fieldset>
+</div>
+
+<div *ngIf="showModalSearch" class="modal fade show d-block" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-lg" style="max-width: 500px;">
+    <div class="modal-content shadow-lg rounded">
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title text-primary">🔍 Search Here...</h5>
+        <button type="button" class="btn btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-3"
+                (click)="modalCancel()" aria-label="Close" title="Close">
+          <i class="fas fa-times text-danger"></i>
+        </button>
+      </div>
+      <div class="modal-body px-4 py-3">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="ac_code" class="form-label fw-semibold">Account Code</label>
+            <input type="number" class="form-control form-control-sm" id="ac_code"
+                  name="ac_code" [(ngModel)]="supplierMasterModalSearch.ac_code" #ac_code="ngModel"
+                  placeholder="Enter Account Code">
+          </div>
+
+          <div class="col-md-6">
+            <label for="account_name" class="form-label fw-semibold">Account Name</label>
+            <input type="text" class="form-control form-control-sm" id="account_name"
+                  name="account_name" [(ngModel)]="supplierMasterModalSearch.account_name" #account_name="ngModel"
+                  placeholder="Enter Account Name">
+          </div>
+
+        <div class="col-md-6">
+            <label for="Account account_description" class="form-label fw-semibold">Description</label>
+            <input type="text" class="form-control form-control-sm" id="Account account_description"
+                  name="Account account_description" [(ngModel)]="supplierMasterModalSearch.account_description" #Account account_description="ngModel"
+                  placeholder="Enter Description">
+          </div>
+      </div>
+      <div class="modal-footer bg-light border-top">
+        <button class="btn btn-outline-secondary" (click)="modalCancel()">Cancel</button>
+        <button class="btn btn-primary" (click)="modalSearch()">Search</button>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,297 @@
+<div class="container-fluid">
+  <form ngForm #SupplierMasterForm="ngForm" name="form" (ngSubmit)="SupplierMasterForm.form.valid && onSubmit(SupplierMasterForm)" novalidate>
+      <div class="row">
+        <!-- Warehouse Name -->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="godown_name" class="form-label">Warehouse Name/ Branch
+              <span class="required-star">*</span>
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="godown_name" [disabled]="itemDisable" [ngClass]="{'is-invalid': isWHNameInvalid}"
+              name="godown_name" [(ngModel)]="warehouseMasterModel.godown_name" #godown_name="ngModel">
+          </div>
+        </div>
+        <!-- Prefix -->
+        <div class="col-md-2">
+          <div class="label-wrapper"> 
+            <label for="godown_name_abbr" class="form-label">Prefix
+              <span class="required-star">*</span>
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="godown_name_abbr" [disabled]="itemDisable" [ngClass]="{'is-invalid': isPrefixInvalid}"
+              name="godown_name_abbr" [(ngModel)]="warehouseMasterModel.godown_name_abbr" #godown_name_abbr="ngModel">
+          </div>
+        </div>
+        <!-- Profit Center -->
+        <div class="col-md-2">
+          <div class="label-wrapper d-flex align-items-center">
+            <label for="productClass" class="form-label  mb-0">Profit Center</label>
+          </div>
+          <select class="label-input" id="centercode" 
+            name="centercode" [(ngModel)]="warehouseMasterModel.centercode" #centercode="ngModel" [disabled]="itemDisable" >
+            <option *ngFor="let main of profitList" [value]="main.centercode">{{ main.centername }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <!--Allow FRQ -->
+        <div class="col-md-2"> 
+          <div class="form-group-wh">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" class="checkbox style-0" [(ngModel)]="warehouseMasterModel.frq" 
+                  name="frq" #frq="ngModel" [disabled]="itemDisable"  style="margin-top:45px"> 
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Allow FRQ</span>
+            </label>
+          </div>
+        </div>
+        <!--Allow Invoice -->
+        <div class="col-md-2">
+          <div class="form-group-wh ">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" class="checkbox style-0" [(ngModel)]="warehouseMasterModel.invoice" 
+              name="invoice" #invoice="ngModel" [disabled]="itemDisable" style="margin-top:45px">
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Allow Invoice</span> 
+            </label>
+          </div>
+        </div>
+        <!--Allow Purchase -->
+        <div class="col-md-2">
+          <div class="form-group-wh ">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" class="checkbox style-0" [(ngModel)]="warehouseMasterModel.purchase" 
+              name="purchase" #purchase="ngModel" [disabled]="itemDisable" style="margin-top:45px">
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Allow Purchase</span> 
+            </label>
+          </div>
+        </div>
+        <!--Inhouse Store -->
+        <div class="col-md-2">
+          <div class="form-group-wh ">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" class="checkbox style-0" [(ngModel)]="warehouseMasterModel.inhouse" 
+              name="inhouse" #inhouse="ngModel" [disabled]="itemDisable" style="margin-top:45px">
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Inhouse Store</span> 
+            </label>
+          </div>
+        </div>
+        <!--Virtual Store -->
+        <div class="col-md-2">
+          <div class="form-group-wh ">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" class="checkbox style-0" [(ngModel)]="warehouseMasterModel.virtual_store" 
+              name="virtual_store" #virtual_store="ngModel" [disabled]="itemDisable" style="margin-top:45px">
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Virtual Store</span> 
+            </label>
+          </div>
+        </div>
+      </div>
+
+    <!--Sub List-->
+
+      <div id="content">
+        <div class="row">
+          <article class="col-sm-12 col-md-12 col-lg-12"> 
+            <div>
+              <div class="widget-body no-padding">
+                <div class="lightest-gray-bg">
+                  <ngx-datatable
+                    class="table table-bordered styled-grid"
+                    [rows]="rows"
+                    [scrollbarV]="scroll"
+                    [scrollbarH]="scroll"
+                    [style.height.px]="170"
+                    [columnMode]="'force'"
+                    [headerHeight]="50"
+                    [rowHeight]="45"
+                    [limit]="controls.pageSize"
+                    [externalPaging]="false"
+                    [selected]="selected"
+                    [messages]="{ emptyMessage: 'No data to display' }"
+                    [reorderable]="reorderable"
+                    [selectionType]="SelectionType.single"
+                    (select)="onRowSelect($event)"
+                  >
+
+                    <ngx-datatable-column name="Payment Mode" prop="paY_CODE">
+                      <ng-template ngx-datatable-header-template>
+                        <span class="datatable-heading">Payment Mode</span>
+                      </ng-template>
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <ng-select [items]="paycodeList" bindLabel="pay_name" bindValue="pay_code" [(ngModel)]="row.paY_CODE" [searchable]="true"
+                          [clearable]="false" [disabled]="true" [appendTo]="'body'"  class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
+                        >
+                        </ng-select>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column name="Account Name" prop="accounT_CODE"  [width]="300">
+                      <ng-template ngx-datatable-header-template>
+                        <span class="datatable-heading">Account Name</span>
+                      </ng-template>
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <div class="input-wrapper">
+                          <ng-select [items]="acccodeList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="row.accounT_CODE" [searchable]="true"
+                            [clearable]="false" [disabled]="itemDisable" [appendTo]="'body'"  class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
+                            (change)="onAccNAmeChange($event, row, 'accounT_CODE')"  [ngClass]="{'is-invalid': isAcctNameInvalid}"
+                          >
+                          </ng-select>
+                        </div>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                   <ngx-datatable-column name="Sales Account" prop="saleS_AC_CODE" [width]="300">
+                    <ng-template ngx-datatable-header-template>
+                      <span class="datatable-heading">Sales Account</span>
+                    </ng-template>
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <div class="input-wrapper">
+                        <ng-select [items]="salAcList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="row.saleS_AC_CODE"
+                          [searchable]="true" [clearable]="false" [disabled]="itemDisable" [appendTo]="'body'"
+                          class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
+                          (change)="onAccNAmeChange($event, row, 'saleS_AC_CODE')" [ngClass]="{'is-invalid': isSalAcInvalid}"
+                          >
+                        </ng-select>
+                      </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column name="Cost of Sales Account" prop="cS_AC_CODE" [width]="300">
+                    <ng-template ngx-datatable-header-template>
+                      <span class="datatable-heading">Cost of Sales Account</span>
+                    </ng-template>
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <div class="input-wrapper">
+                        <ng-select [items]="CostSalAcList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="row.cS_AC_CODE"
+                          [searchable]="true" [clearable]="false" [disabled]="itemDisable" [appendTo]="'body'"
+                          class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
+                          (change)="onAccNAmeChange($event, row, 'cS_AC_CODE')" [ngClass]="{'is-invalid': isCostSalAcInvalid}">
+                        </ng-select>
+                      </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column name="Inventory Accout" prop="inventorY_AC_CODE" [width]="300">
+                    <ng-template ngx-datatable-header-template>
+                      <span class="datatable-heading">Inventory Accout</span>
+                    </ng-template>
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <div class="input-wrapper">
+                        <ng-select [items]="InvAccList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="row.inventorY_AC_CODE"
+                          [searchable]="true" [clearable]="false" [disabled]="itemDisable" [appendTo]="'body'"
+                          class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
+                          (change)="onAccNAmeChange($event, row, 'inventorY_AC_CODE')" [ngClass]="{'is-invalid': isInvAccInvalid}"
+                          >
+                        </ng-select>
+                      </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column name="Sales Discont" prop="saleS_DISC_CODE" [width]="300">
+                    <ng-template ngx-datatable-header-template>
+                      <span class="datatable-heading">Sales Discont</span>
+                    </ng-template>
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <div class="input-wrapper">
+                        <ng-select [items]="SalesDisList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="row.saleS_DISC_CODE"
+                          [searchable]="true" [clearable]="false" [disabled]="itemDisable" [appendTo]="'body'"
+                          class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
+                          (change)="onAccNAmeChange($event, row, 'saleS_DISC_CODE')"[ngClass]="{'is-invalid': isSalesDisInvalid}"
+                          >
+                        </ng-select>
+                      </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column name="Gift Account" prop="gifT_AC_CODE" [width]="300">
+                    <ng-template ngx-datatable-header-template>
+                      <span class="datatable-heading">Gift Account</span>
+                    </ng-template>
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <div class="input-wrapper">
+                        <ng-select [items]="GiftAccList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="row.gifT_AC_CODE"
+                          [searchable]="true" [clearable]="false" [disabled]="itemDisable" [appendTo]="'body'"
+                          class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
+                          (change)="onAccNAmeChange($event, row, 'gifT_AC_CODE')" [ngClass]="{'is-invalid': isGiftAccInvalid}"
+                          >
+                        </ng-select>
+                      </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column name="Stock Adjustment" prop="adjustmenT_CODE" [width]="300">
+                    <ng-template ngx-datatable-header-template>
+                      <span class="datatable-heading">Stock Adjustment</span>
+                    </ng-template>
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <div class="input-wrapper">
+                        <ng-select [items]="StockAdjList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="row.adjustmenT_CODE"
+                          [searchable]="true" [clearable]="false" [disabled]="itemDisable" [appendTo]="'body'"
+                          class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
+                          (change)="onAccNAmeChange($event, row, 'adjustmenT_CODE')" [ngClass]="{'is-invalid': isStockAdjInvalid}"
+                          >
+                        </ng-select>
+                      </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column name="Service" prop="servicE_AC_CODE" [width]="300">
+                    <ng-template ngx-datatable-header-template>
+                      <span class="datatable-heading">Service</span>
+                    </ng-template>
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <div class="input-wrapper">
+                        <ng-select [items]="ServiceAccList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="row.servicE_AC_CODE"
+                          [searchable]="true" [clearable]="false" [disabled]="itemDisable" [appendTo]="'body'"
+                          class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
+                          (change)="onAccNAmeChange($event, row, 'servicE_AC_CODE')" [ngClass]="{'is-invalid': isServiceAccInvalid}"
+                          >
+                        </ng-select>
+                      </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column name="Warranty Expense" prop="warR_EXP_AC_CODE" [width]="300">
+                    <ng-template ngx-datatable-header-template>
+                      <span class="datatable-heading">Warranty Expense</span>
+                    </ng-template>
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <div class="input-wrapper">
+                        <ng-select [items]="WarExpList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="row.warR_EXP_AC_CODE"
+                          [searchable]="true" [clearable]="false" [disabled]="itemDisable" [appendTo]="'body'"
+                          class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
+                          (change)="onAccNAmeChange($event, row, 'warR_EXP_AC_CODE')" [ngClass]="{'is-invalid': isWarExpInvalid}"
+                          >
+                        </ng-select>
+                      </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  </ngx-datatable>
+                </div>
+              </div> 
+            </div>
+          </article>
+        </div>
+      </div>        
+
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer">
+      <div class="btn-group">
+        <button type="submit" class="btn btn-primary" [disabled]="saveDisable">
+          <i class="fa fa-save"></i> Save
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="CancelclickMethod()">
+          <i class="fa fa-ban"></i> Cancel
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

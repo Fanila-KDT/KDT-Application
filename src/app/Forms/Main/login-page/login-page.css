@@ -1,0 +1,159 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* vertical centering */
+  align-items: center;       /* horizontal centering */
+  height: 100vh;             /* full viewport height */
+  width: 100vw;              /* full viewport width */
+  background: linear-gradient(135deg, #a7c2e2, #d2deeb,#7aced4,#97b2d4,#7aa4d4, #fdfdfd); /* optional background */
+  color: #fff;
+}
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;   /* align at top */
+  gap: 40px;                 /* space between login-content and login-card */
+  padding: 20px;
+}
+
+.login-content {
+  margin-right: 40px;  /* pushes login-card away */
+}
+
+.login-card {
+  background:linear-gradient(135deg, #f1eeee, #f5f4f1);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  width: 380px;
+  text-align: center;
+  animation: fadeIn 0.8s ease;
+}
+
+.login-header .logo {
+  width: 250px;
+  margin-bottom: 10px;
+}
+
+.login-header h2 {
+  margin: 10px 0 5px;
+  font-size: 24px;
+  color: #333;
+}
+
+.login-header p {
+  color: #777;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+.login-content p {
+  color: #706767;                /* softer dark gray for readability */
+  font-size: 16px;            /* slightly larger text */
+  line-height: 1.6;           /* comfortable spacing between lines */
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-weight: 400;           /* balanced weight */
+  letter-spacing: 0.5px;      /* subtle spacing for elegance */
+  text-align: justify;        /* neat alignment */
+  max-width: 500px;           /* keeps text from stretching too wide */
+  padding: 10px 15px;         /* breathing space inside */
+  border-radius: 8px;         /* rounded corners */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* subtle shadow for depth */
+}
+
+
+.login-form .form-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.login-form i {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.login-form input:focus {
+  border-color: #2575fc;
+  outline: none;
+}
+
+.login-form button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .login-wrapper {
+    flex-direction: column;  /* stack vertically */
+    gap: 20px;               /* smaller gap */
+  }
+}
+
+.error-message {
+  color: #d9534f;          /* Bootstrap danger red */
+  background: #f8d7da;     /* light red background */
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+
+/*-------------------------------------Aler Box Styles--------------------------------------------------*/
+/* Base snackbar style */
+::ng-deep .custom-snackbar {
+  color: #ffffff !important;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 14px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* Info Snackbar */
+::ng-deep .custom-snackbar.info {
+  background: linear-gradient(135deg, #1976d2, #21cbf3); /* Blue tones */
+}
+
+/* Success Snackbar */
+::ng-deep .custom-snackbar.success {
+  background: linear-gradient(135deg, #2e7d32, #66bb6a); /* Green tones */
+}
+
+/* Error Snackbar */
+::ng-deep .custom-snackbar.error {
+  background: linear-gradient(135deg, #d32f2f, #ef5350); /* Red tones */
+}

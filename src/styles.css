@@ -1,1 +1,57 @@
-/* You can add global styles to this file, and also import other style files */
+/*------------------------------------------Date picker -----------------------------------------------------------*/
+/* Container */
+.bs-datepicker-container {
+  font-family: 'Segoe UI', sans-serif;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: none;
+  overflow: hidden;
+}
+
+/* Header */
+.bs-datepicker-head {
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Navigation arrows */
+.bs-datepicker-head .prev,
+.bs-datepicker-head .next {
+  color: white;
+}
+
+/* Calendar cells */
+.bs-datepicker-body table td span {
+  border-radius: 50%;
+  padding: 6px 10px;
+  font-size: 14px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.bs-datepicker-body table td span:hover {
+  background-color: #e2e6ea;
+  cursor: pointer;
+}
+
+.bs-datepicker-body table td span.selected {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Today’s date */
+.bs-datepicker-body table td span.today {
+  border: 1px solid #007bff;
+}
+
+.datepicker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

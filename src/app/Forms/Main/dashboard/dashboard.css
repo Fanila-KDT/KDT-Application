@@ -1,0 +1,39 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* vertical centering */
+  align-items: center;       /* horizontal centering */
+  height: 94vh;             /* full viewport height */
+  width: 85.8vw;              /* full viewport width */
+  background: linear-gradient(135deg, #a7c2e2, #d2deeb,#7aced4,#97b2d4,#7aa4d4, #fdfdfd); /* optional background */
+  color: #fff;
+}
+
+/*-------------------------------------Aler Box Styles--------------------------------------------------*/
+/* Base snackbar style */
+::ng-deep .custom-snackbar {
+  color: #ffffff !important;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 14px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* Info Snackbar */
+::ng-deep .custom-snackbar.info {
+  background: linear-gradient(135deg, #1976d2, #21cbf3); /* Blue tones */
+}
+
+/* Success Snackbar */
+::ng-deep .custom-snackbar.success {
+  background: linear-gradient(135deg, #2e7d32, #66bb6a); /* Green tones */
+}
+
+/* Error Snackbar */
+::ng-deep .custom-snackbar.error {
+  background: linear-gradient(135deg, #d32f2f, #ef5350); /* Red tones */
+}

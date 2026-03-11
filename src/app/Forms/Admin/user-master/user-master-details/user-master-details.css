@@ -1,0 +1,17 @@
+.table-scroll {
+  max-height: 250px;       /* adjust height as needed */
+  overflow-y: auto;        /* vertical scroll only */
+  overflow-x: hidden;
+}
+
+/* Keep header fixed while body scrolls */
+.table-scroll thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f8f9fa; /* match Bootstrap table-light */
+  z-index: 2;               /* ensure header stays above rows */
+}
+
+.select-input.is-invalid{
+  border: 1px solid red !important;
+}

@@ -1,0 +1,117 @@
+/* Main dashboard container */
+.dashboard-content {
+  padding: 2rem;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Summary cards */
+.summary-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: transform 0.2s ease;
+}
+.summary-card:hover {
+  transform: translateY(-4px);
+}
+.summary-card h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+.summary-card .value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2e86de;
+}
+.summary-card .change {
+  font-size: 0.9rem;
+  color: #27ae60;
+}
+
+/* Chart container */
+.chart-box {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+/* Circular progress indicators */
+.progress-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.progress-indicator .label {
+  font-size: 1rem;
+  color: #555;
+  margin-top: 1rem;
+}
+.progress-indicator .balance {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+/* Responsive grid layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.summary-card,
+.chart-box,
+.progress-indicator {
+  display: block;              /* make <a> behave like a box */
+  text-decoration: none;       /* remove underline */
+  color: inherit;              /* keep text color */
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover,
+.chart-box:hover,
+.progress-indicator:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/*---------------------------------- Alert Styles ----------------------------------*/
+
+/* Base snackbar style */
+::ng-deep .custom-snackbar {
+  color: #ffffff !important;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 14px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(4, 145, 150, 0.2);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* Info Snackbar */
+::ng-deep .custom-snackbar.info {
+  background: linear-gradient(135deg, #1976d2, #21cbf3); /* Blue tones */
+}
+
+/* Success Snackbar */
+::ng-deep .custom-snackbar.success {
+  background: linear-gradient(135deg, #2e7d32, #74b377); /* Green tones */
+}
+
+/* Error Snackbar */
+::ng-deep .custom-snackbar.error {
+  background: linear-gradient(135deg, #d32f2f, #bb5e5e); /* Red tones */
+}

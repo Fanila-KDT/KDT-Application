@@ -1,0 +1,86 @@
+<div class="container-fluid">
+  <form ngForm #AccountMasterForm="ngForm" name="form" (ngSubmit)="AccountMasterForm.form.valid && onSubmit(AccountMasterForm)" novalidate>
+      <div class="row">
+        <!-- Account Code -->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="ac_code" class="form-label">Account Code</label>
+          </div>
+          <input type="text" class="label-input" id="ac_code" [disabled]="true"
+            name="ac_code" [(ngModel)]="accountMasterModel.ac_code" #ac_code="ngModel">
+        </div>
+        <!-- Account Name -->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="account_name" class="form-label">Account Name
+              <span class="required-star">*</span>
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="account_name" [disabled]="itemDisable" [ngClass]="{'is-invalid': isAccNameInvalid}"
+              name="account_name" [(ngModel)]="accountMasterModel.account_name" #account_name="ngModel">
+            </div>
+        </div>
+        
+        <div class="col-md-1 spacing-left">
+            <!--Active -->
+            <div class="col-md-9"> 
+                <div class="form-group">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox style-0" [(ngModel)]="accountMasterModel.account_status" 
+                            name="account_status" #account_status="ngModel" [disabled]="itemDisable" style="padding-right: 52px;"> 
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label">Active</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="row">
+        <!-- Main Group -->
+        <div class="col-md-2">
+          <div class="label-wrapper d-flex align-items-center">
+            <label for="productClass" class="form-label  mb-0">Main Group
+              <span class="required-star">*</span>
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <select class="label-input" id="main_group_code" (change)="mainGroupChange($event)" [ngClass]="{'is-invalid': isMainGrpInvalid}"
+              name="main_group_code" [(ngModel)]="accountMasterModel.main_group_code" #main_group_code="ngModel" [disabled]="itemDisable" >
+              <option *ngFor="let main of mainList" [value]="main.main_group_code">{{ main.group_name }}</option>
+            </select>
+          </div>
+        </div>
+        <!-- sub -->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="sub" class="form-label">Sub Group</label>
+          </div>
+          <select class="label-input" id="sub_group_code"
+            name="sub_group_code" [(ngModel)]="accountMasterModel.sub_group_code" #sub_group_code="ngModel" [disabled]="itemDisable" >
+            <option *ngFor="let sub of subList" [value]="sub.sub_group_code">{{ sub.sub_group_name }}</option>
+          </select>
+        </div>
+        <!-- Description -->
+        <div class="col-md-4">
+          <div class="label-wrapper">
+            <label for="account_description" class="form-label">Description</label>
+          </div>
+          <textarea class="label-input" id="account_description" name="account_description" rows="2"
+            [(ngModel)]="accountMasterModel.account_description" #account_description="ngModel" [disabled]="itemDisable" ></textarea>
+        </div>
+      </div>
+
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer">
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary" [disabled]="saveDisable">
+            <i class="fa fa-save"></i> Save
+          </button>
+          <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+            <i class="fa fa-ban"></i> Cancel
+          </button>
+        </div>
+      </div>
+  </form>
+</div>

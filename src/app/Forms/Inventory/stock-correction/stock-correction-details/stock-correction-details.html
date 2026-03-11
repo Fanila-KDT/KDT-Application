@@ -1,0 +1,424 @@
+ <div class="container-fluid">
+  <form ngForm #StockCorrectionForm="ngForm" name="form" (ngSubmit)="StockCorrectionForm.form.valid && onSubmit(StockCorrectionForm)" novalidate>
+    <div class="row">
+       <!-- <div class="input-wrapper">
+          <input type="text" class="label-input" id="voucher_id" disabled name="voucher_id"  name="voucher_id" 
+          [(ngModel)]="stockCorrection.voucher_id" #voucher_id="ngModel">
+      </div>   -->
+      <!-- Warehouse -->
+        <div class="col-md-2">
+          <div class="label-wrapper d-flex align-items-center">
+              <label for="godown_code" class="form-label mb-0">Warehouse
+                <span class="required-star">*</span>
+              </label>
+          </div>
+          <div class="input-wrapper">
+              <ng-select  [items]="godownList" bindLabel="from_godown" bindValue="godown_code" [(ngModel)]="stockCorrection.godown_code" class="select-input"
+                [disabled]="isEditable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   [ngClass]="{'is-invalid': isWarehouseInvalid}"> 
+              </ng-select>
+          </div>
+        </div>
+        <!-- Account Name -->
+        <div class="col-md-2">
+          <div class="label-wrapper d-flex align-items-center">
+              <label for="godown_code" class="form-label mb-0">Account Name
+                <span class="required-star">*</span>
+              </label>
+          </div>
+          <div class="input-wrapper">
+              <ng-select  [items]="accountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="stockCorrection.account_code" class="select-input"
+                [disabled]="isEditable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"  [ngClass]="{'is-invalid': isAccountInvalid}"> 
+              </ng-select>
+          </div>
+        </div>
+        <!-- Reason -->
+        <div class="col-md-2">
+          <div class="label-wrapper d-flex align-items-center">
+              <label for="narration" class="form-label mb-0">Reason
+                <span class="required-star">*</span>
+              </label>
+          </div>
+          <div class="input-wrapper">
+            <select [(ngModel)]="stockCorrection.narration"  class="form-control label-input" [disabled]="isEditable" dropdownPanelClass="'black-dropdown'"
+              [ngModelOptions]="{ standalone: true }" style="height: 28px;line-height:20px; padding-top:2px;"  [ngClass]="{'is-invalid': isReasonInvalid}">
+                <option value="Wastage">Wastage</option>
+                <option value="Complimentary">Complimentary</option>
+                <option value="Customer Taste">Customer Taste</option>
+                <option value="Stolen">Stolen</option>
+                <option value="Unknown">Unknown</option>
+                <option value="Others">Others</option>
+                <option value="Expiry">Expiry</option>
+                <option value="Gift">Gift</option>
+                <option value="Shortage">Shortage</option>
+                <option value="Excess">Excess</option>
+                <option value="Scrap">Scrap</option>
+            </select>
+          </div>
+        </div>
+      <!--Doc No -->
+        <div class="col-md-2">
+            <div class="label-wrapper d-flex align-items-center">
+            <label for="document_number" class="form-label  mb-0">Doc No
+            </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="document_number" disabled name="document_number"  name="document_number" 
+                [(ngModel)]="stockCorrection.document_number" #document_number="ngModel">
+            </div>
+        </div>
+      <!-- Entry Date -->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="voucher_date" class="form-label">Entry Date
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <div class="datepicker-wrapper">
+              <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="isEditable"
+                [bsConfig]="{
+                  dateInputFormat: 'DD/MM/YYYY',
+                  showWeekNumbers: false
+                }"
+                (bsValueChange)="onDateSelected($event)" [ngModel]="stockCorrection.voucherDate" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
+                />
+              <button type="button" class="btn btn-outline-secondary" (click)="dp.show()" [disabled]="isEditable">
+                📅
+              </button>
+              </div> 
+          </div>
+        </div>
+        <!--Status-->
+        <div class="col-md-2">
+            <div class="label-wrapper d-flex align-items-center">
+            <label for="approval_status" class="form-label  mb-0">Status
+            </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="approval_status" disabled name="approval_status"  name="approval_status" 
+                [(ngModel)]="stockCorrection.approval_status" #approval_status="ngModel">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!--Reference-->
+        <div class="col-md-3">
+          <div class="label-wrapper">
+            <label for="voucher_reference" class="form-label">Reference
+            </label>
+          </div>
+          <div class="input-wrapper">
+              <textarea class="label-input" id="voucher_reference" name="voucher_reference" rows="2"
+                [(ngModel)]="stockCorrection.voucher_reference" #voucher_reference="ngModel" [disabled]="isEditable" >
+              </textarea>
+          </div>
+        </div>
+         <div class="col-md-9">
+        <div class="d-flex mt-2 gap-2">
+            <fieldset style="width:350px; background-color:#f5f5be; padding:8px;">
+                <div class="row">
+                    <!-- Total Qty -->
+                    <div class="col-md-6">
+                    <div class="label-wrapper">
+                        <label for="totalQty" class="form-label">Total Reciept Qty</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="text" class="label-input" id="totalQty" [disabled]="true" name="totalQty" [(ngModel)]="totalQty" #totalQtys="ngModel">
+                    </div>
+                    </div>
+                    <!-- Total Qty -->
+                    <div class="col-md-6">
+                    <div class="label-wrapper">
+                        <label for="totalAmount" class="form-label">Total Reciept Amount</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="text" class="label-input" id="totalAmount" [disabled]="true" name="totalAmount" [(ngModel)]="totalAmount" #totalAmounts="ngModel">
+                    </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset style="width:350px; background-color:#f5e6bc; padding:8px;">
+                <div class="row">
+                    <!-- Total Issued Qty -->
+                    <div class="col-md-6">
+                    <div class="label-wrapper">
+                        <label for="totalIssuedQty" class="form-label">Total Issued Qty</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="text" class="label-input" id="totalIssuedQty" [disabled]="true" name="totalIssuedQty" [(ngModel)]="totalIssuedQty" #totalIssQtys="ngModel">
+                    </div>
+                    </div>
+                    <!-- Total Issued Amount -->
+                    <div class="col-md-6">
+                    <div class="label-wrapper">
+                        <label for="totalIssuedAmount" class="form-label">Total Issued Amount</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="text" class="label-input" id="totalIssuedAmount" [disabled]="true" name="totalIssuedAmount" [(ngModel)]="totalIssuedAmount" #totalIssuedAmounts="ngModel">
+                    </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        </div>
+    </div>
+    
+    <ngx-datatable 
+      class="table table-bordered styled-grid"
+      [rows]="rows"
+      [scrollbarV]="scroll"
+      [virtualization]="true"
+      [style.height.px]="gridHeight"
+      [columnMode]="'force'"
+      [headerHeight]="50"
+      [footerHeight]="60"
+      [rowHeight]="30"
+      [limit]="controls.pageSize"
+      [externalPaging]="false"
+      [selected]="selected"
+      [messages]="{ emptyMessage: 'No data to display' }"
+      [reorderable]="reorderable"
+      [selectionType]="SelectionType.single"
+      [rowIdentity]="getRowIdentity"
+      (activate)="onSubListActivate($event)">
+
+      <!-- Sl No -->
+      <ngx-datatable-column name="Sl No"  prop="seq_no" [maxWidth]="80">
+          <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+            <input 
+            type="text" 
+              class="form-control" 
+              value ="{{ rowIndex + 1 }}"
+              />
+          </ng-template>
+        </ngx-datatable-column>
+
+      <!-- Item Code -->
+      <ngx-datatable-column name="Item Code" prop="item_no">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <ng-select 
+            [items]="ItemList" 
+            bindLabel="item_code" 
+            bindValue="item_no" 
+            [(ngModel)]="row.item_no"
+            (change)="ItemCodeEnter(row.item_no, row)"
+            [disabled]="isEditable"
+            class="form-control grid-select"
+            [ngModelOptions]="{ standalone: true }"
+            [appendTo]="'body'">
+          </ng-select>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Model Name -->
+      <ngx-datatable-column name="Model Name" prop="item_name_abbr" [minWidth]="300">
+         <ng-template let-row="row" ngx-datatable-cell-template>
+            <input 
+              list="ItemList" 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="row.item_name_abbr" 
+              [ngModelOptions]="{standalone: true}" 
+              (change)="ModelNameChange(row.item_name_abbr,row)" 
+              [disabled]="isEditable" />
+
+            <datalist id="ItemList">
+              <option *ngFor="let item of ItemList" [value]="item.item_code + ' - ' + item.item_name_abbr">
+              </option>
+            </datalist>
+          </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Unit -->
+      <ngx-datatable-column name="Unit" prop="unit_name"  [maxWidth]="70">
+        <ng-template let-row="row" ngx-datatable-cell-template >
+          <input 
+            type="text" 
+            class="form-control grid-input" 
+            [value]="row.unit_name"   
+            disabled />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Rec Qty -->
+      <ngx-datatable-column name="Rec Qty(+)" prop="receipt_quantity">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <input 
+            type="number" 
+            class="form-control grid-input" 
+            [(ngModel)]="row.receipt_quantity" 
+            [disabled]="isEditable" (input)="ReceiptQtyChange(row.receipt_quantity,row)"
+            [ngModelOptions]="{ standalone: true }" />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Iss Qty -->
+      <ngx-datatable-column name="Iss Qty(-)" prop="issue_quantity">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <input 
+            type="number" 
+            class="form-control grid-input" 
+            [(ngModel)]="row.issue_quantity" 
+            [disabled]="isEditable" (input)="IssueQtyChange(row.issue_quantity,row)"
+            [ngModelOptions]="{ standalone: true }" />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Rate -->
+      <ngx-datatable-column name="Rate" prop="avG_COST">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <input 
+            type="number" 
+            class="form-control grid-input" 
+            [(ngModel)]="row.avG_COST" 
+            [disabled]="isEditable" (input)="RateChange(row.avG_COST,row)"
+            [ngModelOptions]="{ standalone: true }"  />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!--Total Rate -->
+      <ngx-datatable-column name="Total Rate" prop="transamount">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <input 
+            type="text" 
+            class="form-control grid-input" 
+            [(ngModel)]="row.transamount" 
+            disabled   
+            [ngModelOptions]="{ standalone: true }"  />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!--Fgn Total -->
+      <ngx-datatable-column name="Fgn.Rate" prop="fgn_rate" *ngIf="false"> 
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <input 
+            type="text" 
+            class="form-control grid-input" 
+            [(ngModel)]="row.fgn_rate" 
+            disabled   
+            [ngModelOptions]="{ standalone: true }"  />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!--Fgn Total -->
+      <ngx-datatable-column name="Fgn Total" prop="fgn_total">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <input 
+            type="text" 
+            class="form-control grid-input" 
+            [(ngModel)]="row.fgn_total" 
+            [disabled]="isEditable" (input)="FgnTotalChange(row.fgn_total,row)"
+            [ngModelOptions]="{ standalone: true }"  />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Delete -->
+      <ngx-datatable-column name="Delete" [maxWidth]="70">
+        <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+          <button 
+            type="button" 
+            class="btn btn-danger btn-sm delete-btn" 
+            (click)="deleteRow(rowIndex)" 
+            [disabled]="isEditable">
+            🗑️
+          </button>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Footer -->
+      <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template>
+          <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 datatable-footer-border">
+            <span>Total Rows: {{ rows.length }}</span>
+            <div class="btn-group">
+              <button type="button" class="btn btn-add" (click)="addRow()" [disabled]="isEditable">➕ Add</button>
+            </div>
+          </div>
+        </ng-template>
+      </ngx-datatable-footer>
+    </ngx-datatable>
+
+    <div class="row">
+      <!-- Created By-->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="created_by" class="form-label">Created By
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="created_by" disabled 
+              name="created_by" [(ngModel)]="stockCorrection.created_by" #created_by="ngModel">
+        </div>
+      </div>
+      <!-- Created On-->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="created_date" class="form-label">Created On
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="created_date" disabled 
+              name="created_date" [(ngModel)]="stockCorrection.created_date" #created_date="ngModel">
+        </div>
+      </div>
+      <!-- Updated By -->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="modified_by" class="form-label">Modified By
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="modified_by" disabled 
+              name="modified_by" [(ngModel)]="stockCorrection.modified_by" #modified_by="ngModel">
+        </div>
+      </div>
+      <!-- Updated On -->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="modified_date" class="form-label">Modified On
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="modified_date" disabled 
+              name="modified_date" [(ngModel)]="stockCorrection.modified_date" #modified_date="ngModel">
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="approved_by" class="form-label">Approved By
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="approved_by" disabled 
+              name="approved_by" [(ngModel)]="stockCorrection.approved_by" #approved_by="ngModel">
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="approver_remarks" class="form-label">Approval Remarks
+          </label>
+        </div>
+        <div class="input-wrapper">
+            <textarea class="label-input" id="approver_remarks" name="approver_remarks" rows="2"
+              [(ngModel)]="stockCorrection.approver_remarks" #approver_remarks="ngModel" disabled >
+            </textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer" style="overflow: hidden;">
+      <div class="btn-group pull-right">
+        <div class="badge bg-color-greenLight action mine"></div>
+        <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+          <i class="fa fa-save"></i>Save
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+          <i class="fa fa-ban"></i>Cancel
+        </button>
+      </div>
+    </div> 
+  </form>
+</div>

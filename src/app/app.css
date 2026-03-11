@@ -1,0 +1,26 @@
+.main-content {
+  margin-left: 250px;
+  padding: 30px;
+  background-color: #ffffff;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+.container {
+  max-width: 100% !important;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.login-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;   /* full viewport width */
+  height: 100vh;  /* full viewport height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f9fa; /* optional background */
+  z-index: 9999;       /* sits above other content */
+}

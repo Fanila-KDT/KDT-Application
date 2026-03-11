@@ -1,0 +1,96 @@
+<!-- Spinner start -->
+<div class="spinner_overlay" *ngIf="isLoading">
+  <div class="loader"></div>
+</div>
+<!-- Spinner end -->
+<br>
+<h5>List of {{Heading}}'s</h5>
+<fieldset class="border p-2" >
+  <ngx-datatable
+    *ngIf="!disableGrid"
+      class="table table-bordered styled-grid"
+      [rows]="rows"
+      [scrollbarV]="scroll"
+      [style.height.px]="updateGridHeight()"
+      [columnMode]="'force'"
+      [headerHeight]="80"
+      [footerHeight]="60"
+      [rowHeight]="36"
+      [limit]="controls.pageSize"
+      [externalPaging]="false"
+      [selected]="selected"
+      [messages]="{ emptyMessage: 'No data to display' }"
+      [reorderable]="reorderable"
+      (activate)="onActivate($event)"
+      style="cursor:pointer;padding-right: 5px;"
+      [selectionType]="SelectionType.single"
+      [scrollbarH]="true"
+    >
+
+
+     <ngx-datatable-column name="Vendor" prop="account_name"  [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterPendingReciept.account_name"
+            placeholder="Vendor" (keyup)="updateFilter()" />
+          <span class="datatable-heading">Vendor</span>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="PO. No" prop="document_number"  [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterPendingReciept.document_number"
+            placeholder="PO. No" (keyup)="updateFilter()" />
+          <span class="datatable-heading">PO. No</span>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
+     <ngx-datatable-column name="Entry Date" prop="voucherDate"  [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterPendingReciept.voucherDate"
+            placeholder="Entry Date" (keyup)="updateFilter()" />
+          <span class="datatable-heading">Entry Date</span>
+        </div>
+      </ng-template> 
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Open" [sortable]="false" [canAutoResize]="false" [width]="120">
+      <ng-template ngx-datatable-header-template>
+        Open
+      </ng-template>
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <div class="d-flex align-items-start">
+          <button type="button" class="btn btn-book" (click)="OpenItem(row)">
+            <i class="fa fa-book-open  me-1"></i> Open
+          </button>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
+
+    <!-- Footer -->
+     <ngx-datatable-footer>
+      <ng-template ngx-datatable-footer-template
+        let-rowCount="rowCount"
+        let-pageSize="pageSize"
+        let-curPage="curPage"
+        let-offset="offset">
+        <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 datatable-footer-border">
+
+          <!-- Info Section -->
+          <div class="col-md-2">
+            <div class="datatable-info text-muted">
+             Showing {{ rows.length }} entries
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ngx-datatable-footer>
+  </ngx-datatable>
+</fieldset>
+
+<!-- Pager Controls -->

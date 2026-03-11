@@ -1,0 +1,50 @@
+<div class="dashboard-content">
+
+  <!-- Summary Cards -->
+  <div class="dashboard-grid">
+    <a class="summary-card" (click)="onLocalClick()">
+      <h3>Local Pending Receipts</h3>
+      <div class="value">{{localPOsCount}}</div>
+      <div class="change">click here for more details</div>
+    </a>
+    <a class="summary-card" (click)="onForeignClick()">
+      <h3>Foreign Pending Receipts</h3>
+      <div class="value">{{foreignPOsCount}}</div>
+      <div class="change">click here for more details</div>
+    </a>
+    <!-- <a href="/cash-report" class="summary-card">
+      <h3>Hold Receipts</h3>
+      <div class="value">92,000</div>
+      <div class="change">click here for more details</div>
+    </a>
+    <a href="/profit-report" class="summary-card">
+      <h3>Total Receipts</h3>
+      <div class="value">228,000</div>
+      <div class="change">click here for more details</div>
+    </a> -->
+  </div>
+
+  <!-- Chart Section -->
+  <a href="/balance-report" class="chart-box">
+    <h3>Balance Receipts</h3>
+    <canvas id="balanceChart"></canvas>
+  </a>
+
+  <!-- Progress Indicators -->
+  <div class="dashboard-grid">
+    <a href="/income-budget" class="progress-indicator">
+      <canvas id="incomeProgress"></canvas>
+      <div class="label">% of Pending Receipts: 67%</div>
+      <div class="balance">Balance: - 23,570 /  31,430</div>
+      <span>View Full Report</span>
+    </a>
+    <a href="/expense-budget" class="progress-indicator">
+      <canvas id="expenseProgress"></canvas>
+      <div class="label">% of Approved Receipts: 48%</div>
+      <div class="balance">Balance: - 18,570 /  31,430</div>
+      <span>View Full Report</span>
+    </a>
+  </div>
+
+</div>
+

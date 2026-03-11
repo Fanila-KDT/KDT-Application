@@ -1,0 +1,675 @@
+/* ------------------- Header Section ------------------- */
+.bg-body-secondary h2 {
+  font-size: 1.5rem;       /* smaller than display-6 */
+  font-weight: 600;
+  text-align: left;
+  margin-left: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.bg-body-secondary {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+/* ------------------- Toolbar ------------------- */
+.btn-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-toolbar .btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-toolbar .btn i {
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+/* ------------------- Modal ------------------- */
+.modal.fade.show.d-block {
+  background-color: rgba(0,0,0,0.5);
+  z-index: 1050;
+  overflow-y: auto;
+  padding-top: 60px;
+}
+
+.modal-dialog.modal-lg {
+  max-width: 500px;
+  margin: auto;
+}
+
+.modal-content {
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+}
+
+.modal-title {
+  font-weight: 600;
+  color: #007bff;
+}
+
+.modal-header .btn {
+  background: none;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  background-color: #fff;
+}
+
+.modal-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+  text-align: right;
+}
+
+/* ------------------- Modal Form Elements ------------------- */
+.modal-body .form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-body .form-control,
+.modal-body .label-input {
+  width: 100%;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal-body .form-control:focus,
+.modal-body .label-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+/* Ensure ng-select container is styled cleanly */
+::ng-deep .select-modal.ng-select {
+  width: 100%;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 0.9rem;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* Remove inner container border that causes double effect */
+::ng-deep .select-modal .ng-select-container {
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+/* Focus effect */
+::ng-deep .select-modal.ng-select:focus-within {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* ------------------- Modal Buttons ------------------- */
+.modal-footer .btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+.modal-footer .btn-primary {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.modal-footer .btn-outline-secondary {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  color: #333;
+}
+
+/* ------------------- Form Layout ------------------- */
+.container-fluid {
+  padding: 5px;
+}
+
+fieldset {
+  border: 1px solid #ccc !important;
+  border-radius: 6px;
+  padding: 0.2rem;
+}
+
+legend.legend-left {
+  text-align: left;
+  float: none;
+  width: auto;
+  margin-left: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0b4f7c;
+  background-color: #e1e6eb;
+  padding: 2px 6px;
+}
+
+/* ------------------- Labels ------------------- */
+.label-wrapper {
+  margin-bottom: 2px;
+  text-align: left;
+}
+.label-wrapper .form-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 2px;
+  display: block;
+}
+
+/* ------------------- Inputs ------------------- */
+.label-input,
+input.form-control,
+textarea.label-input {
+  height: 28px;
+  font-size: 13px;
+  padding: 4px 6px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #212529;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  width: 100%;
+  box-sizing: border-box;
+}
+.label-input:focus,
+input.form-control:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+.label-input[disabled],
+input.form-control[disabled] {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* ------------------- Validation ------------------- */
+.required-star {
+  color: red;
+  margin-left: 4px;
+  font-weight: bold;
+}
+.label-input.is-invalid,
+.grid-input.is-invalid ,.select-input.is-invalid{
+  border: 1px solid red !important;
+}
+.error-icon {
+  transform: translateY(-50%);
+  color: red;
+  font-weight: bold;
+  background-color: #fff;
+  border: 1px solid red;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  text-align: center;
+  line-height: 14px;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+/* ------------------- Buttons ------------------- */
+.btn {
+  padding: 4px 10px;
+  font-size: 13px;
+}
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+.btn-add {
+  background-color: #007bff;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 6px 12px;
+}
+.btn-add:hover {
+  background-color: #0056b3;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ------------------- Datatable ------------------- */
+.table-wrapper {
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  padding: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+::ng-deep .styled-grid {
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+::ng-deep .styled-grid .datatable-header {
+  border-bottom: 1px solid #ccc;
+}
+::ng-deep .styled-grid .datatable-header-cell {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+  padding: 6px 10px;
+  border-right: 1px solid #ddd;
+}
+::ng-deep .styled-grid .datatable-body-cell {
+  padding: 6px 10px;
+  border-right: 1px solid #eee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+}
+/* Force text alignment to left in datatable */
+::ng-deep .styled-grid .datatable-header-cell{
+  text-align: left !important;
+}
+::ng-deep .styled-grid .datatable-body-cell {
+  text-align: left !important;
+  max-height: 30px;
+  padding: 1px 2px;
+}
+
+::ng-deep .styled-grid .datatable-row-wrapper {
+  border-bottom: 1px solid #eee;
+  max-height: 30px;
+}
+::ng-deep .styled-grid .datatable-body-row:hover {
+  background-color: #f1f1f1;
+}
+::ng-deep .styled-grid .datatable-body-row.active {
+  background-color: #e3f2fd;
+}
+.datatable-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  font-size: 12px;
+  padding: 8px;
+}
+.datatable-footer-border {
+  border-top: 1px solid #dee2e6;
+  padding-top: 6px;
+}
+
+/* ------------------- Loader ------------------- */
+.spinner_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/****************** Data Table Select *******************/
+.grid-select {
+  width: 100%;
+  min-width: 120px;
+  font-size: 14px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease-in-out;
+}
+
+/* Focus and hover states */
+.grid-select:focus,
+.grid-select.ng-select-focused {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+::ng-deep .grid-select.ng-select {
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+::ng-deep .grid-select .ng-select-container {
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  background-color: transparent;
+}
+
+/* Remove borders for inputs inside ngx-datatable only */
+::ng-deep ngx-datatable .form-control {
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  padding: 2px 4px;   /* keep compact spacing */
+}
+
+/* Optional: keep disabled look consistent */
+::ng-deep ngx-datatable .form-control[disabled] {
+  background-color: transparent !important;
+  color: #555; /* dim text */
+}
+
+/* Ensure search input always has a border */
+input.form-control.search {
+  border: 1px solid #ccc !important;   /* light gray border */
+  border-radius: 4px;
+  background-color: #fff;
+  padding: 4px 8px;
+}
+input.form-control.search:focus {
+  border-color: #007bff !important;    /* blue border on focus */
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+/* Make ng-select same size as normal inputs */
+::ng-deep ng-select {
+  height: 28px;              /* match input height */
+  font-size: 13px;           /* match input font size */
+  width: 100%;               /* full width like inputs */
+}
+
+::ng-deep ng-select .ng-select-container {
+  min-height: 28px !important;   /* force container height */
+  height: 28px !important;
+  font-size: 13px;
+  padding: 2px 6px;              /* compact padding */
+  border: 1px solid #ced4da;     /* same border as inputs */
+  border-radius: 4px;
+}
+
+::ng-deep ng-select.ng-select-disabled .ng-select-container {
+  background-color: #f8f9fa;     /* disabled look */
+  color: #6c757d;
+}
+
+/* Align dropdown options to the right */
+::ng-deep ng-select .ng-option {
+  text-align: left !important;
+}
+
+
+
+/* Add spacing between row blocks */
+.row {
+  margin-bottom: 5px;   /* adjust value as needed (8–16px works well) */
+}
+
+.inbox-compose-footer {
+  display: flex;
+  justify-content: flex-end;   /* push content to right corner */
+  align-items: center;
+  padding: 10px 20px;
+  min-height: 60px;            /* slightly smaller footer height */
+}
+
+.inbox-compose-footer .btn {
+  font-size: 15px;             /* bigger text */
+  padding: 8px 20px;          /* bigger button size */
+  border-radius: 6px;
+}
+
+.inbox-compose-footer .btn + .btn {
+  margin-left: 8px;            /* spacing between buttons */
+}
+
+/* Header + Tabs */
+.bg-body-secondary {
+  background-color: #f8f9fa !important;  /* unified light gray */
+}
+
+/* Fieldsets */
+.fieldset-custom,
+fieldset.border {
+  background-color: #ffffff;             /* clean white */
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Legends */
+legend.legend-left {
+  background-color: #f8f9fa;             /* same as header */
+  color: #0b4f7c;
+}
+
+/* Modal */
+.modal-content,
+.custom-modal-content {
+  background-color: #ffffff;             /* consistent white */
+}
+
+.modal-header,
+.custom-modal-header {
+  background-color: #f8f9fa;             /* same light gray */
+}
+
+.modal-footer,
+.custom-modal-footer {
+  background-color: #f8f9fa;             /* same light gray */
+}
+
+/* Footer */
+.inbox-compose-footer {
+  background-color: #f8f9fa;             /* same light gray */
+  border-top: 1px solid #dee2e6;
+}
+
+.form-group {
+  padding-top: 18px;  /* moves the whole group down */
+}
+
+/* Gradient button */
+.btn-gradient {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/*---------------------------------- Tab Container ----------------------------------*/
+
+/* Tab Container */
+.nav-tabs {
+  margin-top: 1rem;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Tab Buttons */
+.nav-tabs .nav-link {
+  border: 1px solid rgb(202, 204, 207);
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  background-color: #e1e6e9;
+  color: #333;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover Effect */
+.nav-tabs .nav-link:hover {
+  background-color: #e3f2fd;
+}
+
+/* Active Tab */
+.nav-tabs .nav-link.active {
+  background: linear-gradient(to bottom, #cce5ff, #e3f2fd);
+  border-color: #b8daff #dee2e6 #fff;
+  color: #0056b3;
+  font-weight: 500;
+  box-shadow: inset 0 -2px 5px rgba(0, 123, 255, 0.1);
+}
+
+/* Tab Content */
+.tab-content {
+  background-color: #ffffff;
+  border-radius: 0 0 0.5rem 0.5rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-top: -1px; /* seamless connection with tabs */
+}
+
+/* Tab Pane Transition */
+.tab-pane {
+  transition: opacity 0.4s ease-in-out;
+}
+
+/*---------------------------------- Form Select ----------------------------------*/
+/* Style select same as input */
+select.form-control {
+  width: 100%;
+  font-size: 13px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #333;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;              /* remove default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23333' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2rem;           /* space for arrow */
+}
+
+/* Focus state */
+select.form-control:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+/* Disabled state */
+select.form-control:disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+/*---------------------------------- Form Text Area ----------------------------------*/
+
+/* Style textarea same as input fields */
+textarea.form-control,
+textarea.custom-input {
+  width: 100%;
+  font-size: 13px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #333;
+  resize: vertical;              /* allow vertical resize only */
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Focus state */
+textarea.form-control:focus,
+textarea.custom-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+/* Disabled state */
+textarea.form-control:disabled,
+textarea.custom-input:disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+/*---------------------------------- Alert Styles ----------------------------------*/
+
+/* Base snackbar style */
+::ng-deep .custom-snackbar {
+  color: #ffffff !important;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 14px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(4, 145, 150, 0.2);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* Info Snackbar */
+::ng-deep .custom-snackbar.info {
+  background: linear-gradient(135deg, #1976d2, #21cbf3); /* Blue tones */
+}
+
+/* Success Snackbar */
+::ng-deep .custom-snackbar.success {
+  background: linear-gradient(135deg, #2e7d32, #74b377); /* Green tones */
+}
+
+/* Error Snackbar */
+::ng-deep .custom-snackbar.error {
+  background: linear-gradient(135deg, #d32f2f, #bb5e5e); /* Red tones */
+}
+
+
+
+

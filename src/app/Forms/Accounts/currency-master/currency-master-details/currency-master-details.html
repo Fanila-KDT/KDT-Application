@@ -1,0 +1,173 @@
+<div class="container-fluid">
+  <form ngForm #CurrencyMasterForm="ngForm" name="form" (ngSubmit)="CurrencyMasterForm.form.valid && onSubmit(CurrencyMasterForm)" novalidate>
+    <div class="row">
+      <!-- Currency -->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="cur_name" class="form-label">Currency
+            <span class="required-star">*</span>
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="cur_name" [disabled]="itemDisable"  [ngClass]="{'is-invalid': isCurNameInvalid}"
+            name="cur_name" [(ngModel)]="currencyMasterModel.cur_name" #cur_name="ngModel">
+        </div>
+      </div>
+      <!-- Description -->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="cur_desc" class="form-label">Description
+            <span class="required-star">*</span>
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="cur_desc" [disabled]="itemDisable"  [ngClass]="{'is-invalid': isDescriptionInvalid}"
+            name="cur_desc" [(ngModel)]="currencyMasterModel.cur_desc" #cur_desc="ngModel">
+        </div>
+      </div>
+    </div>
+
+    <!--Sub List-->
+    <div class="container-fluid">  
+      <div id="content">
+        <div class="row">
+          <article class="col-sm-12 col-md-12 col-lg-12"> 
+            <div>
+              <div class="widget-body no-padding">
+                <div class="lightest-gray-bg">
+                  <ngx-datatable
+                    class="table table-bordered styled-grid"
+                    [rows]="rows"
+                    [scrollbarV]="scroll"
+                    [style.height.px]="gridHeight"
+                    [columnMode]="'force'"
+                    [headerHeight]="50"
+                    [footerHeight]="60"
+                    [rowHeight]="45"
+                    [limit]="controls.pageSize"
+                    [externalPaging]="false"
+                    [selected]="selected"
+                    [messages]="{ emptyMessage: 'No data to display' }"
+                    [reorderable]="reorderable"
+                    [selectionType]="SelectionType.single"
+                    (select)="onRowSelect($event)"
+                  >
+
+                    <!-- Header Columns -->
+                    <ngx-datatable-column name="Sl No" prop="sl_no" [maxWidth]="50">
+                      <ng-template ngx-datatable-header-template>
+                        <span class="datatable-heading">Sl No</span>
+                      </ng-template>
+                      <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+                        {{ rowIndex + 1 }}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column name="From Date" prop="from_date">
+                      <ng-template ngx-datatable-header-template>
+                        <span class="datatable-heading">From Date</span>
+                      </ng-template>
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <input type="text" [(ngModel)]="row.from_date" class="form-control grid-input" [disabled]="true" [ngModelOptions]="{standalone: true}" />
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column name="To Date" prop="to_date">
+                      <ng-template ngx-datatable-header-template>
+                        <span class="datatable-heading">To Date</span>
+                      </ng-template>
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <!-- <input 
+                          type="text" [(ngModel)]="row.to_date" class="form-control grid-input" [class.is-invalid]="!isToDateValid(row)" 
+                            (ngModelChange)="formatToDateInput($event, row)"[disabled]="isEditable"
+                              [ngModelOptions]="{standalone: true}" placeholder="dd/MM/yyyy" /> -->
+                        <div class="datepicker-wrapper">
+                        <input
+                          type="text"
+                          class="form-control"
+                          bsDatepicker
+                          #dp="bsDatepicker"
+                          [bsConfig]="{
+                            dateInputFormat: 'DD/MM/YYYY',
+                            showWeekNumbers: false
+                          }"
+                          (bsValueChange)="onDateSelected($event, row)"
+                          [ngModel]="row.to_date"
+                          (ngModelChange)="formatToDateInput($event, row)"
+                          [ngModelOptions]="{ standalone: true }"
+                          placeholder="dd/MM/yyyy" [disabled]="isEditable"/>
+                        <button type="button" class="btn btn-outline-secondary" (click)="dp.show()" [disabled]="isEditable">
+                          📅
+                        </button>
+                        </div>  
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column name="Exch Rate" prop="ex_rate">
+                      <ng-template ngx-datatable-header-template>
+                        <span class="datatable-heading">Exch Rate</span>
+                      </ng-template>
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <input type="number" [(ngModel)]="row.ex_rate" class="form-control grid-input" value="1"  [class.is-invalid]="!isExRateValid(row)" [disabled]="isEditable" [ngModelOptions]="{standalone: true}" />
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column name="Consumable Exch Rate" prop="consumable_ex_rate">
+                      <ng-template ngx-datatable-header-template>
+                        <span class="datatable-heading">Consumable Exch Rate</span>
+                      </ng-template>
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <input type="number" [(ngModel)]="row.consumable_ex_rate" class="form-control grid-input" value="1" [disabled]="isEditable" [ngModelOptions]="{standalone: true}" />
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column name="Delete">
+                      <ng-template ngx-datatable-header-template></ng-template>
+                      <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                        <button type="button" class="btn btn-danger btn-sm delete-btn" (click)="deleteRow(rowIndex)" [disabled]="isEditable || rowIndex !== rows.length - 1" >
+                          🗑️
+                        </button>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <!-- Footer -->
+                    <ngx-datatable-footer>
+                      <ng-template ngx-datatable-footer-template
+                        let-rowCount="rowCount"
+                        let-pageSize="pageSize"
+                        let-curPage="curPage"
+                        let-offset="offset">
+                        <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 datatable-footer-border">
+                          <div class="row-count-text">
+                            <span>Total Rows: {{ rows.length }}</span>
+                          </div>
+                          <div class="col-md-5 d-flex justify-content-end align-items-center gap-2 flex-wrap">
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-add" (click)="addRow()" [disabled]="isEditable">➕ Add</button>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </ngx-datatable-footer>
+                  </ngx-datatable>
+                </div>
+              </div> 
+            </div>
+          </article>
+        </div>
+      </div>        
+    </div> 
+
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer">
+      <div class="btn-group">
+        <button type="submit" class="btn btn-primary" [disabled]="saveDisable">
+          <i class="fa fa-save"></i> Save
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="CancelclickMethod()">
+          <i class="fa fa-ban"></i> Cancel
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

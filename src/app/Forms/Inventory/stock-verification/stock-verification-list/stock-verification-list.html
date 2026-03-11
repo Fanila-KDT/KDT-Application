@@ -1,0 +1,180 @@
+<!-- Spinner start -->
+<div class="spinner_overlay" *ngIf="isLoading">
+  <div class="loader"></div>
+</div>
+<!-- Spinner end -->
+  <ngx-datatable
+      [hidden]="disableGrid"
+      class="table table-bordered styled-grid"
+      [rows]="rows"
+      [scrollbarV]="scroll"
+      [style.height.px]="gridHeight"
+      [columnMode]="'force'"
+      [headerHeight]="80"
+      [footerHeight]="60"
+      [rowHeight]="30"
+      [limit]="controls.pageSize"
+      [externalPaging]="false"
+      [selected]="selected"
+      [messages]="{ emptyMessage: 'No data to display' }"
+      [reorderable]="reorderable"
+      (activate)="onActivate($event)"
+      style="cursor:pointer;padding-right: 5px;"
+      [selectionType]="SelectionType.single"
+      [count]="totRowCounts"
+      [offset]="currPage - 1"
+      [scrollbarH]="true"
+    >
+
+    <!-- Columns -->
+    <ngx-datatable-column name="GRN No" prop="document_number"  [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterStockVerification.document_number"
+            placeholder="GRN No" (keyup)="updateFilter()" />
+          <span class="datatable-heading">GRN No</span>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Warehouse" prop="godown_name" [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterStockVerification.godown_name" 
+            placeholder="Warehouse" (keyup)="updateFilter()" />
+          <span class="datatable-heading">Warehouse</span>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Vendor" prop="account_name" [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterStockVerification.account_name" 
+            placeholder="Vendor" (keyup)="updateFilter()" />
+          <span class="datatable-heading">Vendor</span>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="PO No" prop="po_no"  [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterStockVerification.po_no"
+            placeholder="PO No" (keyup)="updateFilter()" />
+          <span class="datatable-heading">PO No</span>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Entry Date" prop="verifiedDate" [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterStockVerification.verifiedDate" 
+            placeholder="Entry Date" (keyup)="updateFilter()" />
+          <span class="datatable-heading">Entry Date</span>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Status" prop="approval_status" [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterStockVerification.approval_status" 
+            placeholder="Status" (keyup)="updateFilter()" />
+          <span class="datatable-heading">Status</span>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <!-- Footer -->
+     <ngx-datatable-footer>
+      <ng-template ngx-datatable-footer-template
+        let-rowCount="rowCount"
+        let-pageSize="pageSize"
+        let-curPage="curPage"
+        let-offset="offset">
+        <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 datatable-footer-border">
+
+          <!-- Info Section -->
+          <div class="col-md-2">
+            <div class="datatable-info text-muted">
+             Showing {{ startCount }} to {{ endCount }} of {{ totRowCounts }} entries
+            </div>
+          </div>
+
+          <!-- Filter section -->
+          <div class="col-md-2">
+            <!-- <button class="btn btn-sm btn-primary" (click)="resetFilters()" [disabled]="clrFilterDisable">
+              <i class="fa fa-times me-1"></i> Clear All Filters
+            </button> -->
+          </div>
+
+          <!-- Page Size Dropdown -->
+          <div class="col-md-3 d-flex justify-content-md-center justify-content-start">
+            <select
+              [disabled]="isVisibleGroupingDD()"
+              class="col-md-1.5"
+              [(ngModel)]="controls.pageSize"
+              (ngModelChange)="updatePageSize()">
+              <option *ngFor="let size of [10,50,100,200,500,1000]" [value]="size">{{ size }}</option>
+            </select>
+          </div>
+
+          <!-- Pager Controls -->
+          <div class="col-md-5 d-flex justify-content-end align-items-center gap-2 flex-wrap">
+            <span class="text-muted small">
+              Page <strong>{{ currPage }}</strong> of <strong>{{ totalPages_pager }}</strong>
+            </span>
+
+            <!-- First Page -->
+            <button class="btn btn-sm btn-outline-primary"
+                    aria-label="First page"
+                    (click)="goToPage(1)"
+                    [disabled]="currPage === 1">
+              <i class="fa fa-angle-double-left"></i>
+            </button>
+
+            <!-- Previous Page -->
+            <button class="btn btn-sm btn-outline-primary"
+                    aria-label="Previous page"
+                    (click)="paginate('left')"
+                    [disabled]="leftArrwDisable">
+              <i class="fa fa-angle-left"></i>
+            </button>
+
+            <!-- Page Numbers -->
+            <ng-container *ngIf="totalPages_pager > 1">
+              <button *ngFor="let page of getMiddlePages()"
+                      class="btn btn-sm"
+                      [ngClass]="{
+                        'btn-outline-secondary': page !== currPage,
+                        'btn-primary': page === currPage
+                      }"
+                      (click)="goToPage(page)"
+                      [attr.aria-current]="page === currPage ? 'page' : null">
+                {{ page }}
+              </button>
+            </ng-container>
+
+            <!-- Next Page -->
+            <button class="btn btn-sm btn-outline-primary"
+                    aria-label="Next page"
+                    (click)="paginate('right')"
+                    [disabled]="rightArrwDisable">
+              <i class="fa fa-angle-right"></i>
+            </button>
+
+            <!-- Last Page -->
+            <button class="btn btn-sm btn-outline-primary"
+                    aria-label="Last page"
+                    (click)="goToPage(totalPages_pager)"
+                    [disabled]="currPage === totalPages_pager">
+              <i class="fa fa-angle-double-right"></i>
+            </button>
+          </div>
+        </div>
+      </ng-template>
+    </ngx-datatable-footer>
+  </ngx-datatable>
+<!-- Pager Controls -->
