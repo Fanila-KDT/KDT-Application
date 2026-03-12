@@ -89,5 +89,8 @@ export class UserAccessService {
     return true;
   }
 
-
+  setHeader(name: string) {
+    //this.HeaderName.next(name);
+    //localStorage.setItem('HeaderName', name);
+  }
 }
