@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app.routing';
 import { App } from './app';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -14,9 +14,7 @@ import { LoginModelLog } from './Model/LoginPage/login-page.model';
 import { Header } from './shared/header/header';
 import { NavigationComponent } from './shared/navigation/navigation';
 import { LoginPage } from './Forms/Main/login-page/login-page';
-import { ExpenseEntry } from './Forms/Inventory/expense-entry/expense-entry';
-import { StockTransfer } from './Forms/Inventory/stock-transfer/stock-transfer';
-import { StockCorrection } from './Forms/Inventory/stock-correction/stock-correction';
+import { CustomInterceptor } from './Service/AuthenticationService/custom-interceptor';
 
 @NgModule({
   declarations: [
@@ -38,6 +36,7 @@ import { StockCorrection } from './Forms/Inventory/stock-correction/stock-correc
   ],
   exports:[],
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: CustomInterceptor, multi: true },
     provideBrowserGlobalErrorListeners(),
     LoginModelLog
   ],
