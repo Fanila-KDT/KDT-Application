@@ -15,6 +15,7 @@ import { Header } from './shared/header/header';
 import { NavigationComponent } from './shared/navigation/navigation';
 import { LoginPage } from './Forms/Main/login-page/login-page';
 import { CustomInterceptor } from './Service/AuthenticationService/custom-interceptor';
+import { ItemReorderRequest } from './Forms/Inventory/item-reorder-request/item-reorder-request';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { CustomInterceptor } from './Service/AuthenticationService/custom-interc
     Alert,
     Header,
     LoginPage,
+    ItemReorderRequest,
   ],
   imports: [
     FormsModule,
