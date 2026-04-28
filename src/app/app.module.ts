@@ -23,8 +23,7 @@ import { ItemReorderRequest } from './Forms/Inventory/item-reorder-request/item-
     NavigationComponent,
     Alert,
     Header,
-    LoginPage,
-    ItemReorderRequest,
+    LoginPage
   ],
   imports: [
     FormsModule,
@@ -40,7 +39,7 @@ import { ItemReorderRequest } from './Forms/Inventory/item-reorder-request/item-
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: CustomInterceptor, multi: true },
     provideBrowserGlobalErrorListeners(),
-    LoginModelLog
+    LoginModelLog,
   ],
   bootstrap: [App]
 })

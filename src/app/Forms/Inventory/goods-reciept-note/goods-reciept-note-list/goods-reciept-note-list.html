@@ -26,6 +26,16 @@
       [scrollbarH]="true"
     >
 
+    <ngx-datatable-column name="GRN No" prop="document_number" [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterGoodsReciept.document_number" 
+            placeholder="GRN No" (keyup)="updateFilter()" />
+          <span class="datatable-heading">GRN No</span>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
     <!-- Columns -->
     <ngx-datatable-column name="Register" prop="register_name"  [cellClass]="leftAlignCell" >
       <ng-template ngx-datatable-header-template>
@@ -53,16 +63,6 @@
           <input class="form-control search mb-1" [(ngModel)]="filterGoodsReciept.account_name" 
             placeholder="Vendor" (keyup)="updateFilter()" />
           <span class="datatable-heading">Vendor</span>
-        </div>
-      </ng-template>
-    </ngx-datatable-column>
-
-    <ngx-datatable-column name="GRN No" prop="document_number" [cellClass]="leftAlignCell" >
-      <ng-template ngx-datatable-header-template>
-        <div class="d-flex flex-column">
-          <input class="form-control search mb-1" [(ngModel)]="filterGoodsReciept.document_number" 
-            placeholder="GRN No" (keyup)="updateFilter()" />
-          <span class="datatable-heading">GRN No</span>
         </div>
       </ng-template>
     </ngx-datatable-column>

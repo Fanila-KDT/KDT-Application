@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, inject, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, ViewChild } from '@angular/core';
+import { OnDestroy } from '@angular/core';
 import { GRNGridModel, GRNModel, GRNDetailsModel, GRNHeaderModel, ItemDetailsModel } from '../../../../Model/RecieptEnry/reciept-enry.model';
 import { DatePipe } from '@angular/common';
 import { CommonService } from '../../../../Service/CommonService/common-service';
@@ -14,21 +15,23 @@ import { HttpResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { DashboardService } from '../../../../Service/DashboardService/dashboard-service';
+import { DateModel } from '../../../../Model/CommonModel';
 
 @Component({
   selector: 'goods-reciept-note-details',
   standalone: false, 
   templateUrl: './goods-reciept-note-details.html',
   styleUrls: ['./goods-reciept-note-details.css','../../../common.css'],
-  providers: [DatePipe]
+  providers: [DatePipe],
 })
-export class GoodsRecieptNoteDetails {
+export class GoodsRecieptNoteDetails implements OnDestroy{
   @ViewChild(DatatableComponent) table?: DatatableComponent;
   registerList: any[] = [];
   vendorList: any[] = [];
   forignVendorList: any[] = [];
   localVendorList: any[] = [];
   warehouseList: any[] = [];
+  warehouseListTemp: any[] = [];
   rows: any[] = []; 
   allRows: any[] = [];
   rowTemp: any[] = [];
@@ -61,7 +64,8 @@ export class GoodsRecieptNoteDetails {
   grnModel: GRNModel = new GRNModel();
   grnheaderModel: GRNHeaderModel = new GRNHeaderModel();
   grnDetailsModel:GRNDetailsModel = new GRNDetailsModel();
-  grnGridModel:GRNGridModel[] =[];
+  grnGridModel:GRNGridModel[] =[];  
+  dateModel: DateModel = new DateModel();
   grnModelTemp: GRNModel = new GRNModel();
   subscription: Subscription[] = new Array<Subscription>();
   ItemList: any[] = [];
@@ -82,47 +86,71 @@ export class GoodsRecieptNoteDetails {
     private cdRef: ChangeDetectorRef,public endPointService:EndPointService,public userAccessService:UserAccessService) {
 
     this.subscription.push(
-      this.grnService.clickedGRN.subscribe(x => {
-        this.grnService.ControlsEnableAndDisable.next(true);
-        if(this.dashboardService.RecieptEntry == 1){
-          return
-        } 
+      this.grnService.clickedGRN.subscribe(async x => {
+
+        if (this.dashboardService.RecieptEntry === 1) {
+          return;
+        }
+
         if (!x?.voucher_id) {
           this.grnModel = new GRNModel();
           this.rows = [];
           this.allRows = [];
+          this.cdRef.markForCheck();
           return;
         }
-
-        this.LocalPO = x.register_code == '31';
-        this.ForeignPO = x.register_code == '151';
+        this.grnService.ControlsEnableAndDisable.next(true); 
+        // Assign flags and rates
+        this.LocalPO = x.register_code == 31;
+        this.ForeignPO = x.register_code == 151;
         this.exchangeRate = x.exch_rate;
         this.consExchangeRate = x.cons_exch_rate;
+
+        // Format invoice date
         x.invoiceDate = this.datePipe.transform(x.invoice_date, 'dd/MM/yyyy') || '';
+
+        // Fetch reference list
+        try {
+          const refList = await this.grnService.getRefNoListFull(
+            this.endPointService.companycode,
+            sessionStorage.getItem('year') || ''
+          );
+          this.refNoList = refList;
+          this.grnService.refNoList.next(refList);
+        } catch (err) {
+          console.error('Error fetching RefNoList', err);
+        }
+
+        // Assign GRN model
         this.grnModel = { ...x };
+        this.grnModelTemp = {...this.grnModel};
+
         this.grnService.selectedGRN = this.grnModel.voucher_id;
         this.CounterVid = this.grnModel.counter_vid;
+        // Fetch item details
+        try {
+          const items = await this.grnService.getItemDetails(this.grnModel.voucher_id);
+          if (items && items.length) {
+            
+            this.rows = items.slice();
+            this.rowTemp = this.clone(this.rows);;
+            this.allRows = items.slice();
+            this.totalQty = this.sumRows('receipt_quantity').toFixed(3);
+            this.AssignItems();
+          } else {
+            this.rows = [];
+            this.allRows = []; 
+            this.totalQty = '0.000';
+          }
+        } catch (err) {
+          console.error('Error fetching ItemDetails', err);
+          this.rows = [];
+          this.allRows = [];
+          this.totalQty = '0.000';
+        }
         this.cdRef.markForCheck();
-        // trigger async separately
-        this.grnService.getItemDetails(this.grnModel.voucher_id).then(() => {
-          this.totalQty = this.sumRows('receipt_quantity').toFixed(3);
-          this.cdRef.markForCheck();
-        });
       })
     );
-
-    this.subscription.push(this.grnService.assignItemDetails.subscribe( (data:any)=>{
-      if(data[0]){
-        this.rows = data.slice();
-        this.allRows = data.slice();
-        this.totalQty = this.sumRows('receipt_quantity').toFixed(3);
-        this.AssignItems();
-        this.cdRef.markForCheck();
-      }else{
-        this.rows = [];
-        this.totalQty = 0;
-      }
-    }));
 
     this.subscription.push(this.grnService.refNoList.subscribe( (data:any)=>{
       this.refNoList = data || [];
@@ -131,38 +159,15 @@ export class GoodsRecieptNoteDetails {
 
     this.subscription.push(this.grnService.btnClick.subscribe(async x=>{
       if(x !==''){
-        this.ItemListTemp = this.ItemList;
-        this.ItemList = this.grnService.ItemList;
         await this.btnClickFunction(x);
       }
     }));
 
     this.subscription.push(this.dashboardService.clickedRecieptEntry.subscribe(async data => {
       if (data) {
-        data.register_code = data.register_code == 182 ? 151:31;
-        this.grnService.disableGrid.next(true);
-        await this.btnClickFunction('N');
-        this.grnModel = data;
-        this.grnModel.document_number = null;
-        this.grnModel.voucher_reference = null;
-        await this.grnService.getVendorList(this.endPointService.companycode).then((res: any[]) => {
-            this.vendorList = res;
-          });
-        this.VendorChange(data.account_code);
-        if(data.register_code == 151){
-          this.grnModel.discount = 0;
-        }else{
-          this.grnModel.foreign_discount_amount = 0;
-        }
-        this.PoNoChange(this.grnModel.po_no);
-        this.PoNoList = data.register_code == '151' ? this.foreignPoNoList:this.localPoNoList;
-        this.grnModel.voucherDate =  new Date();
-        this.grnModel.voucher_date =  new Date();
-        this.grnModel.invoice_date =  new Date();
-        this.grnModel.invoiceDate =  new Date();
+        await this.DashboardRecieptEntryClick(data);
       }
-      })
-    );
+    }));
 
     this.subscription.push(this.grnService.approvalStatus.subscribe(data=>{
       if(data){
@@ -175,15 +180,21 @@ export class GoodsRecieptNoteDetails {
     }));
 
     this.subscription.push(this.grnService.cancelClick.subscribe(data=>{
-      this.cancelClickMethod();
+      if( this.dashboardService.RecieptEntry == 1){
+        return;
+      }
+      if(data){
+        this.cancelClickMethod();
+      }
     }));
   }
 
   async ngOnInit() {
     try {
-
+      this.ItemListTemp = JSON.parse(sessionStorage.getItem('ItemList')||'');
+      this.ItemList = JSON.parse(sessionStorage.getItem('ItemList')||'');
       const companyCode = this.endPointService.companycode;
-      const year = sessionStorage.getItem('year') || '';
+      this.cdRef.markForCheck();
 
       this.grnService.getPoNoList(companyCode,1).then((res: any[]) => {
         if(this.dashboardService.RecieptEntry == 1){
@@ -192,12 +203,7 @@ export class GoodsRecieptNoteDetails {
         this.PoNoList = res;
       });
 
-      this.grnService.getRefNoListFull(companyCode, year).then((res: any[]) => {
-        this.refNoList = res;
-        this.grnService.refNoList.next(res);
-      });
-
-      this.grnService.getFullWarehouseList(companyCode).then((res: any[]) => {
+      this.commonService.getFullWarehouseList(this.endPointService.companycode).then((res: any[]) => {
         this.warehouseList = res;
       });
 
@@ -219,16 +225,30 @@ export class GoodsRecieptNoteDetails {
   }
 
   ngOnDestroy(): void {
+    this.dashboardService.clickedRecieptEntry.next(null);
     this.subscription.forEach(sub => sub.unsubscribe());
+    this.isEditable = true;
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.grnService.disableGrid.next(false);
+    this.dashboardService.RecieptEntry = 0;
+    this.grnService.disabledItems.next(false);
+    this.grnService.btnClick.next('');
+    this.rows =[];
+    this.grnModel = new GRNModel();
   }
 
   async btnClickFunction(x: string) {
     this.btnType = x;
-    this.grnModelTemp = {...this.grnModel};
     this.totalQtyTemp = this.totalQty;
-    this.rowTemp = this.rows;
+    this.rowTemp = this.clone(this.rows);;
     this.refNoListTemp = this.refNoList;
     this.PoNoList = [];
+    this.warehouseListTemp = [...this.warehouseList];
+    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
+    this.grnService.getWarehouseList(this.endPointService.companycode).then((res: any[]) => {
+      this.warehouseList = res;
+    });
     if(x =='N'){
       await this.grnService.getPoNoList(this.endPointService.companycode,2).then((res) => {
         this.PoNoList = res;
@@ -236,15 +256,17 @@ export class GoodsRecieptNoteDetails {
         this.foreignPoNoList = res.filter((v:any) => v.register_code == 182);
       });
       this.grnModel = new GRNModel();
-      this.vendorList = [];
+      if(this.dashboardService.RecieptEntry != 1){
+        this.vendorList = [];
+        this.rows = [];
+        this.refNoList = [];
+        this.totalQty =0;
+      }
       this.saveDisable = false;
       this.cancelDisable = false;
       this.itemDisable = false;
       this.registerDisable = false;
       this.isEditable =false;
-      this.totalQty =0;
-      this.rows = [];
-      this.refNoList = [];
       this.grnModel.voucherDate =  new Date();
       this.grnModel.voucher_date =  new Date();
       this.grnModel.invoice_date =  new Date();
@@ -264,10 +286,11 @@ export class GoodsRecieptNoteDetails {
   }
 
   cancelClickMethod(){
-    this.ItemList = this.ItemListTemp;
+    this.ItemList = [...this.ItemListTemp];
+    this.warehouseList = [...this.warehouseListTemp];
     this.grnService.disableGrid.next(false);
     this.totalQty = this.totalQtyTemp;
-    this.rows = this.rowTemp;
+    this.rows = this.clone(this.rowTemp);
     this.grnModel = {...this.grnModelTemp};
     this.refNoList = this.refNoListTemp;
     this.itemDisable = true;
@@ -282,9 +305,17 @@ export class GoodsRecieptNoteDetails {
     this.isVendorInvalid = false;
     this.isWRHouseInvalid = false;
     this.isInvoiceInvalid = false;
-    this.dashboardService.RecieptEntry = 0;
     this.cdRef.markForCheck();
     this.grnService.ControlsEnableAndDisable.next(true);
+    if(this.dashboardService.RecieptEntry == 1){
+      this.dashboardService.RecieptEntry = 0;
+      this.dashboardService.clickedRecieptEntry.next(null);
+      this.grnService.clickedGRN.next(this.grnService.mainList[0]);
+    }
+  }
+
+  clone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
   }
 
   private sumRows(field: string): number {
@@ -307,6 +338,18 @@ export class GoodsRecieptNoteDetails {
     this.grnModel.voucher_date = value;
   }
 
+  onDateSelected1(date: Date | string | null | undefined): void {
+    if (!date) {
+      return;
+    }
+    this.grnModel.invoice_date = date;
+  }
+
+  formatToDateInput1(value: string): void {
+    this.grnModel.invoice_date = value;
+  }
+
+
   updateFilter(value: string, field: 'item_no' | 'item_name_abbr') {
     this.filterStockDetails[field] = value;
     const itemNoFilter = (this.filterStockDetails.item_no || '').toLowerCase();
@@ -317,6 +360,7 @@ export class GoodsRecieptNoteDetails {
       const matchesItemDetails = !itemDetailsFilter || (row.item_details?.toString().toLowerCase().includes(itemDetailsFilter));
       return matchesItemNo && matchesItemDetails;
     });
+    this.cdRef.markForCheck();
   }
 
   async onSubmit(GRNForm:any){
@@ -354,23 +398,21 @@ export class GoodsRecieptNoteDetails {
 
     await this.AssignValues();
     
-    this.grnService.saveGoodsRecieptNote(this.grnheaderModel, this.grnGridModel,this.grnDetailsModel)
+    this.grnService.saveGoodsRecieptNote(this.grnheaderModel, this.grnGridModel,this.grnDetailsModel,this.dateModel)
       .subscribe({
         next: async (response: any) => {
           if(this.btnType == 'N'  || this.btnType == 'C'){
-            //this.grnService.addRowAfterSave.next(savedgrn);
-            this.alertService.triggerAlert('Row saved successfully...',4000, 'success');
+            this.alertService.triggerAlert('Row saved successfully...', 4000, 'success');
+          }else{
+            this.alertService.triggerAlert('Row modified successfully...', 4000, 'success');
           }
-          else if (this.btnType == 'M'){
-           // this.grnService.addRowAfterModify.next(savedgrn);
-            this.alertService.triggerAlert('Row updated successfully...', 4000, 'success');
+          await this.grnService.getGoodsRecieptList(sessionStorage.getItem('year'),2);
+          let item: GRNModel | undefined = this.grnService.mainList.find(item => item.voucher_id === response.grnheaderModel.voucher_id);
+          if (item) {
+            await this.grnService.loadListGRN.next(this.grnService.mainList);
+            this.dashboardService.RecieptEntry = 0;
+            this.grnService.clickedGRN.next(item); // pass single object
           }
-
-          await this.grnService.getGoodsRecieptList(sessionStorage.getItem('year'));
-          let MainList = this.grnService.mainList;
-          const result =MainList.find(item => item.voucher_id === response.grnheaderModel.voucher_id) ?? new GRNModel(); 
-          this.grnService.clickedGRN.next(result);
-
           
           //this.rows = [ ...savedItems];
           this.AssignItems();
@@ -386,7 +428,7 @@ export class GoodsRecieptNoteDetails {
           this.grnService.ControlsEnableAndDisable.next(true);
         },
       error: (err) => {
-        this.alertService.triggerAlert('Failed to save the Row...',4000, 'error');
+        this.alertService.triggerAlert(err.error.message,4000, 'error');
         this.grnService.btnClick.next('');
       }
     });
@@ -398,7 +440,7 @@ export class GoodsRecieptNoteDetails {
    const voucher_id = await this.commonService.GetGuid();
     this.grnheaderModel = {
       company_code: this.endPointService.companycode,
-      voucher_date: new Date(this.grnModel.voucher_date),
+      voucher_date: new Date(new Date(this.grnModel.voucher_date).setDate(new Date(this.grnModel.voucher_date).getDate() + 1)),
       period_id: sessionStorage.getItem('year'),
       register_code: this.grnModel.register_code,
       voucher_reference: this.grnModel.voucher_reference,
@@ -406,11 +448,11 @@ export class GoodsRecieptNoteDetails {
       account_code: this.grnModel.account_code,
       line_amount: this.grnModel.line_amount,
       enter_amount: this.grnModel.enter_amount,
-      discount: this.grnModel.discount,
+      discount: this.grnModel.discount?this.grnModel.discount:0,
       counter_vid: this.CounterVid,
       approver_remarks: this.grnModel.approver_remarks,
       createdt: this.grnModel.createdt,
-      cst :null,
+      cst :0,
 
       ...(this.btnType === 'N'
       ? {
@@ -434,19 +476,26 @@ export class GoodsRecieptNoteDetails {
     };
 
     // GRN DEtails
-    this.grnDetailsModel.voucher_id = this.grnModel.voucher_id;
+    this.grnDetailsModel.voucher_id = this.grnheaderModel.voucher_id;
     this.grnDetailsModel.invoice_no = this.grnModel.invoice_no;
-    this.grnDetailsModel.invoice_date = new Date(this.grnModel.invoiceDate);
+    this.grnDetailsModel.invoice_date = this.grnModel.invoice_date,
     this.grnDetailsModel.cur_no = this.grnModel.cur_no;
     this.grnDetailsModel.exch_rate = this.grnModel.exch_rate;
     this.grnDetailsModel.cons_exch_rate = this.grnModel.cons_exch_rate;
     this.grnDetailsModel.ref_grn_id = this.grnModel.ref_grn_id;
-    this.grnDetailsModel.foreign_discount_amount = this.grnModel.foreign_discount_amount;
-    this.grnDetailsModel.foreign_enter_amount = this.grnModel.foreign_enter_amount;
-    this.grnDetailsModel.foreign_line_amount = this.grnModel.foreign_line_amount;
+    this.grnDetailsModel.foreign_discount_amount = this.grnModel.foreign_discount_amount?this.grnModel.foreign_discount_amount:0;
+    this.grnDetailsModel.foreign_enter_amount = this.grnModel.foreign_enter_amount?this.grnModel.foreign_enter_amount:0;
+    this.grnDetailsModel.foreign_line_amount = this.grnModel.foreign_line_amount?this.grnModel.foreign_line_amount:0;
+
+    const voucher_date = this.datePipe.transform(this.grnModel.voucher_date, 'dd/MM/yyyy');
+    this.dateModel.voucher_date = voucher_date;
+    const user_enter_date = this.datePipe.transform(this.grnModel.user_enter_date, 'dd/MM/yyyy');
+    this.dateModel.user_enter_date = user_enter_date;
+    const invoice_date = this.datePipe.transform(this.grnModel.invoice_date, 'dd/MM/yyyy');
+    this.dateModel.invoice_date = invoice_date;
 
     //Grid Details
-    this.grnGridModel = await this.mapItemsToDetails(this.rows,this.grnModel.voucher_id);
+    this.grnGridModel = await this.mapItemsToDetails(this.rows,this.grnheaderModel.voucher_id);
   }
 
   async mapItemsToDetails(items: any[],voucher_id:any): Promise<GRNGridModel[]> {
@@ -461,15 +510,15 @@ export class GoodsRecieptNoteDetails {
       details.item_no = item.item_no;
       details.item_details = item.item_details;
       details.godown_code = this.grnheaderModel.godown_code;
-      details.receipt_quantity = item.receipt_quantity;
-      details.enter_rate = item.enter_rate;
-      details.cost_rate = item.cost_rate;   
-      details.pamount = item.pamount;
+      details.receipt_quantity = item.receipt_quantity??0;
+      details.enter_rate = item.enter_rate??0;
+      details.cost_rate = item.cost_rate??0;   
+      details.pamount = item.pamount??0;
       details.transamount = item.transamount ?? 0;
       details.line_no = item.line_no;
-      details.fgn_rate = item.fgn_rate;
-      details.fgn_total = item.fgn_total;
-      details.exch_rate = item.exch_rate;
+      details.fgn_rate = item.fgn_rate??0;
+      details.fgn_total = item.fgn_total??0;
+      details.exch_rate = item.exch_rate ?? 0;
       details.ref_row_id = item.ref_row_id ?? null;
 
       detailsList.push(details);
@@ -556,6 +605,7 @@ export class GoodsRecieptNoteDetails {
 
   async ItemCodeEnter(item_no: any, row: any) {
     try {
+      if(!item_no) return;
       const res = await this.purchaseOrderService.itemCodeEnter(item_no);
 
       if (res && res.length > 0) {
@@ -574,8 +624,8 @@ export class GoodsRecieptNoteDetails {
           //**********************************************************************************************************************;
           row.cost_rate = ((row.pamount / row.receipt_quantity) * (this.grnModel.enter_amount / this.grnModel.line_amount));
           row.transamount = (row.cost_rate *row. receipt_quantity).toFixed(3);
-          this.grnModel.line_amount = this.rows.reduce((sum:any, data:any) => sum + (data.pamount || 0), 0);
-          this.grnModel.enter_amount =  this.grnModel.line_amount - this.grnModel.discount;
+          this.grnModel.line_amount = this.rows.reduce((sum:any, data:any) => sum + (data.pamount || 0), 0).toFixed(3)||0;
+          this.grnModel.enter_amount =  (this.grnModel.line_amount - this.grnModel.discount).toFixed(3)||0;
         }
         else if (this.grnModel.register_code == '151') {
           row.fgn_rate = item.fgn_last_pur_rate;
@@ -631,8 +681,15 @@ export class GoodsRecieptNoteDetails {
     });
   }
 
+  VendorClick(){
+    if(!this.grnModel.register_code){
+      this.alertService.triggerAlert('Please select Register...',3000,'error');
+      return;
+    }
+  }
+
   VendorChange(account_code :any){
-    if(this.grnModel.po_no != null && this.grnModel.po_no != '' && this.btnType != 'M'){
+    if(this.grnModel.po_no == null && this.grnModel.po_no == '' && this.btnType != 'M'){
       this.grnModel.discount = null;
       this.grnModel.enter_amount = null;
       this.grnModel.line_amount = null;
@@ -714,6 +771,8 @@ export class GoodsRecieptNoteDetails {
 
         if(this.grnModel.register_code == '151'){
           this.VendorChange(this.grnModel.account_code);
+          this.grnModel.discount = (this.grnModel.foreign_discount_amount * this.exchangeRate).toFixed(3);
+          this.isLocalEditable = true;
         }
         this.rows = [...res.details];
 
@@ -723,7 +782,7 @@ export class GoodsRecieptNoteDetails {
         this.grnModel.foreign_line_amount = this.sumRows('fgn_total').toFixed(4)||0;
         this.grnModel.foreign_enter_amount = (this.grnModel.foreign_line_amount - this.grnModel.foreign_discount_amount).toFixed(4)||0;
 
-        res.details.forEach((row: any) => {
+        this.rows.forEach((row: any) => {
           row.ref_row_id = row.rowguid;
           row.rowguid = null;
          const costRate = (row.pamount / row.receipt_quantity) * 
@@ -794,22 +853,26 @@ export class GoodsRecieptNoteDetails {
   }
 
   QtyChange = this.debounce((qty: number, row: any) => {
-    if(qty>row.original_qty){
+    if(qty <= 0){
+      this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
+      row.receipt_quantity = 1;
+    }
+    if(row.receipt_quantity>row.original_qty){
       this.alertService.triggerAlert('Received quantity cannot be greater than original quantity.',3000,'error');
       row.receipt_quantity = row.original_qty;
       return;
     }
     if (this.grnModel.register_code == '151') {
-      row.fgn_total = (qty * row.fgn_rate).toFixed(4);
+      row.fgn_total = (row.receipt_quantity * row.fgn_rate).toFixed(4);
       row.enter_rate = (row.fgn_rate * row.exch_rate).toFixed(3);
-      row.pamount = (row.enter_rate * qty).toFixed(3);
+      row.pamount = (row.enter_rate * row.receipt_quantity).toFixed(3);
     } else {
-      row.pamount = (qty * row.enter_rate).toFixed(3);
+      row.pamount = (row.receipt_quantity * row.enter_rate).toFixed(3);
     }
 
     this.updateTotals();
-    row.cost_rate = ((row.pamount / qty) * (this.grnModel.enter_amount / this.grnModel.line_amount)).toFixed(3);
-    row.transamount = (row.cost_rate * qty).toFixed(3);
+    row.cost_rate = ((row.pamount / row.receipt_quantity) * (this.grnModel.enter_amount / this.grnModel.line_amount)).toFixed(3);
+    row.transamount = (row.cost_rate * row.receipt_quantity).toFixed(3);
   }, 200);
 
   RateChange = this.debounce((rate: number, row: any) => {
@@ -859,9 +922,8 @@ export class GoodsRecieptNoteDetails {
       this.grnModel.foreign_enter_amount =
       (this.grnModel.foreign_line_amount - (this.grnModel.foreign_discount_amount || 0)).toFixed(4);
     }
-    this.grnModel.line_amount = this.sumRows('pamount').toFixed(3);
-    (this.grnModel.enter_amount =
-      this.grnModel.line_amount - (this.grnModel.discount || 0)).toFixed(3);
+    this.grnModel.line_amount = this.sumRows('pamount').toFixed(3)||0;
+    this.grnModel.enter_amount = (this.grnModel.line_amount - (this.grnModel.discount || 0)).toFixed(3);
     this.totalQty = this.sumRows('receipt_quantity').toFixed(3);
     this.cdRef.markForCheck();
   }
@@ -884,20 +946,28 @@ export class GoodsRecieptNoteDetails {
       foreign_discount_amount : this.grnModel.foreign_discount_amount,
     }
 
-    this.grnService.deleteGRN(this.grnModel.voucher_id,sessionStorage.getItem('year'),items,this.rows)
-    .subscribe(
-      (updatedList: any[]) => {
+    this.grnService.deleteGRN(
+      this.grnModel.voucher_id,
+      sessionStorage.getItem('year'),
+      items,
+      this.rows
+    ).subscribe({
+      next: (updatedList: any[]) => {
         this.grnService.loadListGRN.next(updatedList);
-        this.grnService.clickedGRN.next(updatedList[0]);
+
+        if (updatedList.length > 0) {
+          this.grnService.clickedGRN.next(updatedList[0]);
+        }
+
         this.alertService.triggerAlert('Row deleted successfully...', 4000, 'success');
         this.grnService.btnClick.next('');
         this.cdRef.markForCheck();
       },
-      (error) => {
-        this.alertService.triggerAlert('Failed to delete the Row...', 4000, 'error');
-        this.grnService.btnClick.next('')
+      error: (err: any) => {
+        this.alertService.triggerAlert(err.error.message,4000, 'error');
+        this.grnService.btnClick.next('');
       }
-    );
+    });
   }
 
   onSubListActivate(event: any) {
@@ -933,10 +1003,32 @@ export class GoodsRecieptNoteDetails {
 
   AssignItems(){
     const rowItemNos = this.rows.map(r => r.item_no);
-    const filteredItems = this.grnService.ItemList.filter(item =>
+    const filteredItems = JSON.parse(sessionStorage.getItem('ItemList')||'').filter((item:any) =>
       rowItemNos.includes(item.item_no)
     );
     this.ItemList = filteredItems;
+  }
+
+  async DashboardRecieptEntryClick(data: any){
+    this.rows = [];
+    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
+    await this.grnService.getVendorList(this.endPointService.companycode).then((res: any[]) => {
+      this.vendorList = res;
+    });
+    this.grnModel = data;
+    data.register_code = data.register_code == 182 ? 151:31;
+
+    this.PoNoChange(data.po_no);
+    this.grnService.disableGrid.next(true);
+    await this.btnClickFunction('N');
+    this.grnModel.account_code = data.account_code??null;
+    this.grnModel.document_number = null;
+    this.grnModel.voucher_reference = null;
+    this.PoNoList = data.register_code == '151' ? this.foreignPoNoList:this.localPoNoList;
+    this.grnModel.voucherDate = new Date();
+    this.grnModel.voucher_date = new Date();
+    this.grnModel.invoice_date = new Date();
+    this.grnModel.invoiceDate = new Date();
   }
 }
 

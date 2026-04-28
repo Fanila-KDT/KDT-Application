@@ -1,27 +1,30 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { StockTransferDetailModel, StockTransferModel } from '../../../../Model/StockTransfer/stock-transfer.model';
-import { StockTransferService } from '../../../../Service/StockTransferService/stock-transfer-service';
 import { AlertService } from '../../../../shared/alert/alert.service';
 import { EndPointService } from '../../../../Service/end-point.services';
 import { CommonService } from '../../../../Service/CommonService/common-service';
 import { Subscription } from 'rxjs';
 import { DatatableComponent, SelectionType } from '@swimlane/ngx-datatable';
 import { PurchaseOrderService } from '../../../../Service/PurchaseOrderService/purchase-order-service';
-import { FinancialDataHeader, StockDataDetails } from '../../../../Model/CommonModel';
+import { DateModel, FinancialDataHeader, StockDataDetails } from '../../../../Model/CommonModel';
 import Swal from 'sweetalert2';
+import { StockTransferService } from '../../../../Service/StockTransferService/stock-transfer-service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'stock-transfer-details',
   standalone: false,
   templateUrl: './stock-transfer-details.html',
-  styleUrls: ['./stock-transfer-details.css','../../../common.css']
+  styleUrls: ['./stock-transfer-details.css','../../../common.css'],
+  providers: [DatePipe]
 })
 export class StockTransferDetails {
   @ViewChild(DatatableComponent) table?: DatatableComponent;
   stockTransfer: StockTransferModel = new StockTransferModel();
   stockTransferHeader: FinancialDataHeader = new FinancialDataHeader();
   stockTransferTemp: StockTransferModel = new StockTransferModel();
-  stockTransGridModel: StockDataDetails[] =[];
+  stockTransGridModel: StockDataDetails[] =[];  
+  dateModel: DateModel = new DateModel();
   subscription: Subscription[] = new Array<Subscription>();
   saveDisable:boolean = true;
   cancelDisable:boolean = true;
@@ -29,6 +32,7 @@ export class StockTransferDetails {
   rowTemp: any[] = [];
   godownList: any[] = [];
   isEditable: boolean = true;
+  statusDisable: boolean = true;
   totalQty: number = 0;
   totalQtyTemp: number = 0;
   scroll: boolean = true;
@@ -45,54 +49,78 @@ export class StockTransferDetails {
   isFromInvalid: boolean = false;
   isToInvalid: boolean = false;
 
-  constructor(public stockTransferService:StockTransferService,public alertService:AlertService,public commonService:CommonService,public endPointService: EndPointService,
+  constructor(private datePipe: DatePipe,public stockTransferService:StockTransferService,public alertService:AlertService,public commonService:CommonService,public endPointService: EndPointService,
     private cdRef: ChangeDetectorRef,public purchaseOrderService:PurchaseOrderService) {
 
     this.subscription.push(this.stockTransferService.clickedStockTras.subscribe(async x=>{
-      this.stockTransferService.ControlsEnableAndDisable.next(true);
-      if(!x){
+      if(!x.voucher_id){
         this.stockTransfer =  new StockTransferModel();
         this.rows =[];
         return;
       }
+      this.stockTransferService.ControlsEnableAndDisable.next(true);
       this.stockTransfer = {...x};
-      this.cdRef.markForCheck();
-      await this.stockTransferService.getStockTransferDetails(this.stockTransfer.voucher_id).then((res) => {});
-    }));
-
-    this.subscription.push(this.stockTransferService.assignStockTransDetails.subscribe(async (data:any)=>{
-      if(data[0]){
-        this.rows = JSON.parse(JSON.stringify(data));
-        this.rowTemp = JSON.parse(JSON.stringify(data));
-        this.totalQty = this.sumRows('receipt_quantity');
-        this.AssignItems();
-      }else{
+      try {
+        const items = await this.stockTransferService.getStockTransferDetails(this.stockTransfer.voucher_id);
+        if (items && items.length) {
+          this.rows = items.slice();
+          this.totalQty = this.sumRows('receipt_quantity');
+          this.AssignItems();
+        } else {
+          this.rows = [];
+          this.rowTemp = [];
+          this.totalQty = 0;
+        }
+      } catch (err) {
+        console.error('Error fetching ItemDetails', err);
         this.rows = [];
         this.rowTemp = [];
         this.totalQty = 0;
       }
     }));
 
+    this.subscription.push(this.commonService.isSystemAdmin.subscribe(data=>{
+      this.statusDisable = !data;
+    }));
+
     this.subscription.push(this.stockTransferService.btnClick.subscribe(async x=>{
       if(x !==''){
-        this.ItemListTemp = this.ItemList;
-        this.ItemList = this.stockTransferService.ItemList;
         await this.btnClickFunction(x);
       }
     }));
   }
 
   async ngOnInit(){
+    this.ItemListTemp = JSON.parse(sessionStorage.getItem('ItemList')||'');
+    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
     this.stockTransferService.getGodownList(this.endPointService.companycode).then((res: any[]) => {
       this.godownList = res;
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.forEach(sub => sub.unsubscribe());
+    this.isEditable = true;
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.stockTransferService.disableGrid.next(false);
+    this.stockTransferService.disabledItems.next(false);
+    this.stockTransferService.btnClick.next('');
+    this.rows =[];
+    this.stockTransfer = new StockTransferModel(); 
+  }
+
+  clone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
   }
   
   async btnClickFunction(x: string) {
     this.btnType = x;
     this.stockTransferTemp = {...this.stockTransfer};
     this.totalQtyTemp = this.totalQty;
-    this.rowTemp = this.rows;
+    this.ItemListTemp = [...this.ItemList];
+    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
+    this.rowTemp = this.clone(this.rows);
     if(x =='N'){
       this.stockTransfer = new StockTransferModel();
       this.saveDisable = false;
@@ -102,14 +130,16 @@ export class StockTransferDetails {
       this.rows = [];
       this.stockTransfer.voucherDate =  new Date();
       this.stockTransfer.voucher_date =  new Date();
+      this.cdRef.markForCheck();
     }else if(x =='M'){
       this.saveDisable = false;
       this.cancelDisable = false;
       this.isEditable =false;
+      this.cdRef.markForCheck();
     }else if(x =='D'){
       this.onDelete();
+      this.cdRef.markForCheck();
     }
-    this.cdRef.markForCheck();
   }
 
   ToGodownChange(trns_godown:any){
@@ -118,7 +148,6 @@ export class StockTransferDetails {
       this.alertService.triggerAlert('Please select different Transfer Godown', 4000, 'error');
       return;
     }
-
   }
 
   getRowIdentity(row: any): any {
@@ -184,7 +213,8 @@ export class StockTransferDetails {
 
   AssignItems(){
     const rowItemNos = this.rows.map(r => r.item_no);
-    const filteredItems = this.stockTransferService.ItemList.filter(item =>
+    const list = JSON.parse(sessionStorage.getItem('ItemList')||'');
+    const filteredItems =list.filter((item:any) =>
       rowItemNos.includes(item.item_no)
     );
     this.ItemList = filteredItems;
@@ -226,6 +256,7 @@ export class StockTransferDetails {
 
   async ItemCodeEnter(item_no: any, row: any) {
     try {
+      if(!item_no) return;
       const res = await this.purchaseOrderService.itemCodeEnter(item_no);
       const item = res[0];
       row.item_details = item.item_name_abbr;
@@ -249,7 +280,11 @@ export class StockTransferDetails {
   }
 
   QtyChange = this.debounce((qty: number, row: any) => {
-    row.transamount = (row.cost_rate * qty).toFixed(3);
+    if(row.receipt_quantity <= 0){
+      this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
+      row.receipt_quantity = 1;
+    }
+    row.transamount = (row.cost_rate * row.receipt_quantity).toFixed(3);
     this.totalQty = this.sumRows('receipt_quantity');
     this.stockTransfer.cst = this.sumRows('transamount').toFixed(3);
   }, 200);
@@ -302,33 +337,33 @@ export class StockTransferDetails {
 
     await this.AssignValues();
    
-    this.stockTransferService.saveStockTransfer(this.stockTransferHeader, this.stockTransGridModel,this.stockTransfer.transfer_godown_code)
-          .subscribe({
-          next: async (response: any) => {
-            if(this.btnType == 'N'){
-              this.alertService.triggerAlert('Row saved successfully...', 4000, 'success');
-            }else{
-              this.alertService.triggerAlert('Row modified successfully...', 4000, 'success');
-            }
-            await this.stockTransferService.getStockTransferList(sessionStorage.getItem('year'),2);
-            let item: StockTransferModel | undefined = this.stockTransferService.mainList.find(item => item.voucher_id === response.stockTransferModel.voucher_id);
-            if (item) {
-              await this.stockTransferService.loadListStockTransfer.next(this.stockTransferService.mainList);
-              this.stockTransferService.clickedStockTras.next(item); // pass single object
-            }
-            this.stockTransferService.btnClick.next('');
-            this.saveDisable = true;
-            this.cancelDisable = true;
-            this.isEditable = true;
-            this.stockTransferService.disabledItems.next(false);
-            this.stockTransferService.disableGrid.next(false);
-            this.stockTransferService.ControlsEnableAndDisable.next(true);
-          },
-          error: () => {
-            this.alertService.triggerAlert('Failed to save the Row...', 4000, 'error');
-            this.stockTransferService.btnClick.next('');
-          }
-        });
+    this.stockTransferService.saveStockTransfer(this.stockTransferHeader, this.stockTransGridModel,this.stockTransfer.transfer_godown_code,this.dateModel)
+    .subscribe({
+      next: async (response: any) => {
+        if(this.btnType == 'N'){
+          this.alertService.triggerAlert('Row saved successfully...', 4000, 'success');
+        }else{
+          this.alertService.triggerAlert('Row modified successfully...', 4000, 'success');
+        }
+        await this.stockTransferService.getStockTransferList(sessionStorage.getItem('year'),2);
+        let item: StockTransferModel | undefined = this.stockTransferService.mainList.find(item => item.voucher_id === response.stockTransferModel.voucher_id);
+        if (item) {
+          await this.stockTransferService.loadListStockTransfer.next(this.stockTransferService.mainList);
+          this.stockTransferService.clickedStockTras.next(item); // pass single object
+        }
+        this.stockTransferService.btnClick.next('');
+        this.saveDisable = true;
+        this.cancelDisable = true;
+        this.isEditable = true;
+        this.stockTransferService.disabledItems.next(false);
+        this.stockTransferService.disableGrid.next(false);
+        this.stockTransferService.ControlsEnableAndDisable.next(true);
+      },
+      error: (err) => {
+        this.alertService.triggerAlert(err.error.message,4000, 'error');
+        this.stockTransferService.btnClick.next('');
+      }
+    });
   }
 
   async validateForm(model: StockTransferModel): Promise<boolean> {
@@ -344,7 +379,6 @@ export class StockTransferDetails {
     const voucher_id = await this.commonService.GetGuid();
     this.stockTransferHeader = {
       company_code: this.endPointService.companycode,
-      voucher_date: new Date(this.stockTransfer.voucher_date),
       period_id: Number(sessionStorage.getItem('year')),
       register_code: 81,
       voucher_reference: this.stockTransfer.voucher_reference,
@@ -375,6 +409,7 @@ export class StockTransferDetails {
           approval_status : 'DRAFT',
           createdt :null,
           approver_remarks: null,
+          voucher_date: this.stockTransfer.voucher_date
         }
       : {
           voucher_id:this.stockTransfer.voucher_id,
@@ -382,13 +417,19 @@ export class StockTransferDetails {
           document_number: this.stockTransfer.document_number,
           modified_by: localStorage.getItem('user_id'),
           modified_on: null,
-          user_enter_date: new Date(this.stockTransfer.user_enter_date),
+          user_enter_date: new Date(new Date(this.stockTransfer.user_enter_date).setDate(new Date(this.stockTransfer.user_enter_date).getDate() + 1)),
+          voucher_date: new Date(new Date(this.stockTransfer.voucher_date).setDate(new Date(this.stockTransfer.voucher_date).getDate() + 1)),
           approved_by: this.stockTransfer.approved_by,
           approval_status: this.stockTransfer.approval_status,
           createdt: this.stockTransfer.createdt,
           approver_remarks: this.stockTransfer.approver_remarks
         })
     };
+
+    const voucher_date = this.datePipe.transform(this.stockTransfer.voucher_date, 'dd/MM/yyyy');
+    this.dateModel.voucher_date = voucher_date;
+    const user_enter_date = this.datePipe.transform(this.stockTransfer.user_enter_date, 'dd/MM/yyyy');
+    this.dateModel.user_enter_date = user_enter_date;
 
     //Grid Details
     this.stockTransGridModel = await this.mapItemsToDetails(this.rows,this.stockTransferHeader.voucher_id);
@@ -404,8 +445,8 @@ export class StockTransferDetails {
       details.seq_no = item.seq_no;
       details.item_no = item.item_no;
       details.godown_code = this.stockTransfer.godown_code;
-      details.receipt_quantity = item.receipt_quantity;
-      details.issue_quantity = 0;
+      details.receipt_quantity = 0;
+      details.issue_quantity = item.receipt_quantity;
       details.enter_rate = 0;
       details.cost_rate = item.cost_rate;   
       details.pamount = 0;
@@ -427,8 +468,8 @@ export class StockTransferDetails {
       trans.seq_no = item.seq_no;
       trans.item_no = item.item_no;
       trans.godown_code = this.stockTransfer.transfer_godown_code;
-      trans.receipt_quantity = 0;
-      trans.issue_quantity = item.receipt_quantity;
+      trans.receipt_quantity = item.receipt_quantity;
+      trans.issue_quantity = 0;
       trans.enter_rate = 0;
       trans.cost_rate = item.cost_rate;   
       trans.pamount = 0;
@@ -456,27 +497,37 @@ export class StockTransferDetails {
     this.saveDisable = true;
     this.cancelDisable = true;
     this.stockTransferService.disableGrid.next(false);
-    this.stockTransfer = JSON.parse(JSON.stringify(this.stockTransferTemp));
-    this.rows = JSON.parse(JSON.stringify(this.rowTemp));
+    this.rows = [...this.rowTemp];
+    this.stockTransfer = {...this.stockTransferTemp};
     this.stockTransferService.disabledItems.next(false);
+    this.stockTransferService.btnClick.next('');
   }
 
   async onDelete(){
     const confirmed = await showconfirm("Are you sure you want to delete this item?");
     if(!confirmed)return;
+    
+    this.stockTransGridModel = await this.mapItemsToDetails(this.rows,this.stockTransfer.voucher_id);
+    this.stockTransGridModel = this.stockTransGridModel.map(row => ({
+      ...row,
+      voucher_id: this.stockTransfer.voucher_id
+    }));
 
-    this.stockTransferService.deleteStockTransfer(this.stockTransfer.voucher_id)
-    .subscribe(
-      (updatedList: any[]) => {
+    this.stockTransferService.deleteStockTransfer(
+      this.stockTransfer.voucher_id,
+      this.stockTransGridModel,
+    ).subscribe({
+      next: (updatedList: any[]) => {
         this.stockTransferService.getStockTransferList(sessionStorage.getItem('year'),1);
+        this.alertService.triggerAlert('Row deleted successfully...', 4000, 'success');
         this.stockTransferService.btnClick.next('');
         this.cdRef.markForCheck();
       },
-      (error) => {
-        this.alertService.triggerAlert('Failed to delete the Row...', 4000, 'error');
-        this.stockTransferService.btnClick.next('')
+      error: (err: any) => {
+        this.alertService.triggerAlert(err.error.message,4000, 'error');
+        this.stockTransferService.btnClick.next('');
       }
-    );
+    });
   }
 }
 

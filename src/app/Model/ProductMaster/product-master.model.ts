@@ -31,6 +31,7 @@ export class ProductMasterModel {
     item_category :string="";
     prev_pur: string="0";
     last_invoice:any;
+    user_id:any;
 }
 
 export class MachineFeaturesList{

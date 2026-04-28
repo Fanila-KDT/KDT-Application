@@ -30,6 +30,7 @@ export class StockVerification {
       this.modifyDisable = data;
       this.searchDisable = data;
       this.yearDisable = data;
+      this.refreshDisable = data;
     }));
 
     const subs = [
@@ -83,6 +84,7 @@ export class StockVerification {
     this.modifyDisable = true;
     this.searchDisable = true;
     this.yearDisable = true;
+    this.refreshDisable = true;
     this.stockVerificationService.disableGrid.next(true);
     this.stockVerificationService.btnClick.next(type);
   }
@@ -120,6 +122,8 @@ export class StockVerification {
   Refresh(){
     this.stockVerificationService.ngOnInit.next(true);
     this.getYear();
+    this.searchDisable =  false;
+    this.yearDisable = false;
   }
 
   toggleValue(){

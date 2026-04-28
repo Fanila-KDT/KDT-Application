@@ -12,6 +12,7 @@ export class StockCorrectionEndpointService {
   saveStockCorrection : string;
   DeleteStockCorrection : string;
   GetSearchList : string;
+  GetStockAccount : string;
   constructor(endpoint: EndPointService) {
     //Basic URL
     let apiHostingURL = endpoint.apiHostingURL+ "api/StockCorrection";
@@ -23,5 +24,6 @@ export class StockCorrectionEndpointService {
     this.saveStockCorrection = apiHostingURL + '/saveStockCorrection';
     this.DeleteStockCorrection = apiHostingURL + '/deleteStockCorrection';
     this.GetSearchList = apiHostingURL + '/getSearchList';
+    this.GetStockAccount = apiHostingURL + '/getStockAccount';
   }
 }

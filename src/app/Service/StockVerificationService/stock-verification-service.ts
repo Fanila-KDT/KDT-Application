@@ -4,6 +4,7 @@ import { BehaviorSubject, firstValueFrom, lastValueFrom, Observable, Subject } f
 import { AlertService } from '../../shared/alert/alert.service';
 import { StockVerificationEndpointService } from './stock-verification-end-point.service';
 import { StockDetailsModel, StockVerificationModel, StockVerificationMSearch } from '../../Model/StockVerification/stock-verification.model';
+import { DateModel } from '../../Model/CommonModel';
 
 @Injectable({
   providedIn: 'root'
@@ -65,8 +66,12 @@ export class StockVerificationService {
     }
   }
 
-  saveVaricationItems(Finalrows: any[],status:number) {
-    return this.httpClient.post<any>(this.endpointService.SaveVaricationItems+'/'+status, Finalrows);
+  saveVaricationItems(Finalrows: any[],status:number,dateModel:DateModel) {
+    const payload = {
+      Finalrows: Finalrows,
+      dateModel: dateModel
+    };
+    return this.httpClient.post<any>(this.endpointService.SaveVaricationItems+'/'+status, payload)
   }
 
   async SearchList(searchList: StockVerificationMSearch): Promise<void> {

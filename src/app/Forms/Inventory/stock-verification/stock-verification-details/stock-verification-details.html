@@ -24,7 +24,7 @@
         </div>
       </div>
       <!--Supplier Name -->
-      <div class="col-md-2">
+      <div class="col-md-3">
         <div class="label-wrapper d-flex align-items-center">
           <label for="account_name" class="form-label  mb-0">Supplier Name
           </label>
@@ -35,7 +35,7 @@
         </div>
       </div>
       <!--Warehouse Name -->
-      <div class="col-md-2">
+      <div class="col-md-3  ">
         <div class="label-wrapper d-flex align-items-center">
           <label for="godown_name" class="form-label  mb-0">Warehouse Name
           </label>
@@ -146,6 +146,18 @@
 
       <!-- Received -->
        <ngx-datatable-column name="Received" prop="received">
+        <ng-template ngx-datatable-header-template let-column="column" >
+          <label class="toggle-switch">
+            Received 
+            <input
+              type="checkbox"
+              [(ngModel)]="allReceived" [disabled] ="isEditable"
+              (change)="toggleAllReceived($event)"
+              [ngModelOptions]="{ standalone: true }"
+            />
+            <span class="slider"></span>
+          </label>
+        </ng-template>
         <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
           <label class="toggle-switch">
             <input
@@ -168,7 +180,7 @@
             type="number" 
             class="form-control grid-input" 
             [(ngModel)]="row.verified_qty" 
-            [disabled]="isEditable" (input)="RecQtyChange(row.verified_qty,row)"
+            [disabled]="isEditable" (change)="RecQtyChange(row.verified_qty,row)"
             [ngModelOptions]="{ standalone: true }" />
         </ng-template>
       </ngx-datatable-column>
@@ -195,7 +207,7 @@
         </textarea>
       </div>
       <!--Total Qty -->
-      <div class="col-md-2">
+      <div class="col-md-2  ms-auto">
         <div class="label-wrapper d-flex align-items-center">
           <label for="total_qty" class="form-label  mb-0">Total Qty
           </label>

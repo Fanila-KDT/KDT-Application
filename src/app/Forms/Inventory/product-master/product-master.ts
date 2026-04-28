@@ -42,6 +42,7 @@ export class ProductMaster {
       this.deleteDisable = false;
       this.searchDisable = false;
       this.gridDisable = false;
+      this.refreshDisable = false;
     }));
 
      const subs = [
@@ -69,6 +70,7 @@ export class ProductMaster {
       this.modifyDisable = true;
       this.deleteDisable = true;
       this.searchDisable = true;
+      this.refreshDisable = true;
       this.gridDisable = true;
       this.productMasterService.disableGrid.next(true);
     }
@@ -107,6 +109,7 @@ export class ProductMaster {
 
   Refresh(){
     this.productMasterService.ngOnInit.next(true); 
+    this.searchDisable =  false;
   }
 
   AddPrevCode(){

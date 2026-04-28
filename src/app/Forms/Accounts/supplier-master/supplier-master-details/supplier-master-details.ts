@@ -75,6 +75,12 @@ export class SupplierMasterDetails {
 
   ngOnDestroy(): void {
     this.subscription.forEach(sub => sub.unsubscribe());
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.supplierMasterService.disableGrid.next(false);
+    this.supplierMasterService.disabledItems.next(false);
+    this.supplierMasterService.btnClick.next('');
+    this.supplierAddressModel =  new SupplierAddressModel();
   }
 
   async onSubmit(SupplierasterForm:any){
@@ -115,6 +121,7 @@ export class SupplierMasterDetails {
         this.supplierMasterService.disableGrid.next(false);
         this.supplierMasterService.disabledItems.next(false);
         this.supplierMasterService.btnClick.next('');
+        this.supplierMasterService.selectedSupName = this.supplierMasterModel.account_name;
         this.userAccessService.CheckUserAccess(this.supplierMasterService.FormName,this.supplierMasterService);
       }).catch(error => {
           console.error('SaveSupplierMaster error:', error);

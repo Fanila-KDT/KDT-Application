@@ -11,6 +11,8 @@ import { DatePipe } from '@angular/common';
 import { HttpResponse } from '@angular/common/http';
 import { CommonService } from '../../../../Service/CommonService/common-service';
 import Swal from 'sweetalert2';
+import { DashboardService } from '../../../../Service/DashboardService/dashboard-service';
+import { DateModel } from '../../../../Model/CommonModel';
 
 @Component({
   selector: 'purchase-order-details',
@@ -18,7 +20,6 @@ import Swal from 'sweetalert2';
   templateUrl: './purchase-order-details.html',
   styleUrls: ['./purchase-order-details.css', '../../../common.css'],
   providers: [DatePipe],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PurchaseOrderDetails {
   @ViewChild(DatatableComponent) table?: DatatableComponent;
@@ -27,12 +28,14 @@ export class PurchaseOrderDetails {
   paymentList: any[] = [];
   unitList: any[] = [];
   ItemList: any[] = [];
+  ItemListtemp: any[] = [];
   rows: any[] = []; 
   rowTemp: any[] = []; 
   rowSaveTemp: any[] = [];
   refNoList: any[] = [];
   subscription: Subscription[] = new Array<Subscription>();
   purchaseOrderModel: PurchaseOrderModel = new PurchaseOrderModel();
+  dateModel: DateModel = new DateModel();
   purchaseOrderModelTemp: PurchaseOrderModel = new PurchaseOrderModel();
   itemDetailsModel: ItemDetailsModel = new ItemDetailsModel();
   itemDisable: boolean = true;
@@ -56,47 +59,62 @@ export class PurchaseOrderDetails {
   totalQty: any = 0;
   totalQtyTemp: any = 0;
   btnType: any;
+  statusDisable: boolean = true;
 
-  constructor(private datePipe: DatePipe,private alertService:AlertService,private commonService:CommonService,
-    public purchaseOrderService:PurchaseOrderService,private productMasterService: ProductMasterService,
-    private cdRef: ChangeDetectorRef,public endPointService:EndPointService,public userAccessService:UserAccessService) {
+  constructor(private alertService:AlertService,private commonService:CommonService,
+    public purchaseOrderService:PurchaseOrderService,private productMasterService: ProductMasterService,private datePipe: DatePipe,
+    private cdRef: ChangeDetectorRef,public endPointService:EndPointService,public userAccessService:UserAccessService, public dashboardService: DashboardService) {
      
     this.subscription.push(
       this.purchaseOrderService.clickedPO.subscribe(async x => {
+        if(this.dashboardService.PurchaseOrder == 1){
+          return;
+        }
         if (!x) {
           // x is undefined or null → reset model
           this.purchaseOrderModel = new PurchaseOrderModel();
           this.LocalPO = false;
           this.ForeignPO = false;
           this.rows = []; 
-          this.cdRef.markForCheck();
           return;
         }
-
+        this.purchaseOrderService.ControlsEnableAndDisable.next(true);
         this.purchaseOrderModel = { ...x };
         this.purchaseOrderService.selectedDocNo = this.purchaseOrderModel.document_number;
-        await this.purchaseOrderService.getItemDetails(this.purchaseOrderModel.voucher_id);
+        
+        try {
+          const items =await this.purchaseOrderService.getItemDetails(this.purchaseOrderModel.voucher_id);
+          if (items && items.length) {
+            this.rows = items.slice();
+            this.LocalPO = this.purchaseOrderModel.register_code == '32';
+            this.ForeignPO = this.purchaseOrderModel.register_code == '182';
+            this.AssignItems();
+          } else {
+            this.rows = [];
+            this.LocalPO = false;
+            this.ForeignPO = false;
+          }
+        } catch (err) {
+          console.error('Error fetching ItemDetails', err);
+          this.rows = [];
+          this.totalQty = '0.000';
+        }
         this.totalQty = this.sumRows('receipt_quantity');
-        this.cdRef.markForCheck();
       })
     );
 
-    this.purchaseOrderService.assignItemDetails.subscribe((data: any) => {
-      if (data && data.length > 0) {
-        this.rows = [...data];
-        this.LocalPO = this.purchaseOrderModel.register_code == '32';
-        this.ForeignPO = this.purchaseOrderModel.register_code == '182';
-      } else {
-        this.rows = [];
-        this.LocalPO = false;
-        this.ForeignPO = false;
-      }
-       this.cdRef.markForCheck();
-    });
-
+    this.subscription.push(this.commonService.isSystemAdmin.subscribe(data=>{
+      this.statusDisable = !data;
+    })); 
 
     this.subscription.push(this.purchaseOrderService.btnClick.subscribe(async x=>{
      await this.btnClickFunction(x);
+    }));
+
+    this.subscription.push(this.dashboardService.clickedPurchaseOrder.subscribe(async data => {
+      if (data) {
+        this.purchaseOrderBtnClick(data);
+      }
     }));
   }
  
@@ -107,33 +125,50 @@ export class PurchaseOrderDetails {
         vendorList,
         paymentList,
         unitList,
-        itemList
       ] = await Promise.all([
         this.purchaseOrderService.getRegisterList(this.endPointService.companycode),
         this.purchaseOrderService.getVendorList(this.endPointService.companycode),
         this.purchaseOrderService.getPaymentList(this.endPointService.companycode),
         this.productMasterService.GetUnitList(),
-        this.purchaseOrderService.getItemList()
       ]);
+
       // assign results
       this.registerList = registerList;
       this.vendorList   = vendorList;
       this.paymentList  = paymentList;
       this.unitList     = unitList;
-      this.ItemList     = itemList;
 
       // push to subjects if needed
       this.purchaseOrderService.registerList.next(registerList);
       this.purchaseOrderService.vendorList.next(vendorList);
+      this.ItemList = JSON.parse(sessionStorage.getItem('ItemList')||'');
 
-      this.cdRef.markForCheck();
     } catch (err) {
       console.error('Error loading lists', err);
     }
   }
 
-  ngOnDestroy() {
+  AssignItems(){
+    const rowItemNos = this.rows.map(r => r.item_no);
+    const list = JSON.parse(sessionStorage.getItem('ItemList')||'');
+    const filteredItems = list.filter((item:any) =>
+      rowItemNos.includes(item.item_no)
+    );
+    this.ItemList = filteredItems;
+  }
+
+  ngOnDestroy(): void {
+    this.dashboardService.clickedPurchaseOrder.next(null);
     this.subscription.forEach(sub => sub.unsubscribe());
+    this.isEditable = true;
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.purchaseOrderService.disableGrid.next(false);
+    this.purchaseOrderService.disabledItems.next(false);
+    this.purchaseOrderService.btnClick.next('');
+    this.rows =[];
+    this.purchaseOrderModel = new PurchaseOrderModel();
+    this.dashboardService.PurchaseOrder = 0;
   }
 
   getRowIdentity(row: any): any {
@@ -156,7 +191,6 @@ export class PurchaseOrderDetails {
       +(this.purchaseOrderModel.line_amount - (this.purchaseOrderModel.discount || 0)).toFixed(3);
     }
     this.totalQty = this.sumRows('receipt_quantity');
-    this.cdRef.markForCheck();
   }
 
   onDateSelected(date: Date | string | null | undefined): void {
@@ -175,11 +209,17 @@ export class PurchaseOrderDetails {
     return unit ? unit.unit_name : '';
   };
 
+  clone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
   async btnClickFunction(x: string) {
     this.btnType = x;
     this.purchaseOrderModelTemp = {...this.purchaseOrderModel};
     this.totalQtyTemp = this.totalQty;
-    this.rowTemp = this.rows;
+    this.rowTemp = this.clone(this.rows);
+    this.ItemListtemp = [...this.ItemList];
+    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
     if(x =='N'){
       this.purchaseOrderModel = new PurchaseOrderModel();
       this.saveDisable = false;
@@ -207,14 +247,14 @@ export class PurchaseOrderDetails {
       this.registerDisable = false;
       this.copyClick();
     }
-    this.cdRef.markForCheck();
   }
 
-   cancelClickMethod(){
+  cancelClickMethod(){
     this.purchaseOrderService.disableGrid.next(false);
-    this.totalQty = this.totalQtyTemp;
-    this.rows = this.rowTemp;
-    this.purchaseOrderModel = {...this.purchaseOrderModelTemp};
+    //this.totalQty = this.totalQtyTemp;
+    //this.rows = this.rowTemp;
+    //this.purchaseOrderModel = {...this.purchaseOrderModelTemp};
+    this.ItemList = [...this.ItemListtemp];
     this.itemDisable = true;
     this.saveDisable = true;
     this.registerDisable = true;
@@ -224,7 +264,11 @@ export class PurchaseOrderDetails {
     this.purchaseOrderService.btnClick.next('');
     this.isRegisterInvalid = false;
     this.isVendorInvalid = false;
-    this.cdRef.markForCheck();
+    if(this.dashboardService.PurchaseOrder == 1){
+      this.dashboardService.PurchaseOrder = 0;
+      this.dashboardService.clickedPurchaseOrder.next(null);
+    }
+    this.purchaseOrderService.clickedPO.next(this.purchaseOrderService.mainList[0]);
     this.userAccessService.CheckUserAccess(this.purchaseOrderService.FormName,this.purchaseOrderService);
   }
 
@@ -272,7 +316,6 @@ export class PurchaseOrderDetails {
     this.rows = [...this.rows, newRow];
 
     this.registerDisable =true;
-    this.cdRef.markForCheck();
   }
 
   deleteRow(index: number): void {
@@ -289,14 +332,17 @@ export class PurchaseOrderDetails {
       this.purchaseOrderModel.discount = 0;
       this.purchaseOrderModel.foreign_discount_amount = 0;
     }
-    this.cdRef.markForCheck();
   }
 
   QtyChange = this.debounce((qty: number, row: any) => {
+    if(row.receipt_quantity <= 0){
+      this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
+      row.receipt_quantity = 1;
+    }
     if (this.purchaseOrderModel.register_code == '182') {
-      row.fgn_total =+(qty * row.fgn_rate).toFixed(4);
+      row.fgn_total =+(row.receipt_quantity * row.fgn_rate).toFixed(4);
     } else {
-      row.pamount = +(qty * row.enter_rate).toFixed(3);
+      row.pamount = +(row.receipt_quantity * row.enter_rate).toFixed(3);
     }
     this.updateTotals();
   }, 200);
@@ -330,6 +376,7 @@ export class PurchaseOrderDetails {
 
   async ItemCodeEnter(item_no: any, row: any) {
     try {
+      if(!item_no) return;
       const res = await this.purchaseOrderService.itemCodeEnter(item_no);
       
       if (res && res.length > 0) {
@@ -357,12 +404,10 @@ export class PurchaseOrderDetails {
           this.purchaseOrderModel.foreign_line_amount = this.rows.reduce((sum:any, data:any) => sum + (data.fgn_total || 0), 0);
           this.purchaseOrderModel.foreign_enter_amount = this.purchaseOrderModel.foreign_line_amount - this.purchaseOrderModel.foreign_discount_amount;
         }
-        this.cdRef.markForCheck();
       }
     } catch (error) {
       console.error('ItemCodeEnter error:', error);
     }
-    this.cdRef.markForCheck();
   }
 
   async ModelNameChange( row: any) {
@@ -373,20 +418,25 @@ export class PurchaseOrderDetails {
       const item = this.ItemList.find(v => v.item_code == item_code.trim());
       this.ItemCodeEnter(item.item_no,row);
       row.item_no = item.item_no
-      this.cdRef.markForCheck();
     } catch (error) {
       console.error('ModelNameEnter error:', error);
     }
-    this.cdRef.markForCheck();
   }
 
   registerChange(x:any){
-    this.LocalPO = x == '32'; this.ForeignPO = x == '182'; this.rows = [...this.rows];
+    this.rowTemp =  this.clone(this.rows);
+    this.rows = [];
     if(x =='32'){
+      this.LocalPO = true; this.ForeignPO = false;
       this.purchaseOrderModel.cur_no = null;
     }else{
+      this.LocalPO = false; this.ForeignPO = true;
       const vendor = this.vendorList.find(v => v.account_code == this.purchaseOrderModel.account_code);
       this.purchaseOrderModel.cur_no = vendor ? vendor.cur_no : null;
+    }
+    this.rows =  this.clone(this.rowTemp);
+    if(this.dashboardService.PurchaseOrder == 1){
+      this.updateTotals();
     }
   }
 
@@ -481,7 +531,7 @@ export class PurchaseOrderDetails {
         row.voucher_id = Voucher_id;
       }); 
       this.purchaseOrderModel.created_by = localStorage.getItem('user_id');
-      this.purchaseOrderModel.approval_status = 'PENDING';
+      this.purchaseOrderModel.approval_status = 'DRAFT';
     }else if(this.btnType == 'M'){
       this.rows.forEach(row => {
         row.voucher_id = this.purchaseOrderModel.voucher_id;
@@ -496,23 +546,27 @@ export class PurchaseOrderDetails {
     this.purchaseOrderModel = rest as PurchaseOrderModel;
     this.rowSaveTemp = this.rows;
     this.rows = this.rows.map(({ unit_id,unit_name, ...rest }) => rest);
-    this.purchaseOrderService.savePurchaseOrder(this.purchaseOrderModel, this.rows,temp)
+    const voucher_date = this.datePipe.transform(this.purchaseOrderModel.voucher_date, 'dd/MM/yyyy');
+    this.dateModel.voucher_date = voucher_date;
+
+    this.purchaseOrderService.savePurchaseOrder(this.purchaseOrderModel, this.rows,temp, this.dateModel)
       .subscribe({
-        next: (response: any) => {
-            
-          const savedPO = response.po;
-          const savedItems = response.itemList;
+        next: async (response: any) => {
 
           if(this.btnType == 'N'  || this.btnType == 'C'){
-            this.purchaseOrderService.addRowAfterSave.next(savedPO);
             this.alertService.triggerAlert('Row saved successfully...',4000, 'success');
           }
           else if (this.btnType == 'M'){
-            this.purchaseOrderService.addRowAfterModify.next(savedPO);
             this.alertService.triggerAlert('Row updated successfully...', 4000, 'success');
           }
-          this.rows = [ ...this.rowSaveTemp];
-          this.purchaseOrderModel = {...savedPO};
+          await this.purchaseOrderService.getPurchaseOrderList(sessionStorage.getItem('year'),2);
+          let item: PurchaseOrderModel | undefined = this.purchaseOrderService.mainList.find(item => item.voucher_id === response.poSave.voucher_id);
+          if (item) {
+            this.purchaseOrderService.loadList.next(this.purchaseOrderService.mainList);
+            this.dashboardService.PurchaseOrder = 0;
+            this.purchaseOrderService.clickedPO.next(item); // pass single object
+          }
+
           this.registerDisable = true;
           this.itemDisable = true;
           this.saveDisable = true;
@@ -572,7 +626,6 @@ export class PurchaseOrderDetails {
         this.purchaseOrderService.clickedPO.next(updatedList[0]);
         this.alertService.triggerAlert('Row deleted successfully...', 4000, 'success');
         this.purchaseOrderService.btnClick.next('');
-        this.cdRef.markForCheck();
       },
       (error) => {
         this.alertService.triggerAlert('Failed to delete the Row...', 4000, 'error');
@@ -586,7 +639,6 @@ export class PurchaseOrderDetails {
     this.purchaseOrderModel.order_no = null;
     this.purchaseOrderModel.voucherDate =new Date(new Date);
     this.purchaseOrderModel.voucher_date =  new Date();
-    this.cdRef.markForCheck();
   }
 
   onSubListActivate(event: any) {
@@ -603,7 +655,6 @@ export class PurchaseOrderDetails {
         this.selected = [this.rows[rowIndex]];
         this.scrollToIndex(rowIndex);
       }
-      this.cdRef.markForCheck();
     }
   }
 
@@ -611,7 +662,43 @@ export class PurchaseOrderDetails {
     const rowHeight = this.rows.length; // same as [rowHeight]
     const bodyElement = this.table?.element.querySelector('.datatable-body');
     if (bodyElement) { bodyElement.scrollTop = index * rowHeight; }
-    this.cdRef.markForCheck();
+  }
+
+  async purchaseOrderBtnClick(data:any){
+    this.purchaseOrderService.disableGrid.next(true);
+    this.purchaseOrderModelTemp = {...this.purchaseOrderModel};
+    this.totalQtyTemp = this.totalQty;
+    this.rowTemp =  this.clone(this.rows);
+    this.purchaseOrderService.btnClick.next('N');
+    this.btnType ='N';
+    this.ItemListtemp = [...this.ItemList];
+    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
+    this.purchaseOrderModel = new PurchaseOrderModel();
+    this.purchaseOrderModel.counter_vid = data.voucher_id;
+    this.purchaseOrderModel.request_no = data.document_number;
+    this.purchaseOrderModel.register_code = 32;
+    this.purchaseOrderModel.voucher_date = new Date();
+    this.purchaseOrderModel.voucherDate = new Date();
+    try {
+          const items =await this.purchaseOrderService.getItemDetailsFromReorder(this.purchaseOrderModel.counter_vid);
+          if (items && items.length) {
+            this.rows = items.slice();
+            this.LocalPO = true;
+            this.ForeignPO = false;
+            this.AssignItems();
+            this.updateTotals();
+          } else {
+            this.rows = [];
+            this.LocalPO = false;
+            this.ForeignPO = false;
+          }
+        } catch (err) {
+          console.error('Error fetching ItemDetails', err);
+          this.rows = [];
+          this.totalQty = '0.000';
+        }
+        this.totalQty = this.sumRows('receipt_quantity');
+    
   }
 }
 

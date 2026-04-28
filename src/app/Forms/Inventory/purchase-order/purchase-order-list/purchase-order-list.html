@@ -29,7 +29,7 @@
 
     <!-- Columns -->
 
-    <ngx-datatable-column name="Sl No"  prop="sl_no" [maxWidth]="50">
+    <!-- <ngx-datatable-column name="Sl No"  prop="sl_no" [maxWidth]="50">
       <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
         <input 
         type="text" 
@@ -38,6 +38,16 @@
           [ngModelOptions]="{ standalone: true }"
           value ="{{ rowIndex + 1 }}"
           />
+      </ng-template>
+    </ngx-datatable-column> -->
+
+    <ngx-datatable-column name="PO. No" prop="document_number"  [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterPurchaseOrder.document_number"
+            placeholder="PO. No" (keyup)="updateFilter()" />
+          <span class="datatable-heading">PO. No</span>
+        </div>
       </ng-template>
     </ngx-datatable-column>
 
@@ -57,16 +67,6 @@
           <input class="form-control search mb-1" [(ngModel)]="filterPurchaseOrder.account_name"
             placeholder="Vendor" (keyup)="updateFilter()" />
           <span class="datatable-heading">Vendor</span>
-        </div>
-      </ng-template>
-    </ngx-datatable-column>
-
-    <ngx-datatable-column name="PO. No" prop="document_number"  [cellClass]="leftAlignCell" >
-      <ng-template ngx-datatable-header-template>
-        <div class="d-flex flex-column">
-          <input class="form-control search mb-1" [(ngModel)]="filterPurchaseOrder.document_number"
-            placeholder="PO. No" (keyup)="updateFilter()" />
-          <span class="datatable-heading">PO. No</span>
         </div>
       </ng-template>
     </ngx-datatable-column>

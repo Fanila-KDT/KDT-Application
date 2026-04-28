@@ -1,82 +1,6 @@
  <div class="container-fluid">
   <form ngForm #GRNForm="ngForm" name="form" (ngSubmit)="GRNForm.form.valid && onSubmit(GRNForm)" novalidate>
     <div class="row">
-        <!-- Register -->
-        <div class="col-md-2">
-          <div class="label-wrapper d-flex align-items-center">
-              <label for="register_code" class="form-label  mb-0">Register
-              <span class="required-star">*</span>
-              </label>
-          </div>
-          <div class="input-wrapper">
-              <select class="label-input" id="register_code" [ngClass]="{'is-invalid': isRegisterInvalid}"
-              name="register_code" [(ngModel)]="grnModel.register_code" #register_code="ngModel" [disabled]="registerDisable" (change)="registerChange(grnModel.register_code)" >
-              <option *ngFor="let main of registerList" [value]="main.register_code">{{ main.register_name }}</option>
-              </select>
-          </div>
-        </div>
-        <!-- Vendor -->
-        <div class="col-md-2">
-          <div class="label-wrapper d-flex align-items-center">
-              <label for="account_code" class="form-label mb-0">Vendor
-              <span class="required-star">*</span>
-              </label>
-          </div>
-          <div class="input-wrapper">
-              <ng-select  [items]="vendorList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="grnModel.account_code" class="select-input"
-                (change)="VendorChange(grnModel.account_code)"[disabled]="itemDisable" [ngClass]="{'is-invalid': isVendorInvalid}"
-                dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" >
-              </ng-select>
-          </div>
-        </div>
-        <!-- Warehouse -->
-        <div class="col-md-2">
-          <div class="label-wrapper d-flex align-items-center">
-              <label for="godown_code" class="form-label  mb-0">Warehouse
-              <span class="required-star">*</span>
-              </label>
-          </div>
-          <div class="input-wrapper">
-              <select class="label-input" id="godown_code" [ngClass]="{'is-invalid': isWRHouseInvalid}"
-              name="godown_code" [(ngModel)]="grnModel.godown_code" #godown_code="ngModel" [disabled]="itemDisable" >
-              <option *ngFor="let main of warehouseList" [value]="main.godown_code">{{ main.godown_name }}</option>
-              </select>
-          </div>
-        </div>
-        <!--Invoice Number -->
-      <div class="col-md-2">
-        <div class="label-wrapper d-flex align-items-center">
-          <label for="invoice_no" class="form-label  mb-0">Invoice Number
-          </label>
-        </div>
-        <div class="input-wrapper">
-            <input type="text" class="label-input" id="invoice_no" [disabled]="itemDisable" name="invoice_no"  name="invoice_no" 
-            [(ngModel)]="grnModel.invoice_no" #invoice_no="ngModel" [ngClass]="{'is-invalid': isInvoiceInvalid}">
-        </div>
-      </div>
-      <!-- Invoice Date -->
-      <div class="col-md-2">
-        <div class="label-wrapper">
-          <label for="invoice_date" class="form-label">Invoice Date
-          </label>
-        </div>
-        <div class="input-wrapper">
-          <div class="datepicker-wrapper">
-            <input type="text" class="form-control" bsDatepicker #dpi="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="itemDisable"
-              [bsConfig]="{
-                dateInputFormat: 'DD/MM/YYYY',
-                showWeekNumbers: false
-              }"
-              (bsValueChange)="onDateSelected($event)" [ngModel]="grnModel.invoiceDate" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
-              />
-            <button type="button" class="btn btn-outline-secondary" (click)="dpi.show()" [disabled]="itemDisable">
-              📅
-            </button>
-            </div> 
-        </div>
-      </div>
-    </div>
-    <div class="row">
       <!-- Doc No -->
       <div class="col-md-2">
         <div class="label-wrapper d-flex align-items-center">
@@ -88,34 +12,53 @@
               name="document_number" [(ngModel)]="grnModel.document_number" #document_number="ngModel">
         </div>
       </div>
-      <!--Ref Doc No -->
+      <!-- Register -->
       <div class="col-md-2">
         <div class="label-wrapper d-flex align-items-center">
-          <label for="ref_grn_id" class="form-label  mb-0">Ref Doc No
+          <label for="register_code" class="form-label  mb-0">Register
+            <span class="required-star">*</span>
           </label>
         </div>
         <div class="input-wrapper">
-          <ng-select  [items]="refNoList" bindLabel="ref_no" bindValue="ref_grn_id" [(ngModel)]="grnModel.ref_grn_id" 
-            [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }">
-          </ng-select>
+            <select class="label-input" id="register_code" [ngClass]="{'is-invalid': isRegisterInvalid}"
+            name="register_code" [(ngModel)]="grnModel.register_code" #register_code="ngModel" [disabled]="registerDisable" (change)="registerChange(grnModel.register_code)" >
+            <option *ngFor="let main of registerList" [value]="main.register_code">{{ main.register_name }}</option>
+            </select>
         </div>
       </div>
-      <!--PO Doc No -->
-      <div class="col-md-2">
+      <!-- Vendor -->
+      <div class="col-md-3">
         <div class="label-wrapper d-flex align-items-center">
-          <label for="po_no" class="form-label  mb-0">Po No
+          <label for="account_code" class="form-label mb-0">Vendor
+            <span class="required-star">*</span>
           </label>
         </div>
         <div class="input-wrapper">
-          <ng-select  [items]="PoNoList" bindLabel="po_no" bindValue="po_no" [(ngModel)]="grnModel.po_no" 
-            (change)="PoNoChange(grnModel.po_no)"[disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }">
-          </ng-select>
+            <ng-select  [items]="vendorList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="grnModel.account_code" class="select-input"
+              (change)="VendorChange(grnModel.account_code)"[disabled]="itemDisable" [ngClass]="{'is-invalid': isVendorInvalid}"  (click)="VendorClick()"
+              dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" >
+            </ng-select>
+        </div>
+      </div>
+      <!-- Warehouse -->
+      <div class="col-md-3">
+        <div class="label-wrapper d-flex align-items-center">
+          <label for="godown_code" class="form-label  mb-0">Warehouse
+            <span class="required-star">*</span>
+          </label>
+        </div>
+        <div class="input-wrapper">
+            <select class="label-input" id="godown_code" [ngClass]="{'is-invalid': isWRHouseInvalid}"
+            name="godown_code" [(ngModel)]="grnModel.godown_code" #godown_code="ngModel" [disabled]="itemDisable" >
+            <option *ngFor="let main of warehouseList" [value]="main.godown_code">{{ main.godown_name }}</option>
+            </select>
         </div>
       </div>
       <!-- Entry Date -->
       <div class="col-md-2">
         <div class="label-wrapper">
-          <label for="voucher_date" class="form-label">Entry Date
+          <label for="voucher_date" class="form-label">
+            Entry Date
           </label>
         </div>
         <div class="input-wrapper">
@@ -131,6 +74,65 @@
               📅
             </button>
             </div> 
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <!--Invoice Number -->
+      <div class="col-md-2">
+        <div class="label-wrapper d-flex align-items-center">
+          <label for="invoice_no" class="form-label  mb-0">Invoice Number
+            <span class="required-star">*</span>
+          </label>
+        </div>
+        <div class="input-wrapper">
+            <input type="text" class="label-input" id="invoice_no" [disabled]="itemDisable" name="invoice_no"  name="invoice_no" 
+            [(ngModel)]="grnModel.invoice_no" #invoice_no="ngModel" [ngClass]="{'is-invalid': isInvoiceInvalid}">
+        </div>
+      </div>
+      <!-- Invoice Date -->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="invoice_date" class="form-label">Invoice Date
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <div class="datepicker-wrapper">
+            <input type="text" class="form-control" bsDatepicker #dp1="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="itemDisable"
+              [bsConfig]="{
+                dateInputFormat: 'DD/MM/YYYY',
+                showWeekNumbers: false
+              }"
+              (bsValueChange)="onDateSelected1($event)" [ngModel]="grnModel.invoiceDate" (ngModelChange)="formatToDateInput1($event)" [ngModelOptions]="{ standalone: true }"
+              />
+            <button type="button" class="btn btn-outline-secondary" (click)="dp1.show()" [disabled]="itemDisable">
+              📅
+            </button>
+            </div> 
+        </div>
+      </div>
+      <!--Ref Doc No -->
+        <div class="col-md-2">
+          <div class="label-wrapper d-flex align-items-center">
+            <label for="ref_grn_id" class="form-label  mb-0">Ref Doc No
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <ng-select  [items]="refNoList" bindLabel="ref_no" bindValue="ref_grn_id" [(ngModel)]="grnModel.ref_grn_id" 
+              [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }">
+            </ng-select>
+          </div>
+        </div>
+      <!--PO Doc No -->
+      <div class="col-md-2">
+        <div class="label-wrapper d-flex align-items-center">
+          <label for="po_no" class="form-label  mb-0">Po No
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <ng-select  [items]="PoNoList" bindLabel="po_no" bindValue="po_no" [(ngModel)]="grnModel.po_no" 
+            (change)="PoNoChange(grnModel.po_no)"[disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }">
+          </ng-select>
         </div>
       </div>
       <!-- Reference -->
@@ -379,18 +381,6 @@
     </ngx-datatable>
 
     <div class="row">
-      <!-- Total Qty -->
-      <div class="col-md-2">
-        <div class="label-wrapper">
-          <label for="totalQty" class="form-label">Total Qty
-          </label>
-        </div>
-        <div class="input-wrapper">
-          <input type="text" class="label-input" id="totalQty" [disabled]="true"  
-              name="totalQty" [(ngModel)]="totalQty" #totalQtys="ngModel">
-        </div>
-      </div>
-      
       <!-- Status -->
       <div class="col-md-2">
         <div class="label-wrapper">
@@ -402,8 +392,19 @@
               name="approval_status" [(ngModel)]="grnModel.approval_status" #approval_status="ngModel">
         </div>
       </div>
+      <!-- Total Qty -->
+      <div class="col-md-2  ms-auto">
+        <div class="label-wrapper">
+          <label for="totalQty" class="form-label">Total Qty
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="totalQty" [disabled]="true"  
+              name="totalQty" [(ngModel)]="totalQty" #totalQtys="ngModel">
+        </div>
+      </div>
     </div>
-
+    <br>
     <fieldset class="border">
       <legend class="legend-left">
         {{ 'Local Purchase Details' }}
@@ -428,7 +429,7 @@
           </div>
           <div class="input-wrapper">
             <input type="text" class="label-input" id="discount" [disabled]="isLocalEditable"  
-                name="number" [(ngModel)]="grnModel.discount" #discount="ngModel" (input)="DiscountChange(grnModel.discount)">
+                name="number" [(ngModel)]="grnModel.discount" #discount="ngModel" (change)="DiscountChange(grnModel.discount)">
           </div>
         </div>
         <!-- Net Total -->
@@ -501,7 +502,7 @@
             </label>
           </div>
           <div class="input-wrapper">
-            <input type="number" class="label-input" id="foreign_discount_amount" [disabled]="itemDisable"   (input)="forignDiscountChange(grnModel.foreign_discount_amount)"
+            <input type="number" class="label-input" id="foreign_discount_amount" [disabled]="itemDisable"   (change)="forignDiscountChange(grnModel.foreign_discount_amount)"
               name="foreign_discount_amount" [(ngModel)]="grnModel.foreign_discount_amount" #foreign_discount_amount="ngModel">
           </div>
         </div>
@@ -532,7 +533,7 @@
         </div>
       </div>
       <!-- Created On-->
-      <div class="col-md-2">
+      <div class="col-md-1">
         <div class="label-wrapper">
           <label for="created_date" class="form-label">Created On
           </label>
@@ -554,7 +555,7 @@
         </div>
       </div>
       <!-- Updated On -->
-      <div class="col-md-2">
+      <div class="col-md-1">
         <div class="label-wrapper">
           <label for="modified_date" class="form-label">Modified On
           </label>
@@ -575,15 +576,15 @@
               name="approved_by" [(ngModel)]="grnModel.approved_by" #approved_by="ngModel">
         </div>
       </div>
-
-      <div class="col-md-2">
+      <!-- Remarks -->
+      <div class="col-md-4">
         <div class="label-wrapper">
           <label for="approver_remarks" class="form-label">Approval Remarks
           </label>
         </div>
         <div class="input-wrapper">
             <textarea class="label-input" id="approver_remarks" name="approver_remarks" rows="2"
-              [(ngModel)]="grnModel.approver_remarks" #approver_remarks="ngModel" disabled >
+              [(ngModel)]="grnModel.approver_remarks" #approver_remarks="ngModel" [disabled]="true" >
             </textarea>
         </div>
       </div>

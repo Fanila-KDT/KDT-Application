@@ -49,6 +49,7 @@ export class GoodsRecieptNote {
       this.searchDisable = data;
       this.yearDisable = data;
       this.SVDisabled = data;
+      this.refreshDisable = data;
     }));
 
     const subs = [
@@ -99,8 +100,7 @@ export class GoodsRecieptNote {
         sessionStorage.setItem('data_entry_status',match.data_entry_status.toString());
       }
     if(this.grnModelService.btnClick.value == ''){
-      this.grnModelService.getGoodsRecieptList(event);
-      this.cdRef.markForCheck();
+      this.grnModelService.getGoodsRecieptList(event,1);
       this.grnModelService
       .getRefNoListFull(this.endPointService.companycode, this.year)
       .then((response: any[]) => {
@@ -135,6 +135,7 @@ export class GoodsRecieptNote {
       this.deleteDisable = true;
       this.searchDisable = true;
       this.yearDisable = true;
+      this.refreshDisable = true;
       this.SVDisabled = true;
       this.grnModelService.disableGrid.next(true);
     }
@@ -181,6 +182,8 @@ export class GoodsRecieptNote {
   Refresh(){
     this.grnModelService.ngOnInit.next(true);
     this.getYear();
+    this.searchDisable =  false;
+    this.yearDisable = false;
   }
 
   StockVarification() {

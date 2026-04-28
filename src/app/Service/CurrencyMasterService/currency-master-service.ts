@@ -99,7 +99,14 @@ export class CurrencyMasterService {
   }
   
   deleteCurrencyMaster(cur_no: string): Observable<CurrencyMasterModel[]> {
-    return this.httpClient.delete<CurrencyMasterModel[]>(this.endpointService.DeleteCurrencyMaster + '/' + cur_no);
+    try{
+      return this.httpClient.delete<CurrencyMasterModel[]>(this.endpointService.DeleteCurrencyMaster + '/' + cur_no);
+    }catch (error) {
+      console.error('deleteCurrencyMaster : ', error);
+      const message = 'Something went wrong while Deleting Currency. Please try again.';
+      this.alertService.triggerAlert(message, 4000, 'error');
+      throw error; // Return empty observable on error
+    }
   }
 
   async SearchList(searchList: CurrencyMasterModalSearch): Promise<void> {

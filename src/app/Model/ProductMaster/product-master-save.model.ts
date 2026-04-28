@@ -1,19 +1,19 @@
 export class productMasterModelSave {
-    item_no :string="";
-    item_code :string="";
-    item_name:string="";
-    item_name_abbr:string="";
-    category_code:string="";
+    item_no :any;
+    item_code :any;
+    item_name:any;
+    item_name_abbr:any;
+    category_code:any;
     brand_id:any;
-    bin_location:string="";
+    bin_location:any;
     retail_rate:number=0;
     unitid:number=0;
-    product_type:string="";
+    product_type:any;
     final_rate:number=0;
     product_yield:number=0;
     warranty:number=0;
     type_id:number=0;
-    company_code:number=0;
+    company_code:number=1;
     cost_price :number=0;
     avG_COST :number=0;
     cpP_Bw :number=0;
@@ -27,6 +27,7 @@ export class productMasterModelSave {
     service_item:any=false; 
     inactive_item:any=false; 
     item_category:any;
+    user_id:any;
 }
 
 export class AccessoriesSave {

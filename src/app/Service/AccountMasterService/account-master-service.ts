@@ -108,7 +108,14 @@ export class AccountMasterService {
   }
 
   deleteAccountMaster(account_code: string): Observable<AccountMasterModel[]> {
+    try{
     return this.httpClient.delete<AccountMasterModel[]>(this.endpointService.DeleteAccountMaster + '/' + account_code);
+    }catch (error) {
+      console.error('deleteAccountMaster : ', error);
+      const message = 'Something went wrong while Deleting Account. Please try again.';
+      this.alertService.triggerAlert(message, 4000, 'error');
+      throw error; // Return empty observable on error
+    }
   }
 
   async SearchList(searchList: AccountMasterModalSearch): Promise<void> {
@@ -141,6 +148,7 @@ export class AccountMasterService {
       console.error('accNameCheck : ', error);
       let message='Account Name is already present. Please try again.';
       this.alertService.triggerAlert(message,4000, 'error');
+      throw error;
     }
   }
 }

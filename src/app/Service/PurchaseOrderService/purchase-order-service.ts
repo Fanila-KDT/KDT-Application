@@ -4,6 +4,7 @@ import { AlertService } from '../../shared/alert/alert.service';
 import { BehaviorSubject, firstValueFrom, lastValueFrom, map, Observable } from 'rxjs';
 import { PurchaseOrderEndpointService } from './purchase-order.end-point.service';
 import { ItemDetailsModel, PurchaseOrderModalSearch, PurchaseOrderModel } from '../../Model/PurchaseOrder/purchase-order.model';
+import { DateModel } from '../../Model/CommonModel';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,6 @@ export class PurchaseOrderService {
   public loadList = new BehaviorSubject<PurchaseOrderModel[]>([]);
 
   public clickedPO = new BehaviorSubject<PurchaseOrderModel>(new PurchaseOrderModel()) ;  
-  public addRowAfterSave = new BehaviorSubject<PurchaseOrderModel>(new PurchaseOrderModel()) ;
-  public addRowAfterModify = new BehaviorSubject<PurchaseOrderModel>(new PurchaseOrderModel()) ;
   public assignItemDetails = new BehaviorSubject<ItemDetailsModel>(new ItemDetailsModel()) ;
 
   public disableGrid = new BehaviorSubject<boolean>(false);
@@ -28,21 +27,22 @@ export class PurchaseOrderService {
   public deleteDisabled = new BehaviorSubject<boolean>(false);
   public registerList = new BehaviorSubject<any>(null);
   public vendorList = new BehaviorSubject<any>(null);
-
+  public ControlsEnableAndDisable = new BehaviorSubject<boolean>(false);
   FormName = 'PURCHASE_ORDER';
   selectedDocNo :any;
 
   constructor(private httpClient:HttpClient, public endpointService: PurchaseOrderEndpointService,private alertService:AlertService) { }
 
-  async getPurchaseOrderList(year:any){
+  async getPurchaseOrderList(year:any,status:any){
     try {
       const res = await firstValueFrom(
         this.httpClient.get<PurchaseOrderModel[]>(this.endpointService.getList +'/'+ year)
       );
       this.mainList = res;
-      this.loadList.next(res);
-      this.clickedPO.next(res[0]);
-
+      if(status == 1){
+        this.loadList.next(res);
+        this.clickedPO.next(res[0]);
+      }
       return res; // ✅ Return the response
     } catch (error) {
       console.error('getPurchaseOrderList : ', error);
@@ -94,36 +94,39 @@ export class PurchaseOrderService {
     } 
   }
 
-  async getItemList(): Promise<any[]>{
-    let message='Something went wrong while Getting Item List. Please try again.';
-    try{
-        return await lastValueFrom(
-        this.httpClient.get<any[]>(this.endpointService.GetItemList)
-      );
-    }catch (error) {
-      console.error('GetItemList : ', error);
-      this.alertService.triggerAlert(message,4000, 'error');
-      throw error;
-    }
-  }
-  
-  async getItemDetails(voucher_id: any) {
-    if (!voucher_id) {
-      return;
-    }
-
+  async getItemDetails(voucher_id: any): Promise<any[]> {
     try {
+      if (!voucher_id) {
+        return []; // Return empty array if voucher_id is not provided
+      }
       const res = await firstValueFrom(
-        this.httpClient.get<any>(`${this.endpointService.GetItemDetails}/${voucher_id}`)
+        this.httpClient.get<any[]>(this.endpointService.GetItemDetails +'/'+voucher_id)
       );
-      this.assignItemDetails.next(res);
-    } catch (err: any) {
-      console.error('GetItemDetails : ', err);
-      const message = err?.error?.text || 'Something went wrong while Fetching Item List. Please try again.';
+      return res;
+    } catch (error: any) {
+      console.error('GetItemDetails : ', error);
+      const message = 'Something went wrong while Fetching Item List. Please try again.';
       this.alertService.triggerAlert(message, 4000, 'error');
+      return []; // Ensure function always returns an array
     }
   }
 
+  async getItemDetailsFromReorder(voucher_id: any): Promise<any[]> {
+    try {
+      if (!voucher_id) {
+        return []; // Return empty array if voucher_id is not provided
+      }
+      const res = await firstValueFrom(
+        this.httpClient.get<any[]>(this.endpointService.GetItemDetailsFromReorder +'/'+voucher_id)
+      );
+      return res;
+    } catch (error: any) {
+      console.error('GetItemDetailsFromReorder : ', error);
+      const message = 'Something went wrong while Fetching Item List. Please try again.';
+      this.alertService.triggerAlert(message, 4000, 'error');
+      return []; // Ensure function always returns an array
+    }
+  }
 
   async itemCodeEnter(item_no: any): Promise<any[]> {
     try {
@@ -148,11 +151,12 @@ export class PurchaseOrderService {
     }
   }
 
-  savePurchaseOrder(purchaseOrderModel: PurchaseOrderModel, ItemList: any[],temp:any) {
+  savePurchaseOrder(purchaseOrderModel: PurchaseOrderModel, ItemList: any[],temp:any, dateModel: DateModel) {
     const payload = {
       POSave: purchaseOrderModel,
       ItemList: ItemList,
-      PO : temp
+      PO : temp,
+      dateModel: dateModel
     };
     return this.httpClient.post<any>(this.endpointService.SavePurchaseOrder, payload)
   }
@@ -171,6 +175,8 @@ export class PurchaseOrderService {
 
   async SearchList(searchList: PurchaseOrderModalSearch): Promise<void> {
     let params = new HttpParams();
+
+    params = params.set('year', sessionStorage.getItem('year')|| 0)
 
     if (searchList.register_code != null) {
       params = params.set('register_code', searchList.register_code.toString());

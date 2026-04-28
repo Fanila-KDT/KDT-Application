@@ -32,6 +32,7 @@ export class StockCorrection {
       this.deleteDisable = data;
       this.newDisable = data;
       this.searchDisable = data;
+      this.refreshDisable = data;
       this.yearDisable = data;
     }));
 
@@ -54,6 +55,7 @@ export class StockCorrection {
       this.yearDisable = true;
       this.deleteDisable = true;
       this.newDisable = true;
+      this.refreshDisable = true;
       this.stockCorrectionService.disableGrid.next(true);
     }
     this.stockCorrectionService.btnClick.next(type);

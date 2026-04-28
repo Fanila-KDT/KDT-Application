@@ -33,6 +33,7 @@ export class StockTransfer {
       this.newDisable = data;
       this.searchDisable = data;
       this.yearDisable = data;
+      this.refreshDisable = data;
     }));
 
     const subs = [
@@ -54,6 +55,7 @@ export class StockTransfer {
       this.yearDisable = true;
       this.deleteDisable = true;
       this.newDisable = true;
+      this.refreshDisable = true;
       this.stockTransferService.disableGrid.next(true);
     }
     this.stockTransferService.btnClick.next(type);

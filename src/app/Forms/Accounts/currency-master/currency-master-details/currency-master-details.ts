@@ -83,6 +83,14 @@ export class CurrencyMasterDetails {
 
   ngOnDestroy(): void {
     this.subscription.forEach(sub => sub.unsubscribe());
+    this.isEditable = true;
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.currencyMasterService.disableGrid.next(false);
+    this.currencyMasterService.disabledItems.next(false);
+    this.currencyMasterService.btnClick.next('');
+    this.rows =[];
+    this.currencyMasterModel = new CurrencyMasterModel();
   }
 
   onRowSelect(event: any) {

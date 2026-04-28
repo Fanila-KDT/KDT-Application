@@ -30,8 +30,11 @@ export class NavigationComponent implements OnInit {
         { path: '/Forms/goods-reciept-note', label: 'Goods Receipt Note' },
         { path: '/Forms/stock-verification', label: 'Stock Verification' },
         { path: '/Forms/expense-entry', label: 'Expense Entry' },
+        { path: '/Forms/purchase-return', label: 'Purchase Return' },
         { path: '/Forms/stock-transfer', label: 'Stock Transfer' },
         { path: '/Forms/stock-correction', label: 'Stock Correction' },
+        { path: '/Forms/item-reorder-request', label: 'Reorder Request' },
+        { path: '/Forms/stock-taking', label: 'Stock Taking' },
 
       ],
       reports: [

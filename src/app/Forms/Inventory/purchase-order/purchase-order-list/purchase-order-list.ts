@@ -45,6 +45,7 @@ export class PurchaseOrderList {
   gridHeight:number;
   scroll: boolean = true;
   clrFilterDisable = false;
+  approval_status:string ='';
 
   constructor(public purchaseOrderService:PurchaseOrderService,public endPointService:EndPointService,public userAccessService:UserAccessService,private cdRef: ChangeDetectorRef) {
     this.subscription = new Array<Subscription>();
@@ -73,25 +74,6 @@ export class PurchaseOrderList {
       }
     }));
 
-    this.subscription.push(this.purchaseOrderService.addRowAfterSave.subscribe(data=>{
-      if(data.document_number){
-        this.rows.unshift(data);
-        this.selected = [this.rows[0]];
-        this.purchaseOrderService.selectedDocNo =  data.register_name;
-      }
-    }));
-
-    this.subscription.push(this.purchaseOrderService.addRowAfterModify.subscribe(data => {
-      if (data.document_number) {
-        this.purchaseOrderService.selectedDocNo =  data.register_name;
-        const index = this.rows.findIndex(row => row.document_number === data.document_number);
-        if (index !== -1) {
-          this.rows.splice(index, 1, data);
-        }
-        this.selected = [data];
-      }
-    }));
-    
     this.subscription.push(this.purchaseOrderService.disableGrid.subscribe(data=>{
       this.disableGrid = data;
     }));
@@ -104,11 +86,19 @@ export class PurchaseOrderList {
         this.purchaseOrderService.cancelClick.next(true);
       }
     }));
+
+     this.subscription.push(this.purchaseOrderService.ControlsEnableAndDisable.subscribe(data=>{
+      if(data){
+        this.approval_status = this.rows.length > 0 ? this.rows[0].approval_status : '';
+        this.ControlsEnableAndDisable();
+      }
+    }));
+
   }
 
   ngOnInit(){
-    this.purchaseOrderService.getPurchaseOrderList(this.endPointService.year);
-    this.userAccessService.CheckUserAccess(this.purchaseOrderService.FormName,this.purchaseOrderService);
+    this.purchaseOrderService.getPurchaseOrderList(this.endPointService.year,1);
+    //this.userAccessService.CheckUserAccess(this.purchaseOrderService.FormName,this.purchaseOrderService);
   }
 
   ngOnDestroy(): void {
@@ -130,6 +120,7 @@ export class PurchaseOrderList {
     this.temp = [...this.filteredRows]; // ✅ Store filtered data for pagination
     this.currPage = 1; // ✅ Reset to first page
     this.updatePage(); // ✅ Apply pagination
+    this.approval_status = this.rows[0].approval_status;
     this.purchaseOrderService.clickedPO.next(this.rows[0]);
   }
 
@@ -205,37 +196,62 @@ export class PurchaseOrderList {
     }
 
     onActivate(event: any) {
-      let rowItem = event.row;
-      let rowIndex = this.rows.indexOf(rowItem);
+    let rowItem = event.row;
+    let rowIndex = this.rows.indexOf(rowItem);
 
-      if(rowIndex+1!=this.controls.pageSize){
-        if (event.type === 'keydown' && (event.event.code === 'ArrowDown'))
-        {
-          // Get Selected Row Index
-          this.selectedPurchaseOrder = 1 + rowIndex;
-          this.viewDetails(this.rows[this.selectedPurchaseOrder]);
-          this.cdRef.markForCheck();
-          this.purchaseOrderService.clickedPO.next(this.rows[this.selectedPurchaseOrder]);
-          this.cdRef.markForCheck();
-        } 
-        else if (event.type === 'keydown' && (event.event.code === 'ArrowUp'))
-        {
-          this.selectedPurchaseOrder = rowIndex - 1;
-          this.viewDetails(this.rows[this.selectedPurchaseOrder]);
-          this.cdRef.markForCheck();
-          this.purchaseOrderService.clickedPO.next(this.rows[this.selectedPurchaseOrder]);
-          this.cdRef.markForCheck();
-        }
-        else if (event.type == 'click') 
-        {
-          let rowItem = event.row;
-          this.selectedPurchaseOrder = this.rows.indexOf(rowItem);
-          this.viewDetails(event.row);
-          this.cdRef.markForCheck();
-          this.purchaseOrderService.clickedPO.next(this.rows[this.selectedPurchaseOrder]);
-          this.cdRef.markForCheck();
-        }
+    if(rowIndex+1!=this.controls.pageSize){
+      if (event.type === 'keydown' && (event.event.code === 'ArrowDown'))
+      {
+        // Get Selected Row Index
+        this.selectedPurchaseOrder = 1 + rowIndex;
+        this.viewDetails(this.rows[this.selectedPurchaseOrder]);
+        this.approval_status = this.rows[this.selectedPurchaseOrder].approval_status;
+        this.purchaseOrderService.clickedPO.next(this.rows[this.selectedPurchaseOrder]);
+      } 
+      else if (event.type === 'keydown' && (event.event.code === 'ArrowUp'))
+      {
+        this.selectedPurchaseOrder = rowIndex - 1;
+        this.viewDetails(this.rows[this.selectedPurchaseOrder]);
+        this.approval_status = this.rows[this.selectedPurchaseOrder].approval_status;
+        this.purchaseOrderService.clickedPO.next(this.rows[this.selectedPurchaseOrder]);
       }
-      this.cdRef.markForCheck();
+      else if (event.type == 'click') 
+      {
+        let rowItem = event.row;
+        this.selectedPurchaseOrder = this.rows.indexOf(rowItem);
+        this.viewDetails(event.row);
+        this.approval_status = this.rows[this.selectedPurchaseOrder].approval_status;
+        this.purchaseOrderService.clickedPO.next(this.rows[this.selectedPurchaseOrder]);
+      }
     }
+    this.cdRef.markForCheck();
+  }
+
+  ControlsEnableAndDisable() {
+    // 1. Run user access check first
+    this.userAccessService.CheckUserAccess(this.purchaseOrderService.FormName, this.purchaseOrderService);
+
+    // 2. Read current disable flags after CheckUserAccess
+    const newDisable = this.purchaseOrderService.newDisabled.getValue();
+    const editDisabled = this.purchaseOrderService.editDisabled.getValue();
+    const deleteDisabled = this.purchaseOrderService.deleteDisabled.getValue();
+
+    // 3. Only if user access allows (enabled), apply period rules
+    if ( !newDisable ||  !editDisabled || !deleteDisabled) {
+      let period_status = sessionStorage.getItem('period_status') || '';
+      let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
+      let approval_status = this.approval_status;
+
+      const periodAllowed = this.userAccessService.CheckPeriodAccess(
+        approval_status,
+        period_status,
+        data_entry_status
+      );
+
+      this.purchaseOrderService.newDisabled.next(!periodAllowed);
+      this.purchaseOrderService.editDisabled.next(!periodAllowed || this.approval_status?.toUpperCase() != 'DRAFT');
+      this.purchaseOrderService.deleteDisabled.next(!periodAllowed || this.approval_status?.toUpperCase() != 'DRAFT');
+    }
+    
+  }
 }

@@ -15,7 +15,7 @@ import { PurchaseOrderService } from '../../../../Service/PurchaseOrderService/p
   styleUrls: ['./stock-correction-list.css','../../../common.css']
 })
 export class StockCorrectionList {
-subscription: Subscription[] =  new Array<Subscription>();
+  subscription: Subscription[] =  new Array<Subscription>();
   isLoading: boolean = false;
   disableGrid: boolean =false;
   rows: any[] = [];           // Original data
@@ -95,10 +95,6 @@ subscription: Subscription[] =  new Array<Subscription>();
 
   async ngOnInit() {
     await this.stockCorrectionService.getStockCorrectionList(this.endPointService.year,1);
-    await this.purchaseOrderService.getItemList().then((res: any[]) => {
-      this.stockCorrectionService.ItemList = res;
-    });
-
   }
 
   onActivate(event: any) {

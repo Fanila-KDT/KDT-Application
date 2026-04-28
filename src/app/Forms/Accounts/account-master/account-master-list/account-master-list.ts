@@ -87,9 +87,9 @@ export class AccountMasterList {
       }
     }));
 
-    this.subscription.push(this.accountMasterService.isLoading.subscribe(data=>{
-      this.isLoading = data;
-    }));
+    // this.subscription.push(this.accountMasterService.isLoading.subscribe(data=>{
+    //   this.isLoading = data;
+    // }));
 
     this.subscription.push(this.accountMasterService.ngOnInit.subscribe(data=>{
       if(data){
@@ -103,9 +103,7 @@ export class AccountMasterList {
 
   async ngOnInit() {
     this.userAccessService.CheckUserAccess(this.accountMasterService.FormName,this.accountMasterService);
-    this.accountMasterService.isLoading.next(true);
     await this.accountMasterService.getAccountMasterList();
-    this.accountMasterService.isLoading.next(false);
   }
 
   ngOnDestroy(): void {
@@ -145,9 +143,7 @@ export class AccountMasterList {
     }
   
     async viewDetails(row: any) {
-      this.isLoading = true;
       this.selected = [row];
-      this.isLoading = false;
     }
     
     paginate(direction: 'left' | 'right' | ''): void {

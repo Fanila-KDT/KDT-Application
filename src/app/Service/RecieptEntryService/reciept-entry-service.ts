@@ -4,6 +4,7 @@ import { AlertService } from '../../shared/alert/alert.service';
 import { RecieptEntryEndpointService } from './reciept-entry-end-point.service';
 import { BehaviorSubject, firstValueFrom, lastValueFrom, Observable, Subject } from 'rxjs';
 import { GRNHeaderModel, GRNModel, GRNDetailsModel, ItemDetailsModel, RecieptEntryModel, GRNModelModalSearch } from '../../Model/RecieptEnry/reciept-enry.model';
+import { DateModel } from '../../Model/CommonModel';
 
 @Injectable({
   providedIn: 'root'
@@ -54,15 +55,18 @@ export class RecieptEntryService {
     }
   }
 
-  async getGoodsRecieptList(year:any){
+  async getGoodsRecieptList(year:any,status:any){
     try {
+
       const res = await firstValueFrom(
         this.httpClient.get<GRNModel[]>(this.endpointService.GetGoodsRecieptList + '/' + year)
       );
       this.mainList = res;
-      this.loadListGRN.next(res);
-      this.approvalStatus.next(res[0].approval_status)
-      this.clickedGRN.next(res[0]);
+      if(status == 1){
+        this.loadListGRN.next(res);
+        this.approvalStatus.next(res[0].approval_status);
+        this.clickedGRN.next(res[0]);
+      }
       return res; // ✅ Return the response
     } catch (error) {
       console.error('getParametersList : ', error);
@@ -114,38 +118,20 @@ export class RecieptEntryService {
     } 
   }
 
-  async getFullWarehouseList(companycode: number): Promise<any[]> {
+  async getItemDetails(voucher_id: any): Promise<any[]> {
     try {
-      const res = await firstValueFrom(
-        this.httpClient.get<any[]>(this.endpointService.GetFullWarehouseList +'/'+ companycode)
-      );
-      return res; // ✅ Return the response
-    } catch (error) {
-      console.error('GetFullWarehouseList : ', error);
-      const message = 'Something went wrong while Fetching Full Warehouse List. Please try again.';
-      this.alertService.triggerAlert(message, 4000, 'error');
-      return []; // Return empty array on error
-    } 
-  }
-
-  async getItemDetails(voucher_id:any){
-    try{
-      if(voucher_id == null || voucher_id == undefined){
-        return;
+      if (!voucher_id) {
+        return []; // Return empty array if voucher_id is not provided
       }
-      await this.httpClient.get<any>(this.endpointService.GetItemDetails +'/'+voucher_id).subscribe({
-      next: res => {
-        this.assignItemDetails.next(res);
-      },
-      error: err =>{
-        console.log(err);
-          this.alertService.triggerAlert(err.error.text,4000, 'error');
-      } 
-      });
-    }catch (error) {
+      const res = await firstValueFrom(
+        this.httpClient.get<any[]>(this.endpointService.GetItemDetails +'/'+voucher_id)
+      );
+      return res;
+    } catch (error: any) {
       console.error('GetItemDetails : ', error);
-      let message='Something went wrong while Fetching Item List. Please try again.';
-      this.alertService.triggerAlert(message,4000, 'error');
+      const message = 'Something went wrong while Fetching Item List. Please try again.';
+      this.alertService.triggerAlert(message, 4000, 'error');
+      return []; // Ensure function always returns an array
     }
   }
 
@@ -203,11 +189,12 @@ export class RecieptEntryService {
     } 
   }
 
-  saveGoodsRecieptNote(grnheaderModel: GRNHeaderModel, grnGridModel: any[],grnDetailsModel:GRNDetailsModel) {
+  saveGoodsRecieptNote(grnheaderModel: GRNHeaderModel, grnGridModel: any[],grnDetailsModel:GRNDetailsModel,dateModel:DateModel) {
     const payload = {
       grnheaderModel: grnheaderModel,
       grnGridModel: grnGridModel,
-      grnDetailsModel : grnDetailsModel
+      grnDetailsModel : grnDetailsModel,
+      dateModel : dateModel
     };
     return this.httpClient.post<any>(this.endpointService.SaveGoodsRecieptNote, payload)
   }
@@ -225,6 +212,8 @@ export class RecieptEntryService {
 
   async SearchList(searchList: GRNModelModalSearch): Promise<void> {
     let params = new HttpParams();
+    
+    params = params.set('year', sessionStorage.getItem('year')|| 0)
 
     if (searchList.register_code != null) {
       params = params.set('register_code', searchList.register_code);

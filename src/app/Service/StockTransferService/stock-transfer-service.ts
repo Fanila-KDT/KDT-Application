@@ -4,7 +4,7 @@ import { BehaviorSubject, firstValueFrom, lastValueFrom, Observable, Subject } f
 import { AlertService } from '../../shared/alert/alert.service';
 import { StockTransferEndpointService } from './stock-transfer-end-point.service';
 import { StockTransferDetailModel, StockTransferModel, StockTransferSearch } from '../../Model/StockTransfer/stock-transfer.model';
-import { FinancialDataHeader } from '../../Model/CommonModel';
+import { DateModel, FinancialDataHeader } from '../../Model/CommonModel';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +24,6 @@ export class StockTransferService {
   public ControlsEnableAndDisable = new BehaviorSubject<boolean>(false);
   public clickedStockTras = new BehaviorSubject<StockTransferModel>(new StockTransferModel()) ;
   public loadListStockTransfer = new BehaviorSubject<StockTransferModel[]>([]); 
-  public assignStockTransDetails = new BehaviorSubject<StockTransferDetailModel>(new StockTransferDetailModel()) ;
   public ItemList : any[] = [];
     
   constructor(private httpClient:HttpClient, public endpointService: StockTransferEndpointService,private alertService:AlertService) { }
@@ -62,39 +61,42 @@ export class StockTransferService {
     } 
   }
 
-  async getStockTransferDetails(voucher_id:any){
-    try{
-      if(voucher_id == null || voucher_id == undefined){
-        return;
+  async getStockTransferDetails(voucher_id: any): Promise<any[]> {
+    try {
+      if (!voucher_id) {
+        return []; // Return empty array if voucher_id is not provided
       }
-      await this.httpClient.get<any>(this.endpointService.GetStockTransferDetails +'/'+voucher_id).subscribe({
-      next: res => {
-        this.assignStockTransDetails.next(res);
-      },
-      error: err =>{
-        console.log(err);
-          this.alertService.triggerAlert(err.error.text,4000, 'error');
-      } 
-      });
-    }catch (error) {
-      console.error('getStockTransferDetails : ', error);
-      let message='Something went wrong while Fetching Item List. Please try again.';
-      this.alertService.triggerAlert(message,4000, 'error');
+      const res = await firstValueFrom(
+        this.httpClient.get<any[]>(this.endpointService.GetStockTransferDetails +'/'+voucher_id)
+      );
+      return res;
+    } catch (error: any) {
+      console.error('GetStockTransferDetails : ', error);
+      const message = 'Something went wrong while Fetching Stock Transfer Details. Please try again.';
+      this.alertService.triggerAlert(message, 4000, 'error');
+      return []; // Ensure function always returns an array
     }
   }
 
-  saveStockTransfer(stockTransferModel: FinancialDataHeader, stockTransGridModel: any[],transfer_godown_code:any) {
+  saveStockTransfer(stockTransferModel: FinancialDataHeader, stockTransGridModel: any[],transfer_godown_code:any,dateModel:DateModel){
     const payload = {
       stockTransferModel: stockTransferModel,
       stockTransGridModel: stockTransGridModel,
-      transfer_godown_code: transfer_godown_code
+      transfer_godown_code: transfer_godown_code,
+      dateModel: dateModel
     };
     return this.httpClient.post<any>(this.endpointService.SaveStockTransfer, payload)
   }
 
-  deleteStockTransfer(voucher_id: string): Observable<any[]> {
+  deleteStockTransfer(voucher_id: string,gridModel:any ): Observable<any[]> {
+    const payload = {
+      voucher_id : voucher_id,
+      year : sessionStorage.getItem('year'),
+      gridModel: gridModel
+    };
+    
     return this.httpClient.delete<any[]>(
-      this.endpointService.DeleteStockTransfer + '/' + voucher_id + '/' + sessionStorage.getItem('year')
+      this.endpointService.DeleteStockTransfer, { body: payload } 
     );
   }
 

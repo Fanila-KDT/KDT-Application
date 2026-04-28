@@ -6,7 +6,7 @@ fieldset {
 
 /* Grid on the left */
 fieldset ngx-datatable {
-  flex: 2;
+  flex: 3;
   margin-right: 5px; /* spacing between grid and totals */
 }
 /* Totals panel on the right */

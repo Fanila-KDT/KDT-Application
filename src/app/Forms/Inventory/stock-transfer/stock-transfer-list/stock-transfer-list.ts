@@ -3,10 +3,10 @@ import { SelectionType } from '@swimlane/ngx-datatable';
 import { Subscription } from 'rxjs';
 import { Pagination } from '../../../../Model/pagingResponse';
 import { StockTransferModel } from '../../../../Model/StockTransfer/stock-transfer.model';
-import { StockTransferService } from '../../../../Service/StockTransferService/stock-transfer-service';
 import { EndPointService } from '../../../../Service/end-point.services';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
 import { PurchaseOrderService } from '../../../../Service/PurchaseOrderService/purchase-order-service';
+import { StockTransferService } from '../../../../Service/StockTransferService/stock-transfer-service';
 
 @Component({
   selector: 'stock-transfer-list',
@@ -88,10 +88,6 @@ export class StockTransferList {
 
   async ngOnInit() {
     await this.stockTransferService.getStockTransferList(this.endPointService.year,1);
-    await this.purchaseOrderService.getItemList().then((res: any[]) => {
-      this.stockTransferService.ItemList = res;
-    });
-
   }
 
   onActivate(event: any) {

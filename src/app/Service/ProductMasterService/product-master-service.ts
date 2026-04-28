@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AlertService } from '../../shared/alert/alert.service';
 import { BehaviorSubject, firstValueFrom, lastValueFrom, Observable } from 'rxjs';
@@ -49,7 +49,7 @@ export class ProductMasterService {
       console.error('getParametersList : ', error);
       const message = 'Something went wrong while Fetching Main Grid Items. Please try again.';
       this.alertService.triggerAlert(message, 4000, 'error');
-      return []; // Return empty array on error
+      throw error; // Re-throw the error to be handled by the caller
     }
   }
 
@@ -135,7 +135,7 @@ export class ProductMasterService {
       console.error('AddProductClass : ', error);
       let message='Something went wrong while  Adding New Product Class. Please try again.';
       this.alertService.triggerAlert(message,4000, 'error');
-      return null;
+      throw error;
     }
   }
 
@@ -154,7 +154,7 @@ export class ProductMasterService {
       console.error('AddBrand : ', error);
       let message='Something went wrong while  Adding New Brand. Please try again.';
       this.alertService.triggerAlert(message,4000, 'error');
-      return null;
+      throw error;
     }
   }
 
@@ -167,7 +167,7 @@ export class ProductMasterService {
         console.error('getMachineFeatureList:', error);
         const message = error?.error?.text || 'Something went wrong while fetching machine features. Please try again.';
         this.alertService.triggerAlert(message, 4000, 'error');
-        return []; // Return empty object to maintain type
+        throw error; // Re-throw the error to be handled by the caller
       }
     }
     return [];
@@ -182,7 +182,7 @@ export class ProductMasterService {
         console.error('getAssoceries:', error);
         const message = error?.error?.text || 'Something went wrong while fetching Accessories/Consumable Data. Please try again.';
         this.alertService.triggerAlert(message, 4000, 'error');
-        return []; // Return empty object to maintain type
+        throw error; // Re-throw the error to be handled by the caller
       }
     }
     return [];
@@ -197,7 +197,7 @@ export class ProductMasterService {
         console.error('getPrevCodeList:', error);
         const message = error?.error?.text || 'Something went wrong while fetching Previous Code Data. Please try again.';
         this.alertService.triggerAlert(message, 4000, 'error');
-        return []; // Return empty object to maintain type
+        throw error; // Re-throw the error to be handled by the caller
       }
     }
     return [];
@@ -216,7 +216,7 @@ export class ProductMasterService {
       console.error('prevCodeListSave : ', error);
       let message='Something went wrong while Changing ItemCode. Please try again.';
       this.alertService.triggerAlert(message,4000, 'error');
-      return null;
+      throw error;
     }
   }
   
@@ -237,6 +237,7 @@ export class ProductMasterService {
       console.error('PendingAccessoryList : ', error);
       let message='Something went wrong while Fetching Master Items. Please try again.';
       this.alertService.triggerAlert(message,4000, 'error');
+      throw error;
     }
   }
 
@@ -255,6 +256,7 @@ export class ProductMasterService {
     }catch (error) {
       console.error('SearchList : ', error);
       this.alertService.triggerAlert(message,4000, 'error');
+      throw error;
     }
   }
 
@@ -266,6 +268,7 @@ export class ProductMasterService {
       console.error('getItemNo : ', error);
       let message='Something went wrong while Get ItemNo. Please try again';
       this.alertService.triggerAlert(message,4000, 'error');
+      throw error;
     }
   }
 
@@ -283,6 +286,7 @@ export class ProductMasterService {
       console.error('getItemCategory : ', error);
       const message = 'Something went wrong while getting ItemCategory. Please try again';
       this.alertService.triggerAlert(message, 4000, 'error');
+      throw error;
     }
   }
 
@@ -297,11 +301,10 @@ export class ProductMasterService {
         this.httpClient.post<any>(this.endpointService.SaveProductMaster, payload)
       );
       return res; // ✅ Return the response
-    } catch (error) {
+    } catch(error: any) {
       console.error('SaveProductMaster : ', error);
-      const message = 'Something went wrong while Saving Product Master. Please try again.';
-      this.alertService.triggerAlert(message, 4000, 'error');
-      return null; // Return null on error
+      this.alertService.triggerAlert(error.error.message, 4000, 'error');
+      throw error;
     }   
   }
 
@@ -313,6 +316,7 @@ export class ProductMasterService {
       console.error('itemCodeCheck : ', error);
       let message='Item code already present. Please try again.';
       this.alertService.triggerAlert(message,4000, 'error');
+      throw error;
     }
   }
 
@@ -324,20 +328,25 @@ export class ProductMasterService {
       console.error('deleteCheck : ', error);
       let message='Something went wrong while Check Accessory/consumable item. Please try again.';
       this.alertService.triggerAlert(message,4000, 'error');
+      throw error;
     }
   }
 
   async deleteProductMasterDetails(productMasterModel:  ProductMasterModel){
     try{
-    const response = await this.httpClient.delete<any>(this.endpointService.Delete +'/'+ productMasterModel.item_no).toPromise();
+    const response = await this.httpClient.delete<any>(this.endpointService.Delete +'/'+ productMasterModel.item_no +'/'+ localStorage.getItem('user_id')).toPromise();
       if (!response) {
         throw new Error('No response received from server');
       }
       return response;      
-    }catch (error) {
+    }catch (error:any) {
       console.error('deleteProductMasterDetails : ', error);
-      let message='Something went wrong while Deleting. Please try again.';
-      this.alertService.triggerAlert(message,4000, 'error');
+      if(error.error && error.error.message){
+        this.alertService.triggerAlert(error.error.message, 4000, 'error');
+      } else {
+      this.alertService.triggerAlert(error.message, 4000, 'error');
+      }
+      throw error;
     }
   }
 }

@@ -31,6 +31,7 @@ export class ExpenseEntry {
       this.deleteDisable = data;
       this.searchDisable = data;
       this.yearDisable = data;
+      this.refreshDisable = data;
     }));
 
     const subs = [
@@ -87,6 +88,7 @@ export class ExpenseEntry {
       this.searchDisable = true;
       this.yearDisable = true;
       this.deleteDisable = true;
+      this.refreshDisable = true;
       this.expenseEntryService.disableGrid.next(true);
     }
     this.expenseEntryService.btnClick.next(type);
@@ -121,7 +123,8 @@ export class ExpenseEntry {
 
   Refresh(){
     this.expenseEntryService.ngOnInit.next(true);
-    //this.getYear();
+    this.searchDisable =  false;
+    this.yearDisable = false;
   }
 
   toggleValue(){

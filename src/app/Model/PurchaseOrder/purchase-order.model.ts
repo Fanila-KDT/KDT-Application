@@ -29,6 +29,8 @@ export class PurchaseOrderModel {
     approved_by :any;
     company_code :any;
     period_id :any;
+    counter_vid :any;
+    request_no : any;
 }
 
 export class ItemDetailsModel{

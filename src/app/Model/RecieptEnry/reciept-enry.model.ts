@@ -52,6 +52,7 @@ export class GRNModel {
     foreign_discount_amount :any =0;
     cur_name:any;
     virtual_store:any;
+    ref_status:any;
 }
 
 export class ItemDetailsModel{

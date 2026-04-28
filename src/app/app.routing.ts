@@ -92,6 +92,21 @@ const routes: Routes = [
     loadChildren: () =>
       import('./Forms/Inventory/stock-correction/stock-correction.module').then(m => m.StockCorrectionModule), canActivate: [AuthGuard,PermissionGuard], data: { permission: 'STOCK_CORRECTION', level: 1 }
   },
+  {
+    path: 'Forms/item-reorder-request',
+    loadChildren: () =>
+      import('./Forms/Inventory/item-reorder-request/item-reorder-request.module').then(m => m.ItemReorderRequestModule), canActivate: [AuthGuard,PermissionGuard], data: { permission: 'ITEM_REORDER', level: 1 }
+  },
+  {
+    path: 'Forms/stock-taking',
+    loadChildren: () =>
+      import('./Forms/Inventory/stock-taking/stock-taking.module').then(m => m.StockTakingModule), canActivate: [AuthGuard,PermissionGuard], data: { permission: 'STOCK_TAKING', level: 1 }
+  },
+  {
+    path: 'Forms/purchase-return',
+    loadChildren: () =>
+      import('./Forms/Inventory/purchase-return/purchase-return.module').then(m => m.PurchaseReturnModule), canActivate: [AuthGuard,PermissionGuard], data: { permission: 'PURCHASE_RETURNS', level: 1 }
+  },
 ];
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

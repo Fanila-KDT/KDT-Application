@@ -9,6 +9,7 @@ import { SelectionType } from '@swimlane/ngx-datatable';
 import { HttpResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
+import { CommonService } from '../../../../Service/CommonService/common-service';
   
 
 @Component({
@@ -77,7 +78,7 @@ export class ProductMasterDetails{
   MainCategory: any;
 
   constructor(public productMasterService:ProductMasterService,public userAccessService:UserAccessService,private alertService: AlertService, 
-              private cdRef: ChangeDetectorRef,public endPointService:EndPointService,private cdr: ChangeDetectorRef) {
+              private cdRef: ChangeDetectorRef,public endPointService:EndPointService,private cdr: ChangeDetectorRef,private commonService: CommonService) {
     this.subscription = new Array<Subscription>();
     this.productMasterModel = new ProductMasterModel();
 
@@ -91,9 +92,9 @@ export class ProductMasterDetails{
         this.cdRef.markForCheck();
         return;
       }
+      await this.fetchingData(x);
       this.productMasterService.selectedItemNo = x.item_no;
       this.productMasterService.selectedItemCode = x.item_code;
-      await this.fetchingData(x);
     }));
 
     this.subscription.push(this.productMasterService.btnClick.subscribe(data => {
@@ -172,6 +173,14 @@ export class ProductMasterDetails{
 
   ngOnDestroy(): void {
     this.subscription.forEach(sub => sub.unsubscribe());
+    this.isEditable = true;
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.productMasterService.disableGrid.next(false);
+    this.productMasterService.disabledItems.next(false);
+    this.productMasterService.btnClick.next('');
+    this.productMasterModel = new ProductMasterModel();
+    this.machineFeaturesList = new MachineFeaturesList();
   }
 
   onRowSelectAcc(event: any) {
@@ -382,9 +391,7 @@ export class ProductMasterDetails{
     this.showModalConsumable = true;
   }
 
-
   modalOkCon() {
-    // Just close the modal, since ConsumableRows is already updated live
     this.showModalConsumable = false;
     this.filterText = '';
   }
@@ -538,7 +545,7 @@ export class ProductMasterDetails{
         this.productMasterModelSave.company_code = this.endPointService.companycode;
       }
       else{
-        if(this.productMasterModel.item_code != this.productMasterService.selectedItemCode){
+        if(this.productMasterModel.item_code != this.productMasterService.selectedItemCode ){
         response = await this.productMasterService.itemCodeCheck(this.productMasterModel.item_code);
         }
       }
@@ -553,6 +560,7 @@ export class ProductMasterDetails{
       this.AssignValueProductMaster();
       if(this.btnType === 'N')
       {
+        this.productMasterModelSave.user_id = localStorage.getItem('user_id');
         const item_No = await this.productMasterService.getItemNo();
         this.productMasterModelSave.item_no = item_No.value;
         this.machineFeaturesList.item_no = item_No.value;
@@ -561,17 +569,20 @@ export class ProductMasterDetails{
         });
       
       }if(this.btnType === 'M'){
+        this.productMasterModelSave.user_id = this.productMasterModel.user_id;
         this.machineFeaturesList.item_no = this.productMasterModelSave.item_no;
         this.AcessoryList.forEach(item => {
           item.m_item_no = this.productMasterModelSave.item_no;
         });
       }
     
-      this.productMasterService.SaveProductMaster(this.productMasterModelSave,this.machineFeaturesList,this.AcessoryList).then((res: any) => {
+      this.productMasterModelSave.company_code = this.endPointService.companycode;
+      this.productMasterService.SaveProductMaster(this.productMasterModelSave,this.machineFeaturesList,this.AcessoryList).then(async (res: any) => {
         if (res && res.productMaster) {
           if(this.btnType === 'N'){
             this.productMasterService.addRowAfterSave.next(res.productMaster);
             this.alertService.triggerAlert('Item Saved Successfully.', 4000, 'success');
+            this.productMasterService.selectedItemCode = res.productMaster.item_code;
           }
           if(this.btnType === 'M'){
             this.productMasterService.addRowAfterModify.next(res.productMaster);
@@ -589,7 +600,9 @@ export class ProductMasterDetails{
         this.productMasterService.disabledItems.next(false);
         this.productMasterService.btnClick.next('');
         this.userAccessService.CheckUserAccess(this.productMasterService.FormName,this.productMasterService);
-      }).catch(error => {
+        await this.commonService.getItemList();
+        await this.commonService.getItemListNew();
+      }).catch(error => { 
         console.error('SaveAccountMaster error:', error);
         this.alertService.triggerAlert('Failed to save account. Please try again.', 4000, 'error');
         this.productMasterService.btnClick.next('')
@@ -620,13 +633,10 @@ export class ProductMasterDetails{
         this.alertService.triggerAlert('Action Blocked! Product is assigned as an accessory to other items',6000, 'error');
         this.productMasterService.btnClick.next('')
       }
-     
-    } catch (error) {
-      console.error('Error while deleting Item:', error);
-      this.alertService.triggerAlert('Something went wrong while Deleting...',4000, 'error');
+    } catch (error:any) {
+      //this.alertService.triggerAlert(error.error.message, 4000, 'error');
       this.productMasterService.btnClick.next('')
     }
-    
   }
 
   async validateForm(model: ProductMasterModel): Promise<boolean> {

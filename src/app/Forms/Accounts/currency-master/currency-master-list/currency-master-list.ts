@@ -86,9 +86,9 @@ export class CurrencyMasterList {
       }
     }));
     
-    this.subscription.push(this.currencyMasterService.isLoading.subscribe(data=>{
-      this.isLoading = data;
-    }));
+    // this.subscription.push(this.currencyMasterService.isLoading.subscribe(data=>{
+    //   this.isLoading = data;
+    // }));
 
     this.subscription.push(this.currencyMasterService.ngOnInit.subscribe(data=>{
       if(data){
@@ -101,9 +101,7 @@ export class CurrencyMasterList {
   }    
 
   async ngOnInit() {
-    this.currencyMasterService.isLoading.next(true);
     await this.currencyMasterService.getCurrencyMasterList();
-    this.currencyMasterService.isLoading.next(false);
     this.userAccessService.CheckUserAccess(this.currencyMasterService.FormName,this.currencyMasterService);
   }
 
@@ -145,9 +143,7 @@ export class CurrencyMasterList {
   }
 
   async viewDetails(row: any) {
-    this.isLoading = true;
     this.selected = [row];
-    this.isLoading = false;
   }
   
   paginate(direction: 'left' | 'right' | ''): void {

@@ -4,7 +4,7 @@ import { BehaviorSubject, firstValueFrom, lastValueFrom, Observable, Subject } f
 import { AlertService } from '../../shared/alert/alert.service';
 import { StockCorrectionEndpointService } from './stock-correction-end-point.service';
 import {  StockCorrectionDetailModel, StockCorrectionModel, StockCorrectionSearch } from '../../Model/StockCorrection/stock-correction.model';
-import { FinancialDataHeader } from '../../Model/CommonModel';
+import { DateModel, FinancialDataHeader } from '../../Model/CommonModel';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +26,6 @@ export class StockCorrectionService {
   public clickedStockCorr = new BehaviorSubject<StockCorrectionModel>(new StockCorrectionModel()) ;
   public loadListStockCorrection = new BehaviorSubject<StockCorrectionModel[]>([]); 
   public ItemList : any[] = [];  
-  public assignStockCorrDetails = new BehaviorSubject<StockCorrectionDetailModel>(new StockCorrectionDetailModel()) ;
   
     
   constructor(private httpClient:HttpClient, public endpointService: StockCorrectionEndpointService,private alertService:AlertService) { }
@@ -64,38 +63,41 @@ export class StockCorrectionService {
     } 
   }
 
-    async getStockCorrectionDetails(voucher_id:any){
-    try{
-      if(voucher_id == null || voucher_id == undefined){
-        return;
+  async getStockCorrectionDetails(voucher_id: any): Promise<any[]> {
+    try {
+      if (!voucher_id) {
+        return []; // Return empty array if voucher_id is not provided
       }
-      await this.httpClient.get<any>(this.endpointService.GetStockCorrectionDetails +'/'+voucher_id).subscribe({
-      next: res => {
-        this.assignStockCorrDetails.next(res);
-      },
-      error: err =>{
-        console.log(err);
-          this.alertService.triggerAlert(err.error.text,4000, 'error');
-      } 
-      });
-    }catch (error) {
-      console.error('getStockCorrectionDetails : ', error);
-      let message='Something went wrong while Fetching Item List. Please try again.';
-      this.alertService.triggerAlert(message,4000, 'error');
+      const res = await firstValueFrom(
+        this.httpClient.get<any[]>(this.endpointService.GetStockCorrectionDetails +'/'+voucher_id)
+      );
+      return res;
+    } catch (error: any) {
+      console.error('GetStockCorrectionDetails : ', error);
+      const message = 'Something went wrong while Fetching Stock Correction Details. Please try again.';
+      this.alertService.triggerAlert(message, 4000, 'error');
+      return []; // Ensure function always returns an array
     }
   }
 
-  saveStockCorrection(headerModel: FinancialDataHeader, gridModel: any[],) {
+  saveStockCorrection(headerModel: FinancialDataHeader, gridModel: any[],dateModel:DateModel) {
     const payload = {
       headerModel: headerModel,
       gridModel: gridModel,
+      dateModel : dateModel
     };
     return this.httpClient.post<any>(this.endpointService.saveStockCorrection, payload)
   }
 
-  deleteStockCorrection(voucher_id: string): Observable<any[]> {
+  deleteStockCorrection(voucher_id: string, gridModel: any[]): Observable<any[]> {
+    const payload = {
+      voucher_id : voucher_id,
+      year : sessionStorage.getItem('year'),
+      gridModel: gridModel
+    };
+    
     return this.httpClient.delete<any[]>(
-      this.endpointService.DeleteStockCorrection + '/' + voucher_id + '/' + sessionStorage.getItem('year')
+      this.endpointService.DeleteStockCorrection, { body: payload } 
     );
   }
 
@@ -116,6 +118,19 @@ export class StockCorrectionService {
     this.mainList = res;
     this.loadListStockCorrection.next(res);
     this.clickedStockCorr.next(res[0]);
+  }
+
+  async GetStockAccount(godown_code:any): Promise<any[]>{
+    let message='Something went wrong while Getting Stock Adjustment Account. Please try again.';
+    try{
+        return await lastValueFrom(
+        this.httpClient.get<any[]>(this.endpointService.GetStockAccount + '/' + godown_code)
+      );
+    }catch (error) {
+      console.error('GetStockAccount : ', error);
+      this.alertService.triggerAlert(message,4000, 'error');
+      throw error;
+    }
   }
 
 }

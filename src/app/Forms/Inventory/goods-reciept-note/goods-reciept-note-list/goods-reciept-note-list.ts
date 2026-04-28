@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
 import { Subscription } from 'rxjs';
 import { RecieptEntryService } from '../../../../Service/RecieptEntryService/reciept-entry-service';
@@ -14,7 +14,7 @@ import { DashboardService } from '../../../../Service/DashboardService/dashboard
   selector: 'goods-reciept-note-list',
   standalone: false,
   templateUrl: './goods-reciept-note-list.html',
-  styleUrls: ['./goods-reciept-note-list.css','../../../common.css']
+  styleUrls: ['./goods-reciept-note-list.css','../../../common.css'],
 })
 export class GoodsRecieptNoteList {
 
@@ -51,6 +51,7 @@ export class GoodsRecieptNoteList {
   scroll: boolean = true;
   clrFilterDisable = false;
   approval_status:string ='';
+  ref_status:any = '';
   expBtnDisable: boolean = true;
 
   constructor(public goodsRecieptService:RecieptEntryService,public endPointService:EndPointService,public userAccessService:UserAccessService,
@@ -116,32 +117,37 @@ export class GoodsRecieptNoteList {
     }));
 
     this.subscription.push(this.goodsRecieptService.ControlsEnableAndDisable.subscribe(data=>{
-      this.ControlsEnableAndDisable();
-      const hasExpensePermission = this.userAccessList?.some(
-        (u: any) => u.permissionName === 'PURCHASE_EXPENSE'
-      );
+      if(data){
+        this.ControlsEnableAndDisable();
+        const hasExpensePermission = this.userAccessList?.some(
+          (u: any) => u.permissionName === 'PURCHASE_EXPENSE'
+        ); 
 
-      this.rows.forEach((row: any) => {
-        if (row.approval_status == 'Stock Verified' && hasExpensePermission) {
-          row.expBtnDisable = false;
-        } else {
-          row.expBtnDisable = true;
-        }
-      });
+        this.rows.forEach((row: any) => {
+          if((((row.approval_status).toUpperCase() == 'STOCK VERIFIED' && (row.ref_status).toUpperCase() == 'VERIFIED') || (row.virtual_store == true && (row.approval_status).toUpperCase() == 'DRAFT')) && hasExpensePermission  ){
+            row.expBtnDisable = false;
+          } else {
+            row.expBtnDisable = true;
+          }
+        });
+      }
     }));
   }
 
   async ngOnInit() {
-    await this.purchaseOrderService.getItemList().then((res: any[]) => {
-      this.goodsRecieptService.ItemList = res;
-    });
+    if (this.dashboardService.RecieptEntry === 1) {
+      return;
+    }
 
-    await this.goodsRecieptService.getGoodsRecieptList(this.endPointService.year);
-    this.cdRef.markForCheck();
+    const [receipts] = await Promise.all([
+      this.goodsRecieptService.getGoodsRecieptList(this.endPointService.year,1)
+    ]);
+    // receipts already handled inside getGoodsRecieptList
   }
-
   ngOnDestroy(): void {
     this.subscription.forEach(sub => sub.unsubscribe());
+    this.rows = [];           // Original data
+    this.temp = [];
   }
 
   updateFilter() {
@@ -153,12 +159,13 @@ export class GoodsRecieptNoteList {
       (!f.account_name || row.account_name?.toLowerCase().includes(f.account_name.toLowerCase())) &&
       (!f.document_number || row.document_number?.toLowerCase().includes(f.document_number.toLowerCase())) &&
       (!f.po_no || row.po_no?.toLowerCase().includes(f.po_no.toLowerCase())) &&
-      (!f.voucher_date || row.voucher_date?.toLowerCase().includes(f.voucher_date.toLowerCase()))
+      (!f.voucherDate || row.voucherDate?.toLowerCase().includes(f.voucherDate.toLowerCase()))
     );
     this.temp = [...this.filteredRows]; // ✅ Store filtered data for pagination
     this.currPage = 1; // ✅ Reset to first page
     this.updatePage(); // ✅ Apply pagination
     this.approval_status = this.rows[0].approval_status;
+    this.ref_status = this.rows[0].ref_status;
     this.goodsRecieptService.clickedGRN.next(this.rows[0]);
   }
 
@@ -244,6 +251,7 @@ export class GoodsRecieptNoteList {
         this.selectedGoodsReciept = 1 + rowIndex;
         this.viewDetails(this.rows[this.selectedGoodsReciept]);
         this.approval_status = this.rows[this.selectedGoodsReciept].approval_status;
+        this.ref_status = this.rows[this.selectedGoodsReciept].ref_status;
         this.goodsRecieptService.clickedGRN.next(this.rows[this.selectedGoodsReciept]);
       } 
       else if (event.type === 'keydown' && (event.event.code === 'ArrowUp'))
@@ -251,6 +259,7 @@ export class GoodsRecieptNoteList {
         this.selectedGoodsReciept = rowIndex - 1;
         this.viewDetails(this.rows[this.selectedGoodsReciept]);
         this.approval_status = this.rows[this.selectedGoodsReciept].approval_status;
+        this.ref_status = this.rows[this.selectedGoodsReciept].ref_status;
         this.goodsRecieptService.clickedGRN.next(this.rows[this.selectedGoodsReciept]);
       }
       else if (event.type == 'click') 
@@ -259,17 +268,17 @@ export class GoodsRecieptNoteList {
         this.selectedGoodsReciept = this.rows.indexOf(rowItem);
         this.viewDetails(event.row);
         this.approval_status = this.rows[this.selectedGoodsReciept].approval_status;
+        this.ref_status = this.rows[this.selectedGoodsReciept].ref_status;
         this.goodsRecieptService.clickedGRN.next(this.rows[this.selectedGoodsReciept]);
       }
     }
   }
 
   OpenPurchaseExpense(row:any){
-    this.dashboardService.clickedExpenseEntry.next(row); 
     this.dashboardService.ExpenseEntry = 1;
+    this.dashboardService.clickedExpenseEntry.next(row); 
     sessionStorage.setItem('clickedExpenseEntry', JSON.stringify(row)); // ⚠️ store as JSON string
     this.router.navigate(['/Forms/expense-entry']);
-
   }
 
   ControlsEnableAndDisable() {
@@ -297,7 +306,7 @@ export class GoodsRecieptNoteList {
         data_entry_status
       );
 
-      if (!periodAllowed && this.approval_status != 'VERIFICATION FAILED' && this.approval_status !== 'DRAFT' ) {
+      if (!periodAllowed && (this.approval_status).toUpperCase() != 'VERIFICATION FAILED' && (this.approval_status).toUpperCase() !== 'DRAFT' ) {
           //this.goodsRecieptService.newDisabled.next(false);
           this.goodsRecieptService.editDisabled.next(true);
           this.goodsRecieptService.deleteDisabled.next(true);
@@ -305,16 +314,16 @@ export class GoodsRecieptNoteList {
     }
 
     const row = this.rows[this.selectedGoodsReciept];
-
-    if (row.virtual_store != true && 
-        ['DRAFT', 'VERIFICATION FAILED'].includes(row.approval_status)) {
-      this.goodsRecieptService.SVDisabled.next(false);
-    } else {
-      this.goodsRecieptService.SVDisabled.next(true);
+    if (row){
+      if (row.virtual_store != true && 
+          ['DRAFT', 'VERIFICATION FAILED'].includes(row.approval_status)) {
+        this.goodsRecieptService.SVDisabled.next(false);
+      } else {
+        this.goodsRecieptService.SVDisabled.next(true);
+      }
     }
-
     const hasExpensePermission = this.userAccessList?.some( (u: any) => u.permissionName === 'PURCHASE_EXPENSE' );
-    if(this.approval_status == 'Stock Verified' && hasExpensePermission){
+    if((((row.approval_status).toUpperCase() == 'STOCK VERIFIED' && (row.ref_status).toUpperCase() == 'VERIFIED') || (row.virtual_store == true && (row.approval_status).toUpperCase() == 'DRAFT')) && hasExpensePermission  ){
       row.expBtnDisable = false;
     }else{
       row.expBtnDisable = true;

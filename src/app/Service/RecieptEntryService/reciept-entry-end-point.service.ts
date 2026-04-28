@@ -10,7 +10,6 @@ export class RecieptEntryEndpointService {
   GetRegisterList: string;
   GetVendorList: string;
   GetWarehouseList: string;
-  GetFullWarehouseList: string;
   GetItemDetails: string;
   GetRefNoList = '';
   GetRefNoListFull = '';
@@ -30,7 +29,6 @@ export class RecieptEntryEndpointService {
     this.GetRegisterList = apiHostingURL + '/getRegisterList';
     this.GetVendorList = apiHostingURL + '/getVendorList';
     this.GetWarehouseList = apiHostingURL + '/getWarehouseList';
-    this.GetFullWarehouseList = apiHostingURL + '/getFullWarehouseList';
     this.GetItemDetails = apiHostingURL + '/getItemDetails';
     this.GetRefNoList = apiHostingURL+ "/getRefNoList";
     this.GetRefNoListFull = apiHostingURL+ "/getRefNoListFull";

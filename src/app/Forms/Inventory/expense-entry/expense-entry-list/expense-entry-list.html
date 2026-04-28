@@ -37,22 +37,22 @@
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column name="Entry Date" prop="voucherDate"  [cellClass]="leftAlignCell" >
-      <ng-template ngx-datatable-header-template>
-        <div class="d-flex flex-column">
-          <input class="form-control search mb-1" [(ngModel)]="filterExpenseEntry.voucherDate"
-            placeholder="Entry Date" (keyup)="updateFilter()" />
-          <span class="datatable-heading">Entry Date</span>
-        </div>
-      </ng-template>
-    </ngx-datatable-column>
-
     <ngx-datatable-column name="Puch Ref No" prop="ref_grn"  [cellClass]="leftAlignCell" >
       <ng-template ngx-datatable-header-template>
         <div class="d-flex flex-column">
           <input class="form-control search mb-1" [(ngModel)]="filterExpenseEntry.ref_grn"
             placeholder="Puch Ref No" (keyup)="updateFilter()" />
           <span class="datatable-heading">Puch Ref No</span>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Entry Date" prop="voucherDate"  [cellClass]="leftAlignCell" >
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterExpenseEntry.voucherDate"
+            placeholder="Entry Date" (keyup)="updateFilter()" />
+          <span class="datatable-heading">Entry Date</span>
         </div>
       </ng-template>
     </ngx-datatable-column>

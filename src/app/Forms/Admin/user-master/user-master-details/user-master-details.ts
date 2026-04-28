@@ -73,6 +73,16 @@ export class UserMasterDetails {
     });
   }
 
+  ngOnDestroy(): void {
+    this.subscription.forEach(sub => sub.unsubscribe());
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.userMasterService.disableGrid.next(false);
+    this.userMasterService.disabledItems.next(false);
+    this.userMasterService.btnClick.next('');
+    this.userMasterModel = new UserMasterModel();
+  }
+
   btnClickFunction(x: string) {
     this.btnType = x;
     this.userMasterModelTemp = {...this.userMasterModel};

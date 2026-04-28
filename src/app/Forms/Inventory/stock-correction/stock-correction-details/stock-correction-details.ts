@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { DatatableComponent, SelectionType } from '@swimlane/ngx-datatable';
 import { StockCorrectionDetailModel, StockCorrectionModel } from '../../../../Model/StockCorrection/stock-correction.model';
-import { FinancialDataHeader, StockDataDetails } from '../../../../Model/CommonModel';
+import { DateModel, FinancialDataHeader, StockDataDetails } from '../../../../Model/CommonModel';
 import { Subscription } from 'rxjs';
 import { StockCorrectionService } from '../../../../Service/StockCorrectionService/stock-correction-service';
 import { AlertService } from '../../../../shared/alert/alert.service';
@@ -10,12 +10,14 @@ import { EndPointService } from '../../../../Service/end-point.services';
 import { PurchaseOrderService } from '../../../../Service/PurchaseOrderService/purchase-order-service';
 import Swal from 'sweetalert2';
 import { StockTransferService } from '../../../../Service/StockTransferService/stock-transfer-service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'stock-correction-details',
   standalone: false,
   templateUrl: './stock-correction-details.html',
-  styleUrls: ['./stock-correction-details.css','../../../common.css']
+  styleUrls: ['./stock-correction-details.css','../../../common.css'],
+  providers: [DatePipe]
 })
 export class StockCorrectionDetails {
   @ViewChild(DatatableComponent) table?: DatatableComponent;
@@ -24,6 +26,7 @@ export class StockCorrectionDetails {
   stockCorrectionTemp: StockCorrectionModel = new StockCorrectionModel();
   stockTransGridModel: StockDataDetails[] =[];
   subscription: Subscription[] = new Array<Subscription>();
+  dateModel: DateModel = new DateModel();
   saveDisable:boolean = true;
   cancelDisable:boolean = true;
   rows: any[] = []; 
@@ -40,7 +43,7 @@ export class StockCorrectionDetails {
   totalAmount: number = 0;
   totalAmountTemp: number = 0;
   scroll: boolean = true;
-  gridHeight:number=350;
+  gridHeight: number = 350;
   reorderable = true;
   controls = {
     pageSize:50 
@@ -49,13 +52,14 @@ export class StockCorrectionDetails {
   selected: any[] = [];
   ItemList: any[] = [];
   ItemListTemp: any[] =[];
-  btnType :string = '';
+  btnType: string = '';
   isWarehouseInvalid: boolean = false;
   isAccountInvalid: boolean = false;
   isReasonInvalid: boolean = false;
+  statusDisable: boolean = true;
 
-  constructor(public stockCorrectionService:StockCorrectionService,public alertService:AlertService,public commonService:CommonService,public endPointService: EndPointService,
-    private cdRef: ChangeDetectorRef,public purchaseOrderService:PurchaseOrderService,public stockTransferService:StockTransferService){
+  constructor(private datePipe: DatePipe,public stockCorrectionService:StockCorrectionService,public alertService:AlertService,public commonService:CommonService,public endPointService: EndPointService,
+    public purchaseOrderService:PurchaseOrderService,public stockTransferService:StockTransferService){
 
     this.subscription.push(this.stockCorrectionService.clickedStockCorr.subscribe(async x=>{
       this.stockCorrectionService.ControlsEnableAndDisable.next(true);
@@ -65,32 +69,42 @@ export class StockCorrectionDetails {
         return;
       }
       this.stockCorrection = {...x};
-      this.cdRef.markForCheck();
-      await this.stockCorrectionService.getStockCorrectionDetails(this.stockCorrection.voucher_id).then((res) => {});
-    }));
-
-    this.subscription.push(this.stockCorrectionService.assignStockCorrDetails.subscribe(async (data:any)=>{
-      if(data[0]){
-        this.rows = JSON.parse(JSON.stringify(data));
-        this.rowTemp = JSON.parse(JSON.stringify(data));
-        this.calculateTotals();
-        this.AssignItems();
-      }else{
+      try {
+        const items = await this.stockCorrectionService.getStockCorrectionDetails(this.stockCorrection.voucher_id);
+        if (items && items.length) {
+          this.rows = items.slice();
+          this.calculateTotals();
+          this.AssignItems();
+        } else {
+          this.rows = [];
+          this.rowTemp = [];
+          this.totalQty = 0;
+          this.totalAmount = 0;
+          this.totalIssuedQty = 0;
+          this.totalIssuedAmount = 0;
+        }
+      } catch (err) {
+        console.error('Error fetching ItemDetails', err);
         this.rows = [];
         this.rowTemp = [];
         this.totalQty = 0;
         this.totalAmount = 0;
         this.totalIssuedQty = 0;
-        this.totalIssuedAmount = 0; 
+        this.totalIssuedAmount = 0;
       }
     }));
 
     this.subscription.push(this.stockCorrectionService.btnClick.subscribe(async x=>{
       if(x !==''){
-        this.ItemListTemp = this.ItemList;
-        this.ItemList = this.stockCorrectionService.ItemList;
+        this.stockCorrectionTemp = {...this.stockCorrection};
+        this.rowTemp = this.clone(this.rows);
+        
         await this.btnClickFunction(x);
       }
+    }));
+
+    this.subscription.push(this.commonService.isSystemAdmin.subscribe(data=>{
+      this.statusDisable = !data;
     }));
   }
 
@@ -102,16 +116,35 @@ export class StockCorrectionDetails {
     this.stockCorrectionService.getAccountList(this.endPointService.companycode).then((res: any[]) => {
       this.accountList = res;
     });
+    
+    this.ItemListTemp = JSON.parse(sessionStorage.getItem('ItemList')||'');
+    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.forEach(sub => sub.unsubscribe());
+    this.isEditable = true;
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.stockCorrectionService.disableGrid.next(false);
+    this.stockCorrectionService.disabledItems.next(false);
+    this.stockCorrectionService.btnClick.next('');
+    this.rows =[];
+    this.stockCorrection = new StockCorrectionModel();
+  }
+  
+  clone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
   }
   
   async btnClickFunction(x: string) {
+    this.ItemListTemp = [...this.ItemList];
+    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
     this.btnType = x;
-    this.stockCorrectionTemp = {...this.stockCorrection};
     this.totalQtyTemp = this.totalQty;
     this.totalAmountTemp = this.totalAmount;
     this.totalIssuedAmountTemp = this.totalIssuedAmount;
     this.totalIssuedQtyTemp = this.totalIssuedQty;
-    this.rowTemp = this.rows;
     if(x =='N'){
       this.stockCorrection = new StockCorrectionModel();
       this.saveDisable = false;
@@ -131,7 +164,6 @@ export class StockCorrectionDetails {
     }else if(x =='D'){
       this.onDelete();
     }
-    this.cdRef.markForCheck();
   }
 
   getRowIdentity(row: any): any {
@@ -197,7 +229,8 @@ export class StockCorrectionDetails {
 
   AssignItems(){
     const rowItemNos = this.rows.map(r => r.item_no);
-    const filteredItems = this.stockCorrectionService.ItemList.filter(item =>
+    const list = JSON.parse(sessionStorage.getItem('ItemList')||'');
+    const filteredItems = list.filter((item:any) =>
       rowItemNos.includes(item.item_no)
     );
     this.ItemList = filteredItems;
@@ -238,6 +271,7 @@ export class StockCorrectionDetails {
 
   async ItemCodeEnter(item_no: any, row: any) {
     try {
+      if(!item_no) return;
       const res = await this.purchaseOrderService.itemCodeEnter(item_no);
       const item = res[0];
       row.item_details = item.item_name_abbr;
@@ -264,12 +298,24 @@ export class StockCorrectionDetails {
   }
 
   ReceiptQtyChange = this.debounce((qty: number, row: any) => {
-    row.issue_quantity = 0;
+    if(row.receipt_quantity < 0){
+      this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
+    }
+    if(row.receipt_quantity <= 0){
+      row.receipt_quantity = 1;
+    }
+      row.issue_quantity = 0;
     this. calculateTotals();
   }, 200);
 
   IssueQtyChange = this.debounce((qty: number, row: any) => {
-    row.receipt_quantity = 0;
+     if(row.issue_quantity < 0){
+      this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
+    }
+    if(row.issue_quantity <= 0){
+      row.issue_quantity = 1;
+    }
+      row.receipt_quantity = 0;
     this. calculateTotals();
   }, 200);
 
@@ -278,7 +324,7 @@ export class StockCorrectionDetails {
   }, 200);
 
   FgnTotalChange= this.debounce((rate: number, row: any) => {
-    row.fgn_rate = row.fgn_total / (row.receipt_quantity ? row.receipt_quantity : row.issue_quantity);
+    row.fgn_rate = Math.abs( row.fgn_total / (row.receipt_quantity ? row.receipt_quantity : row.issue_quantity));
   }, 200);
 
   calculateTotals() {
@@ -349,7 +395,7 @@ export class StockCorrectionDetails {
 
     await this.AssignValues();
 
-    this.stockCorrectionService.saveStockCorrection(this.stockCorrectionHeader, this.stockTransGridModel)
+    this.stockCorrectionService.saveStockCorrection(this.stockCorrectionHeader, this.stockTransGridModel,this.dateModel)
       .subscribe({
       next: async (response: any) => {
         if(this.btnType == 'N'){
@@ -374,8 +420,8 @@ export class StockCorrectionDetails {
         this.stockCorrectionService.disableGrid.next(false);
         this.stockCorrectionService.ControlsEnableAndDisable.next(true);
       },
-      error: () => {
-        this.alertService.triggerAlert('Failed to save the Row...', 4000, 'error');
+      error: (err) => {
+        this.alertService.triggerAlert(err.error.message,4000, 'error');
         this.stockCorrectionService.btnClick.next('');
       }
     });
@@ -393,9 +439,9 @@ export class StockCorrectionDetails {
   async AssignValues(){
     // Header Details
     const voucher_id = await this.commonService.GetGuid();
+
     this.stockCorrectionHeader = {
       company_code: this.endPointService.companycode,
-      voucher_date: new Date(this.stockCorrection.voucher_date),
       period_id: Number(sessionStorage.getItem('year')),
       register_code: 200,
       voucher_reference: this.stockCorrection.voucher_reference,
@@ -425,6 +471,7 @@ export class StockCorrectionDetails {
           approved_by: null,modified_by: null,modified_on: null,
           approval_status : 'DRAFT',
           createdt :null,
+          voucher_date: this.stockCorrection.voucher_date,
           approver_remarks: null,
         }
       : {
@@ -433,13 +480,19 @@ export class StockCorrectionDetails {
           document_number: this.stockCorrection.document_number,
           modified_by: localStorage.getItem('user_id'),
           modified_on: null,
-          user_enter_date: new Date(this.stockCorrection.user_enter_date),
+          user_enter_date: new Date(new Date(this.stockCorrection.user_enter_date).setDate(new Date(this.stockCorrection.user_enter_date).getDate() + 1)),
+          voucher_date:this.stockCorrection.voucher_date,
           approved_by: this.stockCorrection.approved_by,
           approval_status: this.stockCorrection.approval_status,
           createdt: this.stockCorrection.createdt,
-          approver_remarks: this.stockCorrection.approver_remarks
+          approver_remarks: this.stockCorrection.approver_remarks,
         })
     };
+
+    const voucher_date = this.datePipe.transform(this.stockCorrection.voucher_date, 'dd/MM/yyyy');
+    this.dateModel.voucher_date = voucher_date;
+    const user_enter_date = this.datePipe.transform(this.stockCorrection.user_enter_date, 'dd/MM/yyyy');
+    this.dateModel.user_enter_date = user_enter_date;
 
     //Grid Details
     this.stockTransGridModel = await this.mapItemsToDetails(this.rows,this.stockCorrectionHeader.voucher_id);
@@ -464,7 +517,7 @@ export class StockCorrectionDetails {
       details.item_discount = 0;
       details.transamount = item.transamount ?Math.abs(parseFloat(item.transamount.replace('+', '').replace('-', ''))): 0;
       details.line_no = 0;
-      details.fgn_rate = item.fgn_rate ?? 0;
+      details.fgn_rate = Math.abs(item.fgn_rate) ?? 0;
       details.fgn_total = item.fgn_total ?? 0;
       details.item_details = item.item_details;
       details.tag_item = false;
@@ -479,15 +532,16 @@ export class StockCorrectionDetails {
   }
   
   cancelClickMethod(){
-    this.ItemList = this.ItemListTemp;
+    this.stockCorrectionService.disableGrid.next(false);
+    this.stockCorrectionService.disabledItems.next(false);
+    this.stockCorrectionService.btnClick.next('');
+    this.ItemList = [...this.ItemListTemp];
     this.totalQty =this.totalQtyTemp;
     this.isEditable = true;
     this.saveDisable = true;
     this.cancelDisable = true;
-    this.stockCorrectionService.disableGrid.next(false);
-    this.stockCorrection = JSON.parse(JSON.stringify(this.stockCorrectionTemp));
-    this.rows = JSON.parse(JSON.stringify(this.rowTemp));
-    this.stockCorrectionService.disabledItems.next(false);
+    this.stockCorrection = {...this.stockCorrectionTemp};
+    this.rows = [...this.rowTemp];
     this.totalQty = this.totalQtyTemp;
     this.totalAmount = this.totalAmountTemp;
     this.totalIssuedAmount = this.totalIssuedAmountTemp;
@@ -498,20 +552,34 @@ export class StockCorrectionDetails {
     const confirmed = await showconfirm("Are you sure you want to delete this item?");
     if(!confirmed)return;
 
-    this.stockCorrectionService.deleteStockCorrection(this.stockCorrection.voucher_id)
-    .subscribe(
-      (updatedList: any[]) => {
+    this.stockTransGridModel = await this.mapItemsToDetails(this.rows,this.stockCorrection.voucher_id);
+    this.stockTransGridModel = this.stockTransGridModel.map(row => ({
+      ...row,
+      voucher_id: this.stockCorrection.voucher_id
+    }));
+
+    this.stockCorrectionService.deleteStockCorrection(
+      this.stockCorrection.voucher_id,
+      this.stockTransGridModel,
+    ).subscribe({
+      next: (updatedList: any[]) => {
         this.stockCorrectionService.getStockCorrectionList(sessionStorage.getItem('year'),1);
+        this.alertService.triggerAlert('Row deleted successfully...', 4000, 'success');
         this.stockCorrectionService.btnClick.next('');
-        this.cdRef.markForCheck();
       },
-      (error) => {
-        this.alertService.triggerAlert('Failed to delete the Row...', 4000, 'error');
-        this.stockCorrectionService.btnClick.next('')
+      error: (err: any) => {
+         this.alertService.triggerAlert(err.error.message,4000, 'error');
+        this.stockCorrectionService.btnClick.next('');
       }
-    );
+    });
   }
-}
+
+  async WarehouseChange(godown_code: any){
+    await this.stockCorrectionService.GetStockAccount(godown_code).then((res: any[]) => {
+        this.stockCorrection.account_code = res;
+      });
+    }
+  }
 
 export function showconfirm(message: any): Promise<boolean> {
   return Swal.fire({

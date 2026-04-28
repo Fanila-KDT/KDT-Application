@@ -18,9 +18,12 @@ export class UserAccessService {
     this.HeaderName = new BehaviorSubject<string>(storedHeader);
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     let user_id = sessionStorage.getItem('user_id');
     let Logi =  localStorage.setItem('LoginUser','IN');
+    if(!user_id){
+      return;
+    }
     this.userMasterService.GetPermissionList(user_id).then((res:any)=>{
        this.userAccessList = res.map((p: any) => ({
         ...p,
@@ -59,6 +62,7 @@ export class UserAccessService {
     Service.newDisabled?.next(level < 2);    // enabled from level 2+
     Service.editDisabled?.next(level < 3);   // enabled from level 3+
     Service.deleteDisabled?.next(level < 4); // enabled from level 4+
+    //Service.ControlsEnableAndDisable?.next(false);
   }
 
   CheckPeriodAccess(approval_status:string,period_status: string, data_entry_status: string): boolean {

@@ -7,25 +7,31 @@ import { Subscription } from 'rxjs';
 import { DatatableComponent, SelectionType } from '@swimlane/ngx-datatable';
 import { DashboardService } from '../../../../Service/DashboardService/dashboard-service';
 import { EndPointService } from '../../../../Service/end-point.services';
-import { AccountList } from '../../../../Model/WarehouseMaster/warehouse-master.model';
 import Swal from 'sweetalert2';
+import { GRNModel } from '../../../../Model/RecieptEnry/reciept-enry.model';
+import { DatePipe } from '@angular/common';
+import { DateModel } from '../../../../Model/CommonModel';
 
 
 @Component({
   selector: 'expense-entry-details',
   standalone: false,
   templateUrl: './expense-entry-details.html',
-  styleUrls: ['./expense-entry-details.css','../../../common.css']
+  styleUrls: ['./expense-entry-details.css','../../../common.css'],
+  providers: [DatePipe],
 })
 export class ExpenseEntryDetails {
   @ViewChild(DatatableComponent) table?: DatatableComponent;
   expenseEntry: ExpenseEntryModel = new ExpenseEntryModel();
   expenseEntryTemp: ExpenseEntryModel = new ExpenseEntryModel();
   expenseHeaderModel:ExpenseHeaderModel = new ExpenseHeaderModel();
-  expenseAccountModel:ExpenseAccountModel[] =[];
+  expenseAccountModel:ExpenseAccountModel[] =[];  
+  grnModelTemp: GRNModel = new GRNModel();
+  dateModel: DateModel = new DateModel();
+  
   saveDisable:boolean = true;
   cancelDisable:boolean = true;
-  
+  statusDisable: boolean = true;
   subscription: Subscription[] = new Array<Subscription>();
   scroll: boolean = true;
   selected: any[] = [];
@@ -43,7 +49,8 @@ export class ExpenseEntryDetails {
   est_landed_exp: number = 0;
   btnType: string = '';
   constructor(public expenseEntryService:ExpenseEntryService,public alertService:AlertService,public commonService:CommonService,private cdRef: ChangeDetectorRef
-    , public dashboardService: DashboardService,public endPointService: EndPointService) {
+              ,public dashboardService: DashboardService,public endPointService: EndPointService,private datePipe: DatePipe) {
+
     this.subscription.push(this.expenseEntryService.clickedEntry.subscribe(async x=>{
       if(this.dashboardService.ExpenseEntry == 1){
           this.expenseRows = [];
@@ -59,18 +66,18 @@ export class ExpenseEntryDetails {
         return;
       }
       this.expenseEntry = {...x};
+     
       await this.expenseEntryService.getExpenseEntryDetails(this.expenseEntry.counter_vid).then((res) => {});
-      
       this.cdRef.markForCheck();
     }));
 
     this.subscription.push(this.expenseEntryService.assignExpenseDetails.subscribe(async (data:any)=>{
       if(data[0]){
-        this.rows = JSON.parse(JSON.stringify(data));
-        this.rowsTemp = JSON.parse(JSON.stringify(data));
+        this.rows = [...data];
         this.expenseEntry.line_amount = Number(this.sumRows('pamount').toFixed(3));
         this.expenseEntry.foriegn_total = Number(this.sumRows('fgn_total').toFixed(4));
-        this.expenseEntry.est_landed_exp =  this.sumExpRows('credit_amount')||0;
+        const exp =Number(this.sumExpRows('credit_amount')||0);
+        this.expenseEntry.est_landed_exp = exp;;
         this.est_landed_exp = this.expenseEntry.est_landed_exp;
         this.findInventoryAccounts();
         this.calculateCosts();
@@ -105,9 +112,9 @@ export class ExpenseEntryDetails {
         this.saveDisable = false;
         this.cancelDisable = false;
         this.isEditable = false;
-        this.expenseEntryTemp = JSON.parse(JSON.stringify(this.expenseEntry));
-        this.rowsTemp = JSON.parse(JSON.stringify(this.rows));
-        this.expenseRowsTemp = JSON.parse(JSON.stringify(this.expenseRows));
+        this.expenseEntryTemp = this.clone(this.expenseEntry);
+        this.expenseRowsTemp = this.clone(this.expenseRows);
+        this.rowsTemp = this.clone(this.rows);
         if(x=='D'){
           this.onDelete();
         }
@@ -120,7 +127,14 @@ export class ExpenseEntryDetails {
       }
     }));
 
+    this.subscription.push(this.commonService.isSystemAdmin.subscribe(data=>{
+      this.statusDisable = !data;
+    }));
+
     this.subscription.push(this.expenseEntryService.cancelClick.subscribe(data=>{
+      if(this.dashboardService.ExpenseEntry == 1){
+        return
+      }
       this.cancelClickMethod();
     }));
   }
@@ -129,6 +143,27 @@ export class ExpenseEntryDetails {
     await this.expenseEntryService.getAccountList().then((res: any[]) => {
       this.AccountList = res;
     });
+  }
+
+  ngOnDestroy(): void {
+    this.dashboardService.clickedExpenseEntry.next(null);
+    this.expenseEntryService.btnClick.next('');
+    this.subscription.forEach(sub => sub.unsubscribe());
+    this.isEditable = true;
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.expenseEntryService.disableGrid.next(false);
+    this.dashboardService.ExpenseEntry = 0;
+    this.expenseEntryService.disabledItems.next(false);
+    this.rows= []; 
+    this.rowsTemp= [];
+    this.InventoryAccounts= [];
+    this.distinctGodownCodes= [];
+    this.expenseRows= [];
+    this.inventoryRows=[];
+    this.expenseRowsTemp= [];
+    this.AccountList= [];
+    this.expenseEntry =  new ExpenseEntryModel();
   }
 
   calculateCosts() {
@@ -144,8 +179,13 @@ export class ExpenseEntryDetails {
   }
 
   roundTo3Decimals(value: number): number { 
-    let num = Number(value.toFixed(3))
-    return num; 
+    let num = Number(value);             // num is number
+    let formatted = Number(num.toFixed(3)); // convert back to number
+    return formatted;
+  }
+
+  clone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
   }
 
   getRowIdentity(row: any): any {
@@ -203,6 +243,15 @@ export class ExpenseEntryDetails {
     return Number(total);  // round to 4 decimal places
   }
 
+  private sumInvRows(field: string): number {
+    const total = this.inventoryRows.reduce((sum: number, row: any) => {
+      const val = Number(row[field]);
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+
+    return Number(total);  // round to 4 decimal places
+  }
+
   addRow(){
     if (this.expenseRows.length > 0) {
       const lastRow = this.expenseRows[this.expenseRows.length - 1];
@@ -231,14 +280,24 @@ export class ExpenseEntryDetails {
   }
 
   CreditAmountChange = this.debounce((credit: number, row: any) => {
+    if(row.credit_amount < 0){
+      this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
+      row.credit_amount = 0;
+    }
     // recompute total from base + sum of all rows
-    const totalCredits = this.expenseRows.reduce((sum, r) => sum + (Number(r.credit_amount) || 0), 0);
-    this.expenseEntry.est_landed_exp = Number(this.est_landed_exp) + totalCredits;
+    //const totalCredits = this.expenseRows.reduce((sum, r) => sum + (Number(r.credit_amount) || 0), 0);
+    //this.expenseEntry.est_landed_exp = Number(this.est_landed_exp) + totalCredits;
+    const exp =Number(this.sumExpRows('credit_amount')||0);
+    this.expenseEntry.est_landed_exp = exp;
     this.calculateCosts();
   }, 200);
 
 
   ForiegnCreditAmountChange = this.debounce((fcredit: number, row: any) => {
+    if(row.fgn_credit_amount < 0){
+      this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
+      row.credit_amount = 0;
+    }
     row.credit_amount =  (row.fgn_credit_amount * this.expenseEntry.exch_rate).toFixed(3) ;
     this.CreditAmountChange(row.credit_amount, row);
   }, 200);
@@ -248,8 +307,8 @@ export class ExpenseEntryDetails {
     // Reassign seq_no for all rows 
     this.expenseRows.forEach((row, i) => { row.seq_no = i + 1; });
     this.expenseRows = [...this.expenseRows];
-    const totalCredits = this.expenseRows.reduce((sum, r) => sum + (Number(r.credit_amount) || 0), 0);
-    this.expenseEntry.est_landed_exp = Number(this.est_landed_exp) + totalCredits;
+   const exp =Number(this.sumExpRows('credit_amount')||0);
+    this.expenseEntry.est_landed_exp = exp;
     this.calculateCosts();
   }
 
@@ -266,30 +325,42 @@ export class ExpenseEntryDetails {
     this.saveDisable = true;
     this.cancelDisable = true;
     this.expenseEntryService.disableGrid.next(false);
-    this.expenseEntry = JSON.parse(JSON.stringify(this.expenseEntryTemp));
-    this.rows = JSON.parse(JSON.stringify(this.rowsTemp));
-    this.expenseRows = JSON.parse(JSON.stringify(this.expenseRowsTemp));
-    this.dashboardService.ExpenseEntry = 0;
+    this.inventoryRows=[];
+    this.expenseRowsTemp= [];
+    
     this.expenseEntryService.disabledItems.next(false);
+    this.expenseEntryService.btnClick.next('');
+    if(this.dashboardService.ExpenseEntry == 1){
+      this.dashboardService.ExpenseEntry = 0;
+      this.dashboardService.clickedExpenseEntry.next(null);
+      this.expenseEntryService.clickedEntry.next(this.expenseEntryService.mainList[0]);
+    }else{
+      this.expenseEntryService.clickedEntry.next(this.expenseEntryTemp);
+    }
   }
 
   async expenseEntryBtnClick(data:any){
+    await this.expenseEntryService.getExpenseEntryDetails(data.ref_grn_id).then((res) => {});
+    this.rowsTemp =  this.clone(this.rows);
     this.expenseEntryService.btnClick.next('N');
     this.btnType ='N';
     this.expenseEntryService.disabledItems.next(true);
     this.expenseEntryService.ControlsEnableAndDisable.next(true);
     this.expenseEntryService.disableGrid.next(true);
-    await this.expenseEntryService.getExpenseEntryDetails(data.ref_grn_id).then((res) => {});
-    this.expenseEntry.discount = this.rows[0]?.main_discount || 0;
-    this.expenseEntry.exch_rate = data.exch_rate;
-    this.expenseEntry.ref_grn = data.document_number;
-    this.expenseEntry.approval_status = data.approval_status;
+    // this.expenseEntry.exch_rate = data.exch_rate;
+    // this.expenseEntry.approval_status = data.approval_status;
+    this.expenseEntry = data;
     this.expenseEntry.voucherDate = new Date();
     this.expenseEntry.voucher_date = new Date();
-    this.expenseEntry.godown_code = data.godown_code;
+    // this.expenseEntry.godown_code = data.godown_code;
+    this.expenseEntry.ref_grn = data.document_number;
     this.expenseEntry.counter_vid = data.ref_grn_id;
+    this.expenseEntry.discount = this.rows[0]?.main_discount || 0;
 
     await this.expenseEntryService.getProfitCenter(data.godown_code).then((res: any[]) => {
+      if(!res[0]){
+        return;
+      }
       this.expenseEntry.centercode = res[0].centercode;
       this.expenseEntry.centername = res[0].centername;
     });
@@ -318,34 +389,48 @@ export class ExpenseEntryDetails {
   }
 
  async validateAndSave(status: string = 'DRAFT') {
-    if (this.expenseRows.length === 0) {
-      this.alertService.triggerAlert('Please add the row items...', 3000, 'error');
-      return;
-    }
+    try {
+      if (this.expenseRows.length === 0) {
+        this.alertService.triggerAlert('Please add the row items...', 3000, 'error');
+        this.inventoryRows=[];
+        return;
+      }
 
-    const itemEmpty = this.expenseRows.some(row => !row.account_code);
-    if (itemEmpty) {
-      this.alertService.triggerAlert('Please select Item Code', 3000, 'error');
-      return;
-    }
+      const itemEmpty = this.expenseRows.some(row => !row.account_code);
+      if (itemEmpty) {
+        this.alertService.triggerAlert('Please select Item Code', 3000, 'error');
+        this.inventoryRows=[];
+        return;
+      }
 
-    const voucher_Date = new Date(this.expenseEntry.voucher_date);
-    const periodFrom = new Date(sessionStorage.getItem('period_from') || '');
-    const periodTo   = new Date(sessionStorage.getItem('period_to') || '');
-    const isBetween = voucher_Date >= periodFrom && voucher_Date <= periodTo;
-    if (!isBetween) {
-      this.alertService.triggerAlert('Entry date must choose within the chosen financial year.', 3000, 'error');
-      return;
-    }
+      const voucher_Date = new Date(this.expenseEntry.voucher_date);
+      const periodFrom = new Date(sessionStorage.getItem('period_from') || '');
+      const periodTo   = new Date(sessionStorage.getItem('period_to') || '');
+      const isBetween = voucher_Date >= periodFrom && voucher_Date <= periodTo;
+      if (!isBetween) {
+        this.alertService.triggerAlert('Entry date must choose within the chosen financial year.', 3000, 'error');
+        return;
+      }
 
-    await this.AssignValues(status);
-    this.expenseHeaderModel.account_code = this.expenseAccountModel[0].account_code;
-    this.CalculateInventoryAccounts();
-    
-    const rows = [...this.expenseAccountModel, ...this.inventoryRows];
-    const reSequencedRows = rows.map((item, index) => ({ ...item, seq_no: index + 1 }));
+      this.CalculateInventoryAccounts();
+      await this.AssignValues(status);
+      this.expenseHeaderModel.account_code = this.expenseAccountModel[0].account_code;
+      
+      const rows = [...this.expenseAccountModel, ...this.inventoryRows];
+      const reSequencedRows = rows.map((item, index) => ({ ...item, seq_no: index + 1 }));
 
-    this.expenseEntryService.savePurchaseExpenseEntry(this.expenseHeaderModel, reSequencedRows)
+      const sumExpAcc = this.sumExpRows('credit_amount');
+      const sumInvAcc = this.sumInvRows('debit_amount');
+      if (sumExpAcc !== sumInvAcc) {
+        this.alertService.triggerAlert('please contact Administrator.', 3000, 'error');
+        this.distinctGodownCodes= [];
+        this.inventoryRows=[];
+        this.expenseRowsTemp= [];
+        return;
+      }
+      reSequencedRows.forEach(row => row.voucher_id = this.expenseHeaderModel.voucher_id);
+
+      this.expenseEntryService.savePurchaseExpenseEntry(this.expenseHeaderModel, reSequencedRows,this.dateModel)
       .subscribe({
         next: async (response: any) => {
           if(this.btnType == 'N'){
@@ -353,10 +438,11 @@ export class ExpenseEntryDetails {
           }else{
             this.alertService.triggerAlert('Row modified successfully...', 4000, 'success');
           }
-          this.expenseEntryService.getExpenseEntryList(sessionStorage.getItem('year'),2);
+          await this.expenseEntryService.getExpenseEntryList(sessionStorage.getItem('year'),2);
           let item: ExpenseEntryModel | undefined = this.expenseEntryService.mainList.find(item => item.voucher_id === response.expenceEntryModel.voucher_id);
           if (item) {
             this.expenseEntryService.loadListExpenseEntry.next(this.expenseEntryService.mainList);
+            this.dashboardService.ExpenseEntry = 0;
             this.expenseEntryService.clickedEntry.next(item); // pass single object
           }
           this.expenseEntryService.btnClick.next('');
@@ -366,20 +452,30 @@ export class ExpenseEntryDetails {
           this.expenseEntryService.disabledItems.next(false);
           this.expenseEntryService.disableGrid.next(false);
           this.expenseEntryService.ControlsEnableAndDisable.next(true);
+          this.distinctGodownCodes= [];
+          //this.expenseRows= [];
+          this.inventoryRows=[];
+          this.expenseRowsTemp= [];
         },
         error: () => {
           this.alertService.triggerAlert('Failed to save the Row...', 4000, 'error');
           this.expenseEntryService.btnClick.next('');
-          this.inventoryRows = [];
+          this.distinctGodownCodes= [];
+          this.inventoryRows=[];
+          this.expenseRowsTemp= [];
         }
       });
+    }catch (error) {
+      this.distinctGodownCodes= [];
+      this.inventoryRows=[];
+      this.expenseRowsTemp= [];
+    }
   }
 
   async AssignValues(status: string = 'Draft') {
     const voucher_id = await this.commonService.GetGuid();
     this.expenseHeaderModel = {
       company_code: this.endPointService.companycode,
-      voucher_date: new Date(this.expenseEntry.voucher_date),
       period_id: sessionStorage.getItem('year'),
       register_code: 33,
       voucher_reference: this.expenseEntry.voucher_reference,
@@ -398,6 +494,7 @@ export class ExpenseEntryDetails {
             document_number: '',
             created_by: localStorage.getItem('user_id'),
             user_enter_date: new Date(),
+            voucher_date:this.expenseEntry.voucher_date,
             approved_by: null,
             modified_by: null,
             modified_on: null,
@@ -411,11 +508,17 @@ export class ExpenseEntryDetails {
             modified_by: localStorage.getItem('user_id'),
             modified_on: new Date(),
             user_enter_date: this.expenseEntry.user_enter_date,
+            voucher_date: this.expenseEntry.voucher_date,
             approved_by: this.expenseEntry.approved_by,
             approval_status: status,   // 👈 use parameter here
             createdt: this.expenseEntry.createdt,
           })
     };
+
+    const voucher_date = this.datePipe.transform(this.expenseEntry.voucher_date, 'dd/MM/yyyy');
+    this.dateModel.voucher_date = voucher_date;
+    const user_enter_date = this.datePipe.transform(this.expenseEntry.user_enter_date, 'dd/MM/yyyy');
+    this.dateModel.user_enter_date = user_enter_date;
 
     this.expenseAccountModel = await this.mapAccountDetails(
       this.expenseRows,
@@ -435,12 +538,12 @@ export class ExpenseEntryDetails {
       details.debit_amount = item.debit_amount??0;
       details.credit_amount = item.credit_amount;
       details.account_code = item.account_code;
-      details.counter_account_code = item.counter_account_code;
+      details.counter_account_code = this.inventoryRows[0]?.account_code || null;
       details.fgn_debit_amount = item.fgn_debit_amount??0;
       details.fgn_credit_amount = item.fgn_credit_amount??0;
       details.dOCUMENT_NUMBER = null;
       details.rOW_REF = item.rOW_REF;
-      details.counter_vid = item.voucher_id;
+      details.counter_vid =  null;
       details.profitcenterid = item.profitcenterid;
       detailsList.push(details);
     }
@@ -476,7 +579,7 @@ export class ExpenseEntryDetails {
     // Assume merged is already created as shown earlier
     merged.forEach((item) => {
       let newRow: Partial<ExpenseAccountModel> = {
-        voucher_id: this.expenseHeaderModel.voucher_id,
+        voucher_id: null,
         seq_no: this.expenseRows.length +this.inventoryRows.length+ 1,
         debit_amount: item.debit_amount ?? 0,  
         credit_amount: 0,

@@ -10,9 +10,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { StockTransfer } from './stock-transfer';
 import { StockTransferRouting } from './stock-transfer.routing';
-import { StockTransferService } from '../../../Service/StockTransferService/stock-transfer-service';
 import { StockTransferList } from './stock-transfer-list/stock-transfer-list';
 import { StockTransferDetails } from './stock-transfer-details/stock-transfer-details';
+import { StockTransferService } from '../../../Service/StockTransferService/stock-transfer-service';
 
 @NgModule({
   declarations: [

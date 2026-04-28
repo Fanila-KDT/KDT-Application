@@ -10,7 +10,9 @@ export class PurchaseOrderEndpointService {
   GetVendorList ='';
   GetPaymentList ='';
   GetItemDetails ='';
+  GetItemDetailsFromReorder = '';
   GetItemList = '';
+  getItemListNew = '';
   ItemCodeEnter = '';
   ModelNameChange = '';
   SavePurchaseOrder = '';
@@ -30,5 +32,7 @@ export class PurchaseOrderEndpointService {
     this.SavePurchaseOrder = apiHostingURL+ "/savePurchaseOrder";
     this.DeletePurchaseOrder = apiHostingURL+ "/deletePurchaseOrder";
     this.GetSearchList = apiHostingURL+ "/getSearchList";
+    this.getItemListNew = apiHostingURL+ "/getItemListNew";
+    this.GetItemDetailsFromReorder = apiHostingURL+ "/getItemDetailsFromReorder";
   }
 }

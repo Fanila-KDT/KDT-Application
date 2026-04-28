@@ -68,6 +68,12 @@ export class AccountMasterDetails {
 
   ngOnDestroy(): void {
     this.subscription.forEach(sub => sub.unsubscribe());
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.accountMasterService.disableGrid.next(false);
+    this.accountMasterService.disabledItems.next(false);
+    this.accountMasterService.btnClick.next('');
+    this.accountMasterModel = new AccountMasterModel();
   }
 
   btnClickFunction(x: string) {
@@ -140,6 +146,7 @@ export class AccountMasterDetails {
         this.subList = [...this.subListTemp];
         this.accountMasterService.btnClick.next('');
         this.userAccessService.CheckUserAccess(this.accountMasterService.FormName,this.accountMasterService);
+        this.accountMasterService.selectedAccName = this.accountMasterModel.account_name;
       }).catch(error => {
         console.error('SaveAccountMaster error:', error);
         this.alertService.triggerAlert('Failed to save account. Please try again.', 4000, 'error');

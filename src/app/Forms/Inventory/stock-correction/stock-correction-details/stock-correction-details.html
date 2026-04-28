@@ -5,8 +5,19 @@
           <input type="text" class="label-input" id="voucher_id" disabled name="voucher_id"  name="voucher_id" 
           [(ngModel)]="stockCorrection.voucher_id" #voucher_id="ngModel">
       </div>   -->
-      <!-- Warehouse -->
+      <!--Doc No -->
         <div class="col-md-2">
+            <div class="label-wrapper d-flex align-items-center">
+            <label for="document_number" class="form-label  mb-0">Doc No
+            </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="document_number" disabled name="document_number"  name="document_number" 
+                [(ngModel)]="stockCorrection.document_number" #document_number="ngModel">
+            </div>
+        </div>
+      <!-- Warehouse -->
+        <div class="col-md-3">
           <div class="label-wrapper d-flex align-items-center">
               <label for="godown_code" class="form-label mb-0">Warehouse
                 <span class="required-star">*</span>
@@ -14,12 +25,13 @@
           </div>
           <div class="input-wrapper">
               <ng-select  [items]="godownList" bindLabel="from_godown" bindValue="godown_code" [(ngModel)]="stockCorrection.godown_code" class="select-input"
-                [disabled]="isEditable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   [ngClass]="{'is-invalid': isWarehouseInvalid}"> 
+                [disabled]="isEditable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   [ngClass]="{'is-invalid': isWarehouseInvalid}"
+                (change)="WarehouseChange(stockCorrection.godown_code)"> 
               </ng-select>
           </div>
         </div>
         <!-- Account Name -->
-        <div class="col-md-2">
+        <div class="col-md-3">
           <div class="label-wrapper d-flex align-items-center">
               <label for="godown_code" class="form-label mb-0">Account Name
                 <span class="required-star">*</span>
@@ -29,6 +41,27 @@
               <ng-select  [items]="accountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="stockCorrection.account_code" class="select-input"
                 [disabled]="isEditable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"  [ngClass]="{'is-invalid': isAccountInvalid}"> 
               </ng-select>
+          </div>
+        </div>
+      <!-- Entry Date -->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="voucher_date" class="form-label">Entry Date
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <div class="datepicker-wrapper">
+              <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="isEditable"
+                [bsConfig]="{
+                  dateInputFormat: 'DD/MM/YYYY',
+                  showWeekNumbers: false
+                }"
+                (bsValueChange)="onDateSelected($event)" [ngModel]="stockCorrection.voucherDate" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
+                />
+              <button type="button" class="btn btn-outline-secondary" (click)="dp.show()" [disabled]="isEditable">
+                📅
+              </button>
+              </div> 
           </div>
         </div>
         <!-- Reason -->
@@ -55,49 +88,6 @@
             </select>
           </div>
         </div>
-      <!--Doc No -->
-        <div class="col-md-2">
-            <div class="label-wrapper d-flex align-items-center">
-            <label for="document_number" class="form-label  mb-0">Doc No
-            </label>
-            </div>
-            <div class="input-wrapper">
-                <input type="text" class="label-input" id="document_number" disabled name="document_number"  name="document_number" 
-                [(ngModel)]="stockCorrection.document_number" #document_number="ngModel">
-            </div>
-        </div>
-      <!-- Entry Date -->
-        <div class="col-md-2">
-          <div class="label-wrapper">
-            <label for="voucher_date" class="form-label">Entry Date
-            </label>
-          </div>
-          <div class="input-wrapper">
-            <div class="datepicker-wrapper">
-              <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="isEditable"
-                [bsConfig]="{
-                  dateInputFormat: 'DD/MM/YYYY',
-                  showWeekNumbers: false
-                }"
-                (bsValueChange)="onDateSelected($event)" [ngModel]="stockCorrection.voucherDate" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
-                />
-              <button type="button" class="btn btn-outline-secondary" (click)="dp.show()" [disabled]="isEditable">
-                📅
-              </button>
-              </div> 
-          </div>
-        </div>
-        <!--Status-->
-        <div class="col-md-2">
-            <div class="label-wrapper d-flex align-items-center">
-            <label for="approval_status" class="form-label  mb-0">Status
-            </label>
-            </div>
-            <div class="input-wrapper">
-                <input type="text" class="label-input" id="approval_status" disabled name="approval_status"  name="approval_status" 
-                [(ngModel)]="stockCorrection.approval_status" #approval_status="ngModel">
-            </div>
-        </div>
     </div>
     <div class="row">
         <!--Reference-->
@@ -111,55 +101,6 @@
                 [(ngModel)]="stockCorrection.voucher_reference" #voucher_reference="ngModel" [disabled]="isEditable" >
               </textarea>
           </div>
-        </div>
-         <div class="col-md-9">
-        <div class="d-flex mt-2 gap-2">
-            <fieldset style="width:350px; background-color:#f5f5be; padding:8px;">
-                <div class="row">
-                    <!-- Total Qty -->
-                    <div class="col-md-6">
-                    <div class="label-wrapper">
-                        <label for="totalQty" class="form-label">Total Reciept Qty</label>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="text" class="label-input" id="totalQty" [disabled]="true" name="totalQty" [(ngModel)]="totalQty" #totalQtys="ngModel">
-                    </div>
-                    </div>
-                    <!-- Total Qty -->
-                    <div class="col-md-6">
-                    <div class="label-wrapper">
-                        <label for="totalAmount" class="form-label">Total Reciept Amount</label>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="text" class="label-input" id="totalAmount" [disabled]="true" name="totalAmount" [(ngModel)]="totalAmount" #totalAmounts="ngModel">
-                    </div>
-                    </div>
-                </div>
-            </fieldset>
-
-            <fieldset style="width:350px; background-color:#f5e6bc; padding:8px;">
-                <div class="row">
-                    <!-- Total Issued Qty -->
-                    <div class="col-md-6">
-                    <div class="label-wrapper">
-                        <label for="totalIssuedQty" class="form-label">Total Issued Qty</label>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="text" class="label-input" id="totalIssuedQty" [disabled]="true" name="totalIssuedQty" [(ngModel)]="totalIssuedQty" #totalIssQtys="ngModel">
-                    </div>
-                    </div>
-                    <!-- Total Issued Amount -->
-                    <div class="col-md-6">
-                    <div class="label-wrapper">
-                        <label for="totalIssuedAmount" class="form-label">Total Issued Amount</label>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="text" class="label-input" id="totalIssuedAmount" [disabled]="true" name="totalIssuedAmount" [(ngModel)]="totalIssuedAmount" #totalIssuedAmounts="ngModel">
-                    </div>
-                    </div>
-                </div>
-            </fieldset>
-        </div>
         </div>
     </div>
     
@@ -247,7 +188,7 @@
             type="number" 
             class="form-control grid-input" 
             [(ngModel)]="row.receipt_quantity" 
-            [disabled]="isEditable" (input)="ReceiptQtyChange(row.receipt_quantity,row)"
+            [disabled]="isEditable" (change)="ReceiptQtyChange(row.receipt_quantity,row)"
             [ngModelOptions]="{ standalone: true }" />
         </ng-template>
       </ngx-datatable-column>
@@ -259,7 +200,7 @@
             type="number" 
             class="form-control grid-input" 
             [(ngModel)]="row.issue_quantity" 
-            [disabled]="isEditable" (input)="IssueQtyChange(row.issue_quantity,row)"
+            [disabled]="isEditable" (change)="IssueQtyChange(row.issue_quantity,row)"
             [ngModelOptions]="{ standalone: true }" />
         </ng-template>
       </ngx-datatable-column>
@@ -271,7 +212,7 @@
             type="number" 
             class="form-control grid-input" 
             [(ngModel)]="row.avG_COST" 
-            [disabled]="isEditable" (input)="RateChange(row.avG_COST,row)"
+            [disabled]="isEditable" (change)="RateChange(row.avG_COST,row)"
             [ngModelOptions]="{ standalone: true }"  />
         </ng-template>
       </ngx-datatable-column>
@@ -307,7 +248,7 @@
             type="text" 
             class="form-control grid-input" 
             [(ngModel)]="row.fgn_total" 
-            [disabled]="isEditable" (input)="FgnTotalChange(row.fgn_total,row)"
+            [disabled]="isEditable" (change)="FgnTotalChange(row.fgn_total,row)"
             [ngModelOptions]="{ standalone: true }"  />
         </ng-template>
       </ngx-datatable-column>
@@ -339,6 +280,57 @@
     </ngx-datatable>
 
     <div class="row">
+      <!--Status-->
+      <div class="col-md-2">
+          <div class="label-wrapper d-flex align-items-center">
+          <label for="approval_status" class="form-label  mb-0">Status
+          </label>
+          </div>
+          <div class="input-wrapper">
+              <input type="text" class="label-input" id="approval_status" [disabled]="statusDisable" name="approval_status"  name="approval_status" 
+              [(ngModel)]="stockCorrection.approval_status" #approval_status="ngModel">
+          </div>
+      </div>
+        <!-- Total Qty -->
+        <div class="col-md-1 ms-auto">
+          <div class="label-wrapper">
+              <label for="totalQty" class="form-label">Total Reciept Qty</label>
+          </div>
+          <div class="input-wrapper">
+              <input type="text" class="label-input" id="totalQty" [disabled]="true" name="totalQty" [(ngModel)]="totalQty" #totalQtys="ngModel">
+          </div>
+        </div>
+        <!-- Total Amount -->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+              <label for="totalAmount" class="form-label">Total Reciept Amount</label>
+          </div>
+          <div class="input-wrapper">
+              <input type="text" class="label-input" id="totalAmount" [disabled]="true" name="totalAmount" [(ngModel)]="totalAmount" #totalAmounts="ngModel">
+          </div>
+        </div>
+
+        <!-- Total Issued Qty -->
+        <div class="col-md-1">
+          <div class="label-wrapper">
+              <label for="totalIssuedQty" class="form-label">Total Issued Qty</label>
+          </div>
+          <div class="input-wrapper">
+              <input type="text" class="label-input" id="totalIssuedQty" [disabled]="true" name="totalIssuedQty" [(ngModel)]="totalIssuedQty" #totalIssQtys="ngModel">
+          </div>
+        </div>
+        <!-- Total Issued Amount -->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+              <label for="totalIssuedAmount" class="form-label">Total Issued Amount</label>
+          </div>
+          <div class="input-wrapper">
+              <input type="text" class="label-input" id="totalIssuedAmount" [disabled]="true" name="totalIssuedAmount" [(ngModel)]="totalIssuedAmount" #totalIssuedAmounts="ngModel">
+          </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
       <!-- Created By-->
       <div class="col-md-2">
         <div class="label-wrapper">
@@ -346,18 +338,18 @@
           </label>
         </div>
         <div class="input-wrapper">
-          <input type="text" class="label-input" id="created_by" disabled 
+          <input type="text" class="label-input" id="created_by" [disabled]="true"  
               name="created_by" [(ngModel)]="stockCorrection.created_by" #created_by="ngModel">
         </div>
       </div>
       <!-- Created On-->
-      <div class="col-md-2">
+      <div class="col-md-1">
         <div class="label-wrapper">
           <label for="created_date" class="form-label">Created On
           </label>
         </div>
         <div class="input-wrapper">
-          <input type="text" class="label-input" id="created_date" disabled 
+          <input type="text" class="label-input" id="created_date" [disabled]="true"  
               name="created_date" [(ngModel)]="stockCorrection.created_date" #created_date="ngModel">
         </div>
       </div>
@@ -368,18 +360,18 @@
           </label>
         </div>
         <div class="input-wrapper">
-          <input type="text" class="label-input" id="modified_by" disabled 
+          <input type="text" class="label-input" id="modified_by" [disabled]="true"  
               name="modified_by" [(ngModel)]="stockCorrection.modified_by" #modified_by="ngModel">
         </div>
       </div>
       <!-- Updated On -->
-      <div class="col-md-2">
+      <div class="col-md-1">
         <div class="label-wrapper">
           <label for="modified_date" class="form-label">Modified On
           </label>
         </div>
         <div class="input-wrapper">
-          <input type="text" class="label-input" id="modified_date" disabled 
+          <input type="text" class="label-input" id="modified_date" [disabled]="true"  
               name="modified_date" [(ngModel)]="stockCorrection.modified_date" #modified_date="ngModel">
         </div>
       </div>
@@ -390,19 +382,19 @@
           </label>
         </div>
         <div class="input-wrapper">
-          <input type="text" class="label-input" id="approved_by" disabled 
+          <input type="text" class="label-input" id="approved_by" [disabled]="true"  
               name="approved_by" [(ngModel)]="stockCorrection.approved_by" #approved_by="ngModel">
         </div>
       </div>
-
-      <div class="col-md-2">
+      <!-- Remarks -->
+      <div class="col-md-4">
         <div class="label-wrapper">
           <label for="approver_remarks" class="form-label">Approval Remarks
           </label>
         </div>
         <div class="input-wrapper">
             <textarea class="label-input" id="approver_remarks" name="approver_remarks" rows="2"
-              [(ngModel)]="stockCorrection.approver_remarks" #approver_remarks="ngModel" disabled >
+              [(ngModel)]="stockCorrection.approver_remarks" #approver_remarks="ngModel" [disabled]="true" >
             </textarea>
         </div>
       </div>

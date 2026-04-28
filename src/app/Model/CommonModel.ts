@@ -57,3 +57,13 @@ export class StockDataDetails
     exch_rate: any;
     ref_row_id: any;
 }
+
+export class DateModel{
+    voucher_date: any;
+    user_enter_date: any;
+    posted_date: any;
+    invoice_date : any;
+    order_date :any;
+    stock_date: any;
+    verified_date: any;
+}

@@ -6,6 +6,7 @@ import { SelectionType } from '@swimlane/ngx-datatable';
 import { ExpenseEntryModel } from '../../../../Model/ExpenseEntry/expense-entry.model';
 import { Subscription } from 'rxjs';
 import { Pagination } from '../../../../Model/pagingResponse';
+import { DashboardService } from '../../../../Service/DashboardService/dashboard-service';
 
 @Component({
   selector: 'expense-entry-list',
@@ -45,7 +46,7 @@ export class ExpenseEntryList {
   approval_status:string ='';
 
   constructor(public expenseEntryService:ExpenseEntryService,public endPointService:EndPointService,public userAccessService:UserAccessService,
-            private cdRef: ChangeDetectorRef) {
+            public dashboardService: DashboardService,private cdRef: ChangeDetectorRef) {
     this.gridHeight = this.endPointService.GridHeight;
 
     this.subscription.push(this.expenseEntryService.loadListExpenseEntry.subscribe(async data => {
@@ -56,6 +57,7 @@ export class ExpenseEntryList {
           this.temp = [...data];
           this.selected = [this.rows[0]];
           this.expenseEntryPagingResponse.TotalItems = this.rows.length;
+          this.approval_status = this.rows[0].approval_status;
           await this.viewDetails(this.rows[0]);
           await this.updatePageSize();
           this.cdRef.markForCheck();
@@ -71,6 +73,9 @@ export class ExpenseEntryList {
     }));
 
     this.subscription.push(this.expenseEntryService.ControlsEnableAndDisable.subscribe(data=>{
+      if(this.dashboardService.ExpenseEntry ==1){
+        return;
+      }
       this.ControlsEnableAndDisable()
     }));
 
@@ -212,7 +217,7 @@ export class ExpenseEntryList {
 
     // 2. Read current disable flags after CheckUserAccess
     const editDisabled = this.expenseEntryService.editDisabled.getValue();
-    const deleteDisabled = this.expenseEntryService.editDisabled.getValue();
+    const deleteDisabled = this.expenseEntryService.deleteDisabled.getValue();
 
     // 3. Only if user access allows (enabled), apply period rules
     if ( !editDisabled || !deleteDisabled) {
@@ -227,11 +232,11 @@ export class ExpenseEntryList {
       );
 
       this.expenseEntryService.editDisabled.next(
-        !periodAllowed || this.approval_status == 'DRAFT'
+        !periodAllowed || (this.approval_status).toUpperCase() != 'DRAFT'
       );
       
       this.expenseEntryService.deleteDisabled.next(
-        !periodAllowed || this.approval_status == 'DRAFT'
+        !periodAllowed || (this.approval_status).toUpperCase() != 'DRAFT'
       );
     }
   }

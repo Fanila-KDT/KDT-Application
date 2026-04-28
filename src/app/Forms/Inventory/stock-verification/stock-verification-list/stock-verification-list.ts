@@ -90,11 +90,12 @@ export class StockVerificationList {
 
   async ngOnInit() {
     await this.stockVerificationService.getStockVerificationList(this.endPointService.year);
-    this.cdRef.markForCheck();
   }
 
   ngOnDestroy(): void {
     this.subscription.forEach(sub => sub.unsubscribe());
+    this.rows = [];           // Original data
+    this.temp = [];
   }
 
   onActivate(event: any) {
@@ -236,8 +237,8 @@ export class StockVerificationList {
       );
 
       this.stockVerificationService.editDisabled.next(
-        !periodAllowed || this.approval_status !== 'Stock Checking'
-     );
+        !periodAllowed || (this.approval_status).toUpperCase() !== 'STOCK CHECKING'
+      );
     }
   }
 }

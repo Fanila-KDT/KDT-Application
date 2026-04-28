@@ -36,6 +36,7 @@ export class PurchaseOrder {
       this.deleteDisable = data;
       this.searchDisable = data;
       this.yearDisable = data;
+      this.refreshDisable = data;
     }));
 
     this.subscription.push(this.purchaseOrderService.registerList.subscribe(data=>{
@@ -74,6 +75,7 @@ export class PurchaseOrder {
       this.deleteDisable = true;
       this.searchDisable = true;
       this.yearDisable = true;
+      this.refreshDisable = true;
       this.purchaseOrderService.disableGrid.next(true);
     }
     this.purchaseOrderService.btnClick.next(type);
@@ -116,6 +118,8 @@ export class PurchaseOrder {
   Refresh(){
     this.purchaseOrderService.ngOnInit.next(true);
     this.getYear();
+    this.searchDisable =  false;
+    this.yearDisable = false;
   }
 
   yearChange(event:any){
@@ -129,7 +133,7 @@ export class PurchaseOrder {
         sessionStorage.setItem('period_to',match.period_to.toString());
       }
     if(this.purchaseOrderService.btnClick.value == ''){
-      this.purchaseOrderService.getPurchaseOrderList(event);
+      this.purchaseOrderService.getPurchaseOrderList(event,1);
     }
   }
 

@@ -100,6 +100,14 @@ export class WarehouseMasterDetails {
 
   ngOnDestroy(): void {
     this.subscription.forEach(sub => sub.unsubscribe());
+    this.isEditable = true;
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.warehouseMasterService.disableGrid.next(false);
+    this.warehouseMasterService.disabledItems.next(false);
+    this.warehouseMasterService.btnClick.next('');
+    this.rows =[];
+    this.warehouseMasterModel = new WarehouseMasterModel(); 
   }
 
   onRowSelect(event: any) {
@@ -152,9 +160,10 @@ export class WarehouseMasterDetails {
   }
 
   onInsertRow() {
+    
   const fixedRows = [
     {
-      paY_CODE: this.paycodeList[0]?.pay_code || null,
+      paY_CODE: 3,
       accounT_CODE:  null,
       saleS_AC_CODE: null,
       cS_AC_CODE: null,
@@ -166,7 +175,7 @@ export class WarehouseMasterDetails {
       WARR_EXP_AC_CODE: null
     },
     {
-      paY_CODE: this.paycodeList[1]?.pay_code || null,
+      paY_CODE: 5,
       accounT_CODE: null,
       saleS_AC_CODE: null,
       cS_AC_CODE: null,

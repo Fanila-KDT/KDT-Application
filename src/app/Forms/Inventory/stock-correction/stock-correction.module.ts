@@ -26,11 +26,12 @@ import { StockCorrectionDetails } from './stock-correction-details/stock-correct
     StockCorrectionRouting,
     NgxDatatableModule,
     NgSelectModule,
-    BsDatepickerModule,
+    //BsDatepickerModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    BsDatepickerModule
   ],
   providers:[StockCorrectionService]
 })

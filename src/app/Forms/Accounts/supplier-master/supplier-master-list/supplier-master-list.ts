@@ -85,9 +85,9 @@ export class SupplierMasterList {
       }
     }));
 
-    this.subscription.push(this.supplierMasterService.isLoading.subscribe(data=>{
-      this.isLoading = data;
-    }));
+    // this.subscription.push(this.supplierMasterService.isLoading.subscribe(data=>{
+    //   this.isLoading = data;
+    // }));
 
     this.subscription.push(this.supplierMasterService.ngOnInit.subscribe(data=>{
       if(data){
@@ -100,9 +100,7 @@ export class SupplierMasterList {
   }
 
   async ngOnInit() {
-    this.supplierMasterService.isLoading.next(true);
     await this.supplierMasterService.getSupplierMasterList();
-    this.supplierMasterService.isLoading.next(false);
     this.userAccessService.CheckUserAccess(this.supplierMasterService.FormName,this.supplierMasterService);
   }
 
@@ -144,9 +142,7 @@ export class SupplierMasterList {
     }
   
     async viewDetails(row: any) {
-      this.isLoading = true;
       this.selected = [row];
-      this.isLoading = false;
     }
     
     paginate(direction: 'left' | 'right' | ''): void {

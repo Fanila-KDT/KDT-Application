@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, signal } from '@angular/core';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { LoginModelLog } from './Model/LoginPage/login-page.model';
@@ -7,12 +7,13 @@ import { AlertService } from './shared/alert/alert.service';
 import { AuthService } from './Service/AuthenticationService/auth';
 import { UserAccessService } from './Service/AuthenticationService/user-access';
 import { AuthGuard } from './Service/AuthenticationService/auth-guard';
+import { CommonService } from './Service/CommonService/common-service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.html',
   standalone: false,
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
   subscription: Subscription[];
@@ -22,10 +23,10 @@ export class App {
   showHeader = false;
   showPadding = true;
 
-  constructor(private router: Router,public loginModelLog: LoginModelLog,public authguard :AuthGuard,public loginService:LoginService,private alertService:AlertService,private userAccessService: UserAccessService,private authService: AuthService) {
+  constructor(private commonService: CommonService,private cdRef: ChangeDetectorRef,private router: Router,public loginModelLog: LoginModelLog,public authguard :AuthGuard,public loginService:LoginService,private alertService:AlertService,private userAccessService: UserAccessService,private authService: AuthService) {
     this.subscription = new Array<Subscription>();
 
-     this.router.events.subscribe(event => {
+    this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         // Hide header/nav and remove padding on login page
         const isLogin = event.urlAfterRedirects.includes('login-page');
@@ -41,7 +42,6 @@ export class App {
     });
 
     this.userAccessService.ngOnInit();
-    
     let user_id = sessionStorage.getItem('user_id')||'';
     this.userAccessService.username.next(user_id);
     localStorage.setItem('user_id',user_id);
@@ -61,16 +61,19 @@ export class App {
   }
 
   ngOnInit() {
-   
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener('beforeunload', async () => {
       if (localStorage.getItem('LoginUser') == 'IN'){
+        if (localStorage.getItem('user_id') != ''){
+          await this.commonService.getItemList();
+          await this.commonService.getItemListNew();
+        }
         localStorage.setItem('authToken','success')
         this.userAccessService.ngOnInit();
         this.userAccessService.HeaderName.next(sessionStorage.getItem('HeaderName')||'dashboard');
         this.isLoginPage = false;
       }
     });
-
+    
     window.addEventListener('unload', () => {
       if (localStorage.getItem('LoginUser') === 'IN'){
           this.commonlogout();
@@ -87,6 +90,8 @@ export class App {
         }
       } 
     });
+   this.cdRef.markForCheck();
+
   }
   
   commonlogout() {

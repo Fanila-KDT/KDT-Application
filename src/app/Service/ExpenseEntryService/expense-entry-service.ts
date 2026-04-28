@@ -4,6 +4,7 @@ import { BehaviorSubject, firstValueFrom, lastValueFrom, Observable, Subject } f
 import { AlertService } from '../../shared/alert/alert.service';
 import { ExpenseEntryServiceEndpointService } from './expense-entry-end-point.service';
 import { ExpenseAccountModel, ExpenseDetailsModel, ExpenseEntryModel, ExpenseEntrySearch, ExpenseHeaderModel } from '../../Model/ExpenseEntry/expense-entry.model';
+import { DateModel } from '../../Model/CommonModel';
 
 @Injectable({
   providedIn: 'root'
@@ -122,18 +123,26 @@ export class ExpenseEntryService {
     return this.httpClient.post<any>(this.endpointService.FindInventoryAccounts, payload)
   }
 
-  savePurchaseExpenseEntry(expenseHeaderModel: ExpenseHeaderModel, accountGridModel: any[]) {
+  savePurchaseExpenseEntry(expenseHeaderModel: ExpenseHeaderModel, accountGridModel: any[],dateModel: DateModel) {
     const payload = {
       expenceEntryModel: expenseHeaderModel,
-      expenseGridModel: accountGridModel
+      expenseGridModel: accountGridModel,
+      dateModel: dateModel
     };
     return this.httpClient.post<any>(this.endpointService.SavePurchaseExpenseEntry , payload)
   }
 
   deletePurchaseExpense(voucher_id: string): Observable<any[]> {
-    return this.httpClient.delete<any[]>(
-      this.endpointService.DeletePurchaseExpense + '/' + voucher_id + '/' + sessionStorage.getItem('year')
-    );
+    try{
+      return this.httpClient.delete<any[]>(
+        this.endpointService.DeletePurchaseExpense + '/' + voucher_id + '/' + sessionStorage.getItem('year')
+      );
+    }  catch (error) {
+        console.error('deletePurchaseExpense : ', error);
+        const message = 'Something went wrong while Deleting Expense Entry. Please try again.';
+        this.alertService.triggerAlert(message, 4000, 'error');
+        throw error; // Return empty observable on error
+    }
   }
 
   async SearchList(searchList: ExpenseEntrySearch): Promise<void> {

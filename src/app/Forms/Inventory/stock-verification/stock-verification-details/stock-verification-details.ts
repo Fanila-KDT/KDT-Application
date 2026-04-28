@@ -7,15 +7,21 @@ import { AlertService } from '../../../../shared/alert/alert.service';
 import { CommonService } from '../../../../Service/CommonService/common-service';
 import { HttpResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
+import { DatePipe } from '@angular/common';
+import { DateModel } from '../../../../Model/CommonModel';
 
 @Component({
   selector: 'stock-verification-details',
   standalone: false,
   templateUrl: './stock-verification-details.html',
-  styleUrls: ['./stock-verification-details.css','../../../common.css']
+  styleUrls: ['./stock-verification-details.css','../../../common.css'],
+  providers: [DatePipe]
 })
 export class StockVerificationDetails {
   @ViewChild(DatatableComponent) table?: DatatableComponent;
+  stockVerification: StockVerificationModel = new StockVerificationModel();
+  stockVerificationTemp: StockVerificationModel = new StockVerificationModel();  
+  dateModel: DateModel = new DateModel();
   itemDisable:boolean=true;
   saveDisable:boolean=true;
   cancelDisable:boolean=true;
@@ -26,16 +32,14 @@ export class StockVerificationDetails {
   rows: any[] = []; 
   Finalrows: any[] = []; 
   rowsTemp: any[] = [];
-  stockVerification: StockVerificationModel = new StockVerificationModel();
-  stockVerificationTemp: StockVerificationModel = new StockVerificationModel();
   
+  allReceived = false;
   subscription: Subscription[];
   totalQty: number = 0;
   recQty: number = 0;
   isEditable: boolean = true;
-  status: number = 0; // 1 for save, 2 for draft
 
-  constructor(public stockVerificationService:StockVerificationService,public alertService:AlertService,public commonService:CommonService) {
+  constructor(public stockVerificationService:StockVerificationService,public alertService:AlertService,public commonService:CommonService,private datePipe: DatePipe,) {
     this.subscription = new Array<Subscription>();
     this.subscription.push(this.stockVerificationService.clickedStock.subscribe(async x=>{
       this.stockVerificationService.ControlsEnableAndDisable.next(true);
@@ -54,7 +58,7 @@ export class StockVerificationDetails {
         this.saveDisable = false;
         this.cancelDisable = false;
         this.isEditable =false;
-        this.stockVerificationTemp = JSON.parse(JSON.stringify(this.stockVerification));
+        this.stockVerificationTemp = {...this.stockVerification};
         this.stockVerification.verifiedDate = new Date();
         this.stockVerification.verified_date = new Date();
       }
@@ -62,8 +66,8 @@ export class StockVerificationDetails {
 
     this.subscription.push(this.stockVerificationService.assignStockDetails.subscribe(async (data:any)=>{
       if(data[0]){
-        this.rows = JSON.parse(JSON.stringify(data));
-        this.rowsTemp = JSON.parse(JSON.stringify(data));
+        this.rows = [...data];
+        this.rowsTemp = this.clone(this.rows);
         this.totalQty = this.sumRows('receipt_quantity');
         this.recQty = this.sumRows('verified_qty');
       }else{
@@ -73,8 +77,24 @@ export class StockVerificationDetails {
     }));
   }
 
+  clone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
   ngOnInit(): void {
     
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.forEach(sub => sub.unsubscribe());
+    this.isEditable = true;
+    this.saveDisable = true;
+    this.cancelDisable = true;
+    this.stockVerificationService.disableGrid.next(false);
+    this.stockVerificationService.disabledItems.next(false);
+    this.stockVerificationService.btnClick.next('');
+    this.rows =[];
+    this.stockVerification =  new StockVerificationModel();
   }
 
   getRowIdentity(row: any): any {
@@ -82,13 +102,18 @@ export class StockVerificationDetails {
   }
 
   RecQtyChange = this.debounce((qty: number, row: any) => {
-    if(qty>row.receipt_quantity){
+    if(row.verified_qty < 0){
+      this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
+      row.verified_qty = 0;
+      row.received = false;
+    }
+    if(row.verified_qty>row.receipt_quantity){
       row.verified_qty = 0;
       row.received = false;
       this.alertService.triggerAlert('Received quantity cannot be greater than Receipt quantity.',3000,'error');
       return;
     }
-    row.received = qty > 0;
+    row.received = row.verified_qty > 0;
     this.recQty = this.sumRows('verified_qty');
   }, 200);
 
@@ -96,6 +121,20 @@ export class StockVerificationDetails {
     row.verified_qty = check ? row.receipt_quantity : 0;
     this.recQty = this.sumRows('verified_qty');
   }, 200);
+
+  toggleAllReceived(event: any) {
+    const checked = event.target.checked;
+    this.rows.forEach(row => {
+      row.received = checked;
+      if (checked) {
+        row.verified_qty = row.receipt_quantity;
+        this.recQty = this.sumRows('verified_qty');
+      }else{
+        row.verified_qty = 0;
+      }
+      this.recQty = this.sumRows('verified_qty');
+    });
+  }
 
   private debounce(func: Function, wait: number) {
     let timeout: any;
@@ -123,10 +162,11 @@ export class StockVerificationDetails {
     this.saveDisable = true;
     this.cancelDisable = true;
     this.isEditable = true;
-    this.rows = JSON.parse(JSON.stringify(this.rowsTemp));
-    this.stockVerification = JSON.parse(JSON.stringify(this.stockVerificationTemp));
+    this.rows = [...this.rowsTemp];
+    this.stockVerification = {...this.stockVerificationTemp};
     this.recQty = this.sumRows('verified_qty');
     this.stockVerificationService.ControlsEnableAndDisable.next(true);
+    this.stockVerificationService.btnClick.next('');
   }
 
   onSubListActivate(event: any) {
@@ -183,19 +223,17 @@ export class StockVerificationDetails {
         buttonsStyling: false
       }).then(async (result) => {
         if (result.isConfirmed) {
-          this.status = 2;
-          await this.saveVerification(this.status);
+          await this.saveVerification(2);
         }
       });
     } else {
-      this.status = 1;
-      await this.saveVerification(this.status);
+      await this.saveVerification(1);
     }
   }
 
   async saveVerification(status: number) {
     await this.AssignValues();
-    this.stockVerificationService.saveVaricationItems(this.Finalrows, status)
+    this.stockVerificationService.saveVaricationItems(this.Finalrows, status,this.dateModel)
     .subscribe({
       next: async (result) => {
         this.stockVerificationService.disableGrid.next(false);
@@ -227,7 +265,7 @@ export class StockVerificationDetails {
 
   async saveAsDraftClickMethod(){
     await this.AssignValues();
-    this.stockVerificationService.saveVaricationItems(this.Finalrows,3)
+    this.stockVerificationService.saveVaricationItems(this.Finalrows,3,this.dateModel)
     .subscribe({
       next: (response) => {
         this.stockVerificationService.disableGrid.next(false);
@@ -258,5 +296,8 @@ export class StockVerificationDetails {
     }
 
     this.Finalrows = this.rows.map(({ bin_location, item_code,item_name,receipt_quantity,received,rowguid,voucher_id, ...rest }) => rest);
+
+    const voucher_date = this.datePipe.transform(this.stockVerification.verified_date, 'dd/MM/yyyy');
+    this.dateModel.verified_date = voucher_date;
   }
 }

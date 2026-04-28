@@ -6,6 +6,7 @@ import { AlertService } from '../../../shared/alert/alert.service';
 import { AuthService } from '../../../Service/AuthenticationService/auth';
 import { Router } from '@angular/router';
 import { UserAccessService } from '../../../Service/AuthenticationService/user-access';
+import { CommonService } from '../../../Service/CommonService/common-service';
 
 @Component({
   selector: 'login-page',
@@ -19,18 +20,23 @@ export class LoginPage {
   loginModel:LoginModel= new LoginModel();
   loginModelLog:LoginModelLog= new LoginModelLog();
 
-  constructor(public app:App, public loginService:LoginService,private alertService:AlertService,private authService: AuthService,private router: Router,public userAccessService:UserAccessService) { }
+  constructor(private commonService: CommonService,public app:App, public loginService:LoginService,private alertService:AlertService,private authService: AuthService,private router: Router,public userAccessService:UserAccessService) {
+    
+   }
+  
   login() {
     this.loginService.login(this.loginModel).subscribe({
-      next: (response) => {
-        localStorage.setItem('jwtToken', response.token);
+      next: async (response) => {
+        sessionStorage.setItem('jwtToken', response.token);
         this.loginModelLog.user_id=this.loginModel.user_id;
         this.loginModelLog.status ='IN';
-
+        await this.commonService.getItemList();
+        await this.commonService.getItemListNew();
          this.loginService.SaveLoginCredinals(this.loginModelLog).then((res: any) => {
           }).catch(error => {
             console.error('SaveAccountMaster error:', error);
             this.alertService.triggerAlert('Login credinal didn\'t saved... Please try again.', 4000, 'error');
+            return;
           });
 
         localStorage.setItem('LoginUser','IN');
