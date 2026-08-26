@@ -26,7 +26,7 @@ export class CurrencyMasterService {
   public newDisabled = new BehaviorSubject<boolean>(false);
   public editDisabled = new BehaviorSubject<boolean>(false);
   public deleteDisabled = new BehaviorSubject<boolean>(false);
-  
+  public ControlsEnableAndDisable = new BehaviorSubject<boolean>(false);
   FormName='CURRENCY_MASTER';
   selectedCurNo: number = 0;
 

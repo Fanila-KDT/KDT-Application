@@ -7,6 +7,7 @@ import { ExpenseEntryModel } from '../../../../Model/ExpenseEntry/expense-entry.
 import { Subscription } from 'rxjs';
 import { Pagination } from '../../../../Model/pagingResponse';
 import { DashboardService } from '../../../../Service/DashboardService/dashboard-service';
+import { CommonService } from '../../../../Service/CommonService/common-service';
 
 @Component({
   selector: 'expense-entry-list',
@@ -45,7 +46,7 @@ export class ExpenseEntryList {
   endCount: number=0;
   approval_status:string ='';
 
-  constructor(public expenseEntryService:ExpenseEntryService,public endPointService:EndPointService,public userAccessService:UserAccessService,
+  constructor(public commonService:CommonService,public expenseEntryService:ExpenseEntryService,public endPointService:EndPointService,public userAccessService:UserAccessService,
             public dashboardService: DashboardService,private cdRef: ChangeDetectorRef) {
     this.gridHeight = this.endPointService.GridHeight;
 
@@ -76,7 +77,10 @@ export class ExpenseEntryList {
       if(this.dashboardService.ExpenseEntry ==1){
         return;
       }
-      this.ControlsEnableAndDisable()
+      this.approval_status = this.rows.length > 0 ? this.rows[this.selectedExpenseEntry].approval_status : '';
+      if(data){
+      this.ControlsEnableAndDisable();
+      }
     }));
 
     this.subscription.push(this.expenseEntryService.ngOnInit.subscribe(data=>{
@@ -87,10 +91,16 @@ export class ExpenseEntryList {
         this.expenseEntryService.cancelClick.next(true);
       }
     }));
-    
+
+    this.subscription.push(this.expenseEntryService.clickedEntry.subscribe(async x=>{
+      if(x.voucher_id){
+        this.selected = [x];
+      }
+    }));
   }
 
   async ngOnInit() {
+    this.filterExpenseEntry = new ExpenseEntryModel();
     await this.expenseEntryService.getExpenseEntryList(this.endPointService.year,1);
   }
 
@@ -220,24 +230,28 @@ export class ExpenseEntryList {
     const deleteDisabled = this.expenseEntryService.deleteDisabled.getValue();
 
     // 3. Only if user access allows (enabled), apply period rules
-    if ( !editDisabled || !deleteDisabled) {
-      let period_status = sessionStorage.getItem('period_status') || '';
-      let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
-      let approval_status = this.approval_status;
+    let period_status = sessionStorage.getItem('period_status') || '';
+    let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
+    let approval_status = this.approval_status;
 
-      const periodAllowed = this.userAccessService.CheckPeriodAccess(
-        approval_status,
-        period_status,
-        data_entry_status
-      );
+    const periodAllowed = this.userAccessService.CheckPeriodAccess(
+      approval_status,
+      period_status,
+      data_entry_status
+    );
 
-      this.expenseEntryService.editDisabled.next(
-        !periodAllowed || (this.approval_status).toUpperCase() != 'DRAFT'
-      );
-      
-      this.expenseEntryService.deleteDisabled.next(
-        !periodAllowed || (this.approval_status).toUpperCase() != 'DRAFT'
-      );
+      if(this.commonService.isSystemAdmin.value == true){
+      this.expenseEntryService.editDisabled.next(false);
+      this.expenseEntryService.deleteDisabled.next(false);
+      return;
     }
+
+    this.expenseEntryService.editDisabled.next(
+      !(periodAllowed && this.approval_status?.toUpperCase() === 'DRAFT' && editDisabled)
+    );
+    
+    this.expenseEntryService.deleteDisabled.next(
+      !(periodAllowed && this.approval_status?.toUpperCase() === 'DRAFT' && deleteDisabled)
+    );
   }
 }

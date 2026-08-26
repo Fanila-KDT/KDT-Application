@@ -13,6 +13,8 @@ export class CommonService {
   ItemListNew: any[] = [];
 
   public isSystemAdmin = new BehaviorSubject<boolean>(false);
+  public isTagAdmin = new BehaviorSubject<boolean>(false);
+  public isAccAdmin = new BehaviorSubject<boolean>(false);
   constructor(private httpClient:HttpClient, public endpointService: CommonEndpointService,private alertService:AlertService) { }
 
   async GetGuid(): Promise<any> {
@@ -61,8 +63,10 @@ export class CommonService {
       );
       // Save ItemList to sessionStorage
       sessionStorage.setItem('ItemList', JSON.stringify(res));
-
+      const activeItems = res.filter(item => !item.inactive_item);
+      localStorage.setItem('ItemListNew', JSON.stringify(activeItems));
       this.ItemList = res;
+      this.ItemListNew = activeItems;
       return res;
     }catch (error) {
       console.error('GetItemList : ', error);

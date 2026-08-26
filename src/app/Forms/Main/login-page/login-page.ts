@@ -31,7 +31,7 @@ export class LoginPage {
         this.loginModelLog.user_id=this.loginModel.user_id;
         this.loginModelLog.status ='IN';
         await this.commonService.getItemList();
-        await this.commonService.getItemListNew();
+        //await this.commonService.getItemListNew();
          this.loginService.SaveLoginCredinals(this.loginModelLog).then((res: any) => {
           }).catch(error => {
             console.error('SaveAccountMaster error:', error);

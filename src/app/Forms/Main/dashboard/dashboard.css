@@ -5,7 +5,7 @@
   align-items: center;       /* horizontal centering */
   height: 94vh;             /* full viewport height */
   width: 85.8vw;              /* full viewport width */
-  background: linear-gradient(135deg, #a7c2e2, #d2deeb,#7aced4,#97b2d4,#7aa4d4, #fdfdfd); /* optional background */
+  background: linear-gradient(135deg, #cdd5db, #c9d8e9,#e8f2f5,#eff2fa,#e8eef1, #f3eeee); /* optional background */
   color: #fff;
 }
 

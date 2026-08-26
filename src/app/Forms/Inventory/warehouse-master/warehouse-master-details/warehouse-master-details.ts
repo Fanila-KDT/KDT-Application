@@ -67,6 +67,7 @@ export class WarehouseMasterDetails {
         this.rows =[];
         return;
       }
+      this.warehouseMasterService.ControlsEnableAndDisable.next(true);
       this.warehouseMasterModel = {...x};
       this.warehouseMasterModelTemp = {...x};
       this.warehouseMasterService.selectedWerNo = x.godown_code;
@@ -83,7 +84,11 @@ export class WarehouseMasterDetails {
     }));
 
     this.subscription.push(this.warehouseMasterService.btnClick.subscribe(x=>{
-     this.btnClickFunction(x);
+      if(x != ''){
+         if(x != ''){
+        this.btnClickFunction(x);
+     }
+      }
     }));
 
     this.subscription.push(this.warehouseMasterService.cancelClick.subscribe(x=>{
@@ -111,7 +116,7 @@ export class WarehouseMasterDetails {
   }
 
   onRowSelect(event: any) {
-    //this.productMasterService.clickedProduct.next(event.selected[0]);
+    //this.warehouseMasterService.clickedProduct.next(event.selected[0]);
   }
 
   AssignDrpdowns(){
@@ -205,19 +210,12 @@ export class WarehouseMasterDetails {
        response = await this.warehouseMasterService.wHNameCheck(this.warehouseMasterModel.godown_name);
       }
     }
-    const isValid = await this.validateForm(this.warehouseMasterModel);
-    if (!isValid) {
-      this.alertService.triggerAlert('Please fill all required fields.', 4000, 'error');
-      return;
-    }
-
-    const invalidRows = this.rows.filter(row => !this.validateRow(row));
-    if (invalidRows.length > 0) {
-        this.alertService.triggerAlert('Please fill all mandatory fields in the grid.', 4000, 'error');
-      return;
-    }
-
     
+    const isValid = await this.validateAll(this.warehouseMasterModel, this.rows);
+    if (!isValid) {
+      return; // Alerts already triggered inside validateAll
+    }
+
     if(response == false){
       this.warehouseMasterService.SavewarehouseMaster(this.warehouseMasterModelSave,this.rows).subscribe({next: (response: any) => {
         if(this.btnType === 'N'){
@@ -235,7 +233,7 @@ export class WarehouseMasterDetails {
         this.warehouseMasterService.disableGrid.next(false);
         this.warehouseMasterService.disabledItems.next(false);
         this.warehouseMasterService.btnClick.next('');
-        this.userAccessService.CheckUserAccess(this.warehouseMasterService.FormName,this.warehouseMasterService);
+        this.warehouseMasterService.ControlsEnableAndDisable.next(true);
       },
         error: (err) => {
           this.alertService.triggerAlert('Failed to save the Row...',4000, 'error');
@@ -273,41 +271,55 @@ export class WarehouseMasterDetails {
     this.saveDisable = true;
     this.cancelDisable = true;
     this.warehouseMasterService.disabledItems.next(false);
-    this.warehouseMasterService.btnClick.next('');
     this.isWHNameInvalid = false;
     this.isPrefixInvalid = false;
-    this.userAccessService.CheckUserAccess(this.warehouseMasterService.FormName,this.warehouseMasterService);
+    this.warehouseMasterService.btnClick.next('');
+    this.warehouseMasterService.ControlsEnableAndDisable.next(true);
   } 
 
-  async validateForm(model: WarehouseMasterModel): Promise<boolean> {
-    // Reset all flags
+  async validateAll(  model: WarehouseMasterModel, rows: any[]): Promise<boolean> {
+    // --- Form validation ---
     this.isWHNameInvalid = !model.godown_name?.trim();
     this.isPrefixInvalid = !model.godown_name_abbr?.trim();
-    
-        // Final validity check
-    const isValid = !(
-      this.isWHNameInvalid ||
-      this.isPrefixInvalid 
-    );
 
-    return isValid;
-  }
+    const isFormValid = !(this.isWHNameInvalid || this.isPrefixInvalid);
+    if (!isFormValid) {
+      this.alertService.triggerAlert('Please fill all required fields.', 4000, 'error');
+      return false;
+    }
 
-  validateRow(row: any): boolean {
-    this.isAcctNameInvalid = !row.accounT_CODE? true : false;
-    this.isSalAcInvalid = !row.saleS_AC_CODE? true : false;
-    this.isCostSalAcInvalid = !row.cS_AC_CODE? true : false;
-    this.isInvAccInvalid = !row.inventorY_AC_CODE? true : false;
-    this.isSalesDisInvalid = !row.saleS_DISC_CODE? true : false;
-    this.isGiftAccInvalid = !row.gifT_AC_CODE? true : false;
-    this.isStockAdjInvalid = !row.adjustmenT_CODE? true : false;
-    this.isServiceAccInvalid = !row.servicE_AC_CODE? true : false;
-    this.isWarExpInvalid = !row.warR_EXP_AC_CODE? true : false;
-    const isValid = !(
-       this.isAcctNameInvalid
-    );
+    // --- Row validation ---
+    const invalidRows = rows.filter(row => {
+      const acctInvalid = !row.accounT_CODE;
+      const salInvalid = !row.saleS_AC_CODE;
+      const costInvalid = !row.cS_AC_CODE;
+      const invInvalid = !row.inventorY_AC_CODE;
+      const discInvalid = !row.saleS_DISC_CODE;
+      const giftInvalid = !row.gifT_AC_CODE;
+      const adjInvalid = !row.adjustmenT_CODE;
+      const servInvalid = !row.servicE_AC_CODE;
+      const warExpInvalid = !row.warR_EXP_AC_CODE;
 
-    return isValid;
+      return (
+        acctInvalid ||
+        salInvalid ||
+        costInvalid ||
+        invInvalid ||
+        discInvalid ||
+        giftInvalid ||
+        adjInvalid ||
+        servInvalid ||
+        warExpInvalid
+      );
+    });
+
+    if (invalidRows.length > 0) {
+      this.alertService.triggerAlert('Please fill all fields in the grid.', 4000, 'error');
+      return false;
+    }
+
+    // --- If both checks pass ---
+    return true;
   }
 
   onAccNAmeChange(event: any, row: any, field: any) {

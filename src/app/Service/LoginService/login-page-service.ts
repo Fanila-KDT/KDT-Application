@@ -24,8 +24,8 @@ export class LoginService {
       return res; // ✅ Return the response
     } catch (error) {
       console.error('SaveAccountMaster : ', error);
-      const message = 'Something went wrong while Saving Account. Please try again.';
-      this.alertService.triggerAlert(message, 4000, 'error');
+      //const message = 'Something went wrong while Saving Account. Please try again.';
+      //this.alertService.triggerAlert(message, 4000, 'error');
       return null; // Return null on error
     }   
   }

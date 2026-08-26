@@ -6,6 +6,7 @@ import { PurchaseOrderModel } from '../../../../Model/PurchaseOrder/purchase-ord
 import { Pagination } from '../../../../Model/pagingResponse';
 import { SelectionType } from '@swimlane/ngx-datatable';
 import { EndPointService } from '../../../../Service/end-point.services';
+import { CommonService } from '../../../../Service/CommonService/common-service';
 
 @Component({
   selector: 'purchase-order-list',
@@ -47,7 +48,8 @@ export class PurchaseOrderList {
   clrFilterDisable = false;
   approval_status:string ='';
 
-  constructor(public purchaseOrderService:PurchaseOrderService,public endPointService:EndPointService,public userAccessService:UserAccessService,private cdRef: ChangeDetectorRef) {
+  constructor(public purchaseOrderService:PurchaseOrderService,public endPointService:EndPointService,
+    public userAccessService:UserAccessService,private cdRef: ChangeDetectorRef,public commonService:CommonService,) {
     this.subscription = new Array<Subscription>();
     this.gridHeight = this.endPointService.GridHeight;
     this.subscription.push(this.purchaseOrderService.loadList.subscribe(async data => {
@@ -89,14 +91,20 @@ export class PurchaseOrderList {
 
      this.subscription.push(this.purchaseOrderService.ControlsEnableAndDisable.subscribe(data=>{
       if(data){
-        this.approval_status = this.rows.length > 0 ? this.rows[0].approval_status : '';
+        this.approval_status = this.rows.length > 0 ? this.rows[this.selectedPurchaseOrder].approval_status : '';
         this.ControlsEnableAndDisable();
       }
     }));
 
+    this.subscription.push(this.purchaseOrderService.clickedPO.subscribe(async x=>{
+      if(x.voucher_id){
+        this.selected = [x];
+      }
+    }));
   }
 
   ngOnInit(){
+    this.filterPurchaseOrder= new PurchaseOrderModel();
     this.purchaseOrderService.getPurchaseOrderList(this.endPointService.year,1);
     //this.userAccessService.CheckUserAccess(this.purchaseOrderService.FormName,this.purchaseOrderService);
   }
@@ -230,14 +238,13 @@ export class PurchaseOrderList {
   ControlsEnableAndDisable() {
     // 1. Run user access check first
     this.userAccessService.CheckUserAccess(this.purchaseOrderService.FormName, this.purchaseOrderService);
-
+    
     // 2. Read current disable flags after CheckUserAccess
     const newDisable = this.purchaseOrderService.newDisabled.getValue();
     const editDisabled = this.purchaseOrderService.editDisabled.getValue();
     const deleteDisabled = this.purchaseOrderService.deleteDisabled.getValue();
 
     // 3. Only if user access allows (enabled), apply period rules
-    if ( !newDisable ||  !editDisabled || !deleteDisabled) {
       let period_status = sessionStorage.getItem('period_status') || '';
       let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
       let approval_status = this.approval_status;
@@ -248,10 +255,22 @@ export class PurchaseOrderList {
         data_entry_status
       );
 
-      this.purchaseOrderService.newDisabled.next(!periodAllowed);
-      this.purchaseOrderService.editDisabled.next(!periodAllowed || this.approval_status?.toUpperCase() != 'DRAFT');
-      this.purchaseOrderService.deleteDisabled.next(!periodAllowed || this.approval_status?.toUpperCase() != 'DRAFT');
-    }
+      if(this.commonService.isSystemAdmin.value == true){
+        this.purchaseOrderService.newDisabled.next(false);
+        this.purchaseOrderService.editDisabled.next(false);
+        this.purchaseOrderService.deleteDisabled.next(false);
+        return;
+      }
+
+    this.purchaseOrderService.newDisabled.next(!(periodAllowed && newDisable));
+    
+    this.purchaseOrderService.editDisabled.next(
+      !(periodAllowed && this.approval_status?.toUpperCase() === 'DRAFT' && editDisabled)
+    );
+    
+    this.purchaseOrderService.deleteDisabled.next(
+      !(periodAllowed && this.approval_status?.toUpperCase() === 'DRAFT' && deleteDisabled)
+    );
     
   }
 }

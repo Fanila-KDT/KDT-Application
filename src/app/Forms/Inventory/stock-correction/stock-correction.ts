@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 import { AlertService } from '../../../shared/alert/alert.service';
 import { CommonService } from '../../../Service/CommonService/common-service';
 import { App } from '../../../app';
+import { EndPointService } from '../../../Service/end-point.services';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'stock-correction',
@@ -18,15 +20,17 @@ export class StockCorrection {
   modifyDisable: boolean = false;
   deleteDisable: boolean = false;
   searchDisable: boolean = false;
+  gridDisabled: boolean = false;
   refreshDisable: boolean = false;
   showModalSearch: boolean = false;
-  gridDisabled: boolean = false;
+  showModalPrint: boolean = false;
+  reportType: any = '2';
   years: any[] = [];
   year: number = new Date().getFullYear(); 
   stockCorrectionSearch:StockCorrectionSearch = new StockCorrectionSearch();
   subscription: Subscription[]= new Array<Subscription>();
 
-  constructor(public app:App,public stockCorrectionService:StockCorrectionService,private alertService:AlertService,public commonService:CommonService) {
+  constructor(private router: Router,public endPointService:EndPointService,public app:App,public stockCorrectionService:StockCorrectionService,private alertService:AlertService,public commonService:CommonService) {
      this.subscription.push(this.stockCorrectionService.disabledItems.subscribe(data=>{
       this.modifyDisable = data;
       this.deleteDisable = data;
@@ -37,7 +41,7 @@ export class StockCorrection {
     }));
 
     const subs = [
-      { obs: this.stockCorrectionService.newDisable, setter: (val: boolean) => this.newDisable = val },
+      { obs: this.stockCorrectionService.newDisabled, setter: (val: boolean) => this.newDisable = val },
       { obs: this.stockCorrectionService.editDisabled, setter: (val: boolean) => this.modifyDisable = val },
       { obs: this.stockCorrectionService.deleteDisabled, setter: (val: boolean) => this.deleteDisable = val }
     ];
@@ -45,6 +49,7 @@ export class StockCorrection {
     subs.forEach(s => {
       this.subscription.push(s.obs.subscribe(s.setter));
     });
+    
     this.getYear();
   }
 
@@ -100,6 +105,7 @@ export class StockCorrection {
 
   modalCancel(){
     this.showModalSearch = false;
+    this.showModalPrint = false;
     this.stockCorrectionSearch.approval_status = null; 
     this.stockCorrectionSearch.document_number = null;
   }
@@ -128,8 +134,27 @@ export class StockCorrection {
   }
 
   toggleValue(){
-    this.gridDisabled = !this.gridDisabled; 
+    this.gridDisabled = !this.gridDisabled;  
     this.stockCorrectionService.disableGrid.next(this.gridDisabled);
+  }
+
+  print(){
+    this.showModalPrint = true;
+  }
+
+  printReport(){
+    const sID = this.router.routerState.root.firstChild?.snapshot.data['screenId']; //14
+    let apiHostingURL = this.endPointService.ReportURL + 'Inventory?sID='+sID;
+    let params = new URLSearchParams();
+
+    params.append("reportType", this.reportType);
+    params.append("voucher_id", this.stockCorrectionService.item.voucher_id?? null);
+    params.append("titleb", "2");
+    params.append("kdt_logo",  this.endPointService.Report_logo);
+
+    const finalUrl = apiHostingURL + "&" + params.toString();
+    window.open(finalUrl, "_blank");
+    this.showModalPrint = false;
   }
   
 }

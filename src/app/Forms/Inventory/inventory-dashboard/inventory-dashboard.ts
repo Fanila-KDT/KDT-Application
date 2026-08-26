@@ -1,6 +1,8 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { RecieptEntryService } from '../../../Service/RecieptEntryService/reciept-entry-service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { EndPointService } from '../../../Service/end-point.services';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'inventory-dashboard',
@@ -14,7 +16,8 @@ export class InventoryDashboard {
   localPOsCount:number = 0;
   foreignPOsCount:number = 0;
   TotalCount:number = 0;
-  constructor(private recieptEntryService:RecieptEntryService, private router: Router,private cdRef: ChangeDetectorRef) { }
+  constructor(private recieptEntryService:RecieptEntryService,private httpClient:HttpClient, private router: Router,
+    private route: ActivatedRoute,private cdRef: ChangeDetectorRef,public endpointService:EndPointService) { }
 
   async ngOnInit() {
     this.localList =await this.recieptEntryService.getPendingPOList(32);
@@ -36,5 +39,11 @@ export class InventoryDashboard {
     sessionStorage.setItem('List', JSON.stringify(this.ForeignList)); 
     sessionStorage.setItem('Heading', 'Foreign Po'); 
     this.router.navigate(['/Forms/inventory-pending-reciepts']); 
+  }
+
+  print(){
+  let apiHostingURL = this.endpointService.ReportURL+ 'ItemDetails?sID='+1;
+    var url = apiHostingURL + '&item_code='+'123456789';
+    window.open(url, '_blank')
   }
 }

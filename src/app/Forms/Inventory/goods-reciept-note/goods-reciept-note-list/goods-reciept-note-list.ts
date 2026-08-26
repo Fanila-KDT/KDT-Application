@@ -9,6 +9,7 @@ import { EndPointService } from '../../../../Service/end-point.services';
 import { PurchaseOrderService } from '../../../../Service/PurchaseOrderService/purchase-order-service';
 import { Router } from '@angular/router';
 import { DashboardService } from '../../../../Service/DashboardService/dashboard-service';
+import { CommonService } from '../../../../Service/CommonService/common-service';
 
 @Component({
   selector: 'goods-reciept-note-list',
@@ -55,7 +56,8 @@ export class GoodsRecieptNoteList {
   expBtnDisable: boolean = true;
 
   constructor(public goodsRecieptService:RecieptEntryService,public endPointService:EndPointService,public userAccessService:UserAccessService,
-              private cdRef: ChangeDetectorRef,private purchaseOrderService:PurchaseOrderService, public dashboardService: DashboardService, private router: Router) {
+              private cdRef: ChangeDetectorRef,private purchaseOrderService:PurchaseOrderService, public dashboardService: DashboardService, 
+              private router: Router,public commonService:CommonService,) {
     this.gridHeight = this.endPointService.GridHeight;
     this.subscription.push(this.goodsRecieptService.loadListGRN.subscribe(async data => {
       if(data){
@@ -118,6 +120,7 @@ export class GoodsRecieptNoteList {
 
     this.subscription.push(this.goodsRecieptService.ControlsEnableAndDisable.subscribe(data=>{
       if(data){
+        this.approval_status = this.rows.length > 0 ? this.rows[this.selectedGoodsReciept].approval_status : '';
         this.ControlsEnableAndDisable();
         const hasExpensePermission = this.userAccessList?.some(
           (u: any) => u.permissionName === 'PURCHASE_EXPENSE'
@@ -135,6 +138,7 @@ export class GoodsRecieptNoteList {
   }
 
   async ngOnInit() {
+    this.filterGoodsReciept = new GRNModel();
     if (this.dashboardService.RecieptEntry === 1) {
       return;
     }
@@ -295,23 +299,32 @@ export class GoodsRecieptNoteList {
     const deleteDisabled = this.goodsRecieptService.deleteDisabled.getValue();
 
     // 3. Only if user access allows (enabled), apply period rules
-    if (!newDisabled || !editDisabled || !deleteDisabled) {
-      let period_status = sessionStorage.getItem('period_status') || '';
-      let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; // ⚠️ you had a bug: you were reading period_status twice
-      let approval_status = this.approval_status;
+    let period_status = sessionStorage.getItem('period_status') || '';
+    let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; // ⚠️ you had a bug: you were reading period_status twice
+    let approval_status = this.approval_status;
 
-      const periodAllowed = this.userAccessService.CheckPeriodAccess(
-        approval_status,
-        period_status,
-        data_entry_status
-      );
+    const periodAllowed = this.userAccessService.CheckPeriodAccess(
+      approval_status,
+      period_status,
+      data_entry_status
+    );
 
-      if (!periodAllowed && (this.approval_status).toUpperCase() != 'VERIFICATION FAILED' && (this.approval_status).toUpperCase() !== 'DRAFT' ) {
-          //this.goodsRecieptService.newDisabled.next(false);
-          this.goodsRecieptService.editDisabled.next(true);
-          this.goodsRecieptService.deleteDisabled.next(true);
-      }
+    if(this.commonService.isSystemAdmin.value == true){
+      this.goodsRecieptService.newDisabled.next(false); 
+      this.goodsRecieptService.editDisabled.next(false);
+      this.goodsRecieptService.deleteDisabled.next(false);
+      return;
     }
+
+    this.goodsRecieptService.newDisabled.next(!(periodAllowed && newDisabled));
+
+    this.goodsRecieptService.editDisabled.next(
+      !(periodAllowed && ['DRAFT', 'VERIFICATION FAILED'].includes(this.approval_status) && editDisabled)
+    );
+    
+    this.goodsRecieptService.deleteDisabled.next(
+      !(periodAllowed && ['DRAFT', 'VERIFICATION FAILED'].includes(this.approval_status) && deleteDisabled)
+    );
 
     const row = this.rows[this.selectedGoodsReciept];
     if (row){
@@ -322,12 +335,12 @@ export class GoodsRecieptNoteList {
         this.goodsRecieptService.SVDisabled.next(true);
       }
     }
-    const hasExpensePermission = this.userAccessList?.some( (u: any) => u.permissionName === 'PURCHASE_EXPENSE' );
-    if((((row.approval_status).toUpperCase() == 'STOCK VERIFIED' && (row.ref_status).toUpperCase() == 'VERIFIED') || (row.virtual_store == true && (row.approval_status).toUpperCase() == 'DRAFT')) && hasExpensePermission  ){
-      row.expBtnDisable = false;
-    }else{
-      row.expBtnDisable = true;
-    }
+    // const hasExpensePermission = this.userAccessList?.some( (u: any) => u.permissionName === 'PURCHASE_EXPENSE' );
+    // if((((row.approval_status).toUpperCase() == 'STOCK VERIFIED' && (row.ref_status).toUpperCase() == 'VERIFIED') || (row.virtual_store == true && (row.approval_status).toUpperCase() == 'DRAFT')) && hasExpensePermission  ){
+    //   row.expBtnDisable = false;
+    // }else{
+    //   row.expBtnDisable = true;
+    // }
   }
 
 }

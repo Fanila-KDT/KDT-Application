@@ -163,7 +163,7 @@
             class="form-control" 
             [(ngModel)]="row.seq_no"
             [ngModelOptions]="{ standalone: true }"
-            value ="{{ rowIndex + 1 }}"
+            value ="{{ rowIndex + 1 }}" disabled
             />
         </ng-template>
       </ngx-datatable-column>
@@ -263,7 +263,7 @@
             type="number" 
             class="form-control grid-input" 
             [(ngModel)]="row.fgn_rate"   
-            [disabled]="isEditable" (change)="RateChange(row.fgn_rate,row)"
+            [disabled]="isEditable" (input)="RateChange(row.fgn_rate,row)"
             [ngModelOptions]="{ standalone: true }" />
         </ng-template>
       </ngx-datatable-column>
@@ -275,7 +275,7 @@
             type="number" 
             class="form-control grid-input" 
             [(ngModel)]="row.receipt_quantity" 
-            [disabled]="isEditable" (change)="QtyChange(row.receipt_quantity,row)"
+            [disabled]="isEditable" (input)="QtyChange(row.receipt_quantity,row)"
             [ngModelOptions]="{ standalone: true }" />
         </ng-template>
       </ngx-datatable-column>

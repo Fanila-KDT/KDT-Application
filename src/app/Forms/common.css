@@ -7,6 +7,14 @@
   margin-bottom: 0.5rem;
 }
 
+.bg-body-secondary h3 {
+  font-size: 32px;       /* smaller than display-6 */
+  font-weight: 600;
+  text-align: left;
+  margin-left: 1rem;
+  margin-bottom: 0.5rem;
+}
+
 .bg-body-secondary {
   padding-top: 1rem !important;
   padding-bottom: 1rem !important;
@@ -176,6 +184,18 @@ legend.legend-left {
   padding: 2px 6px;
 }
 
+legend.legend-report {
+  text-align: left;
+  float: none;
+  width: auto;
+  margin-left: 8px;
+  font-size: 21px;
+  font-weight: 600;
+  color: #0b4f7c;
+  background-color: #e1e6eb;
+  padding: 2px 6px;
+}
+
 /* ------------------- Labels ------------------- */
 .label-wrapper {
   margin-bottom: 2px;
@@ -223,7 +243,7 @@ input.form-control[disabled] {
   margin-left: 4px;
   font-weight: bold;
 }
-.label-input.is-invalid,
+.label-input.is-invalid,.grid-select.is-invalid,
 .grid-input.is-invalid ,.select-input.is-invalid{
   border: 1px solid red !important;
 }
@@ -672,4 +692,376 @@ textarea.custom-input:disabled {
 
 
 
+/*---------------------------------- Report Styles ----------------------------------*/
 
+.btn-pdf {
+  color: #fff;
+  background-color: #d32f2f;   /* deeper red for PDF */
+  border: none;
+  padding: 6px 12px;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-pdf:hover {
+  background-color: #b71c1c;   /* darker red on hover */
+}
+
+.btn-excel {
+  color: #fff;
+  background-color: #2e7d32;   /* Excel green */
+  border: none;
+  padding: 6px 12px;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-excel:hover {
+  background-color: #1b5e20;   /* darker green on hover */
+}
+
+.btn-group .btn-excel {
+  margin-right: 3px; /* adjust gap size */
+}
+
+.btn-group .email-btn {
+  margin-right: 4px; /* adjust gap size */
+}
+
+.email-btn {
+  display: inline-flex;              /* keeps icon + text aligned */
+  align-items: center;               /* vertical centering */
+  gap: 8px;                          /* space between icon and text */
+  padding: 10px 16px;                /* button size */
+  background-color: #0078d4;         /* Microsoft blue */
+  color: #fff;                       /* white text */
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 5px;                /* rounded corners */
+  cursor: pointer;
+  text-decoration: none;             /* remove underline if <a> */
+  transition: background-color 0.3s ease;
+}
+
+.email-btn i {
+  font-size: 16px;                   /* icon size */
+}
+
+.email-btn:hover {
+  background-color: #005a9e;         /* darker blue on hover */
+}
+
+
+
+/* 🌐 Horizontal Layout Container */
+.filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap; /* allows wrapping on smaller screens */
+  margin-top: 10px;
+}
+
+/* 🧩 Individual Cards */
+.filter-card {
+  flex: 1;
+  min-width: 250px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  padding: 16px 20px;
+  transition: box-shadow 0.3s ease;
+  margin-left: 18px;
+  margin-right: 18px;
+}
+
+.filter-card.advanced-filters {
+  flex: 1;
+  max-width: 430px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  padding: 16px 20px;
+  transition: box-shadow 0.3s ease;
+}
+
+.filter-card.costing-options {
+  flex: 1;
+  max-width: 50px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  padding: 16px 20px;
+  transition: box-shadow 0.3s ease;
+}
+
+
+.filter-card:hover,.filter-card.advanced-filters:hover,.filter-card.costing-options:hover  {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+/* 🏷️ Section Titles */
+.filter-card h5,.filter-card.advanced-filters h5,.filter-card.costing-options h5{
+  font-size: 19px;
+  font-weight: 600;
+  color: #2a2a2a;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #181616;
+  padding-bottom: 6px;
+}
+
+/* Costing card layout */
+.filter-card.costing-options {
+  flex: 1;
+  max-width: 250px;       /* give enough width */
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  padding: 16px 20px;
+  transition: box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column; /* stack children vertically */
+}
+
+/* Radio buttons as segmented options */
+.costing-options {
+  display: flex;
+  gap: 10px;
+}
+
+.costing-options input[type="radio"] {
+  display: none;
+}
+
+.costing-options label {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.costing-options input[type="radio"]:checked + label {
+  background-color: #0078d4;
+  color: #fff;
+  border-color: #0078d4;
+  box-shadow: 0 2px 6px rgba(0, 120, 212, 0.3);
+}
+
+
+/* ✅ Quick Filters (pill-style checkboxes) */
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-wrapper .checkbox-label {
+  background-color: #ebecec;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 15px;
+  color: #000000;
+  transition: all 0.3s ease;
+  
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + .checkmark + .checkbox-label {
+  background-color: #187a92;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 120, 212, 0.3);
+}
+/* Disabled state - highlight more */
+.checkbox-wrapper input[type="checkbox"]:disabled ~ .checkbox-label::before {
+  cursor: not-allowed;
+  opacity: 0.8;                /* slightly dimmed */
+}
+
+/* 🎛️ Advanced Filters (dropdowns & inputs) */
+.advanced-filters .form-group {
+  margin-bottom: 12px;
+}
+
+.advanced-filters select,
+.advanced-filters input[type="text"] {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  transition: border-color 0.3s ease;
+}
+
+.advanced-filters select:focus,
+.advanced-filters input[type="text"]:focus {
+  border-color: #0078d4;
+  outline: none;
+}
+
+/* 💰 Select Costing (segmented buttons) */
+.costing-options {
+  display: flex;
+  gap: 10px;
+}
+
+.costing-options label {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.costing-options input[type="radio"] {
+  display: none;
+}
+
+.costing-options input[type="radio"]:checked + label {
+  background-color:  #187a92;
+  color: #fff;
+  border-color:  #187a92;
+  box-shadow: 0 2px 6px rgba(0, 120, 212, 0.3);
+}
+
+.placeholder-option {
+ text-align: center;
+}
+
+
+.label-control{
+  width: 70px;
+  height: 30px;
+}
+
+
+.label-wrapperyear{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+
+/* Wrapper for each radio */
+.radio-wrapper {
+  display: flex;
+  position: relative;
+  padding-left: 25px;
+  margin-right: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+}
+
+/* Hide the default radio */
+.radio-wrapper input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Custom circle */
+.radio-wrapper .radio-label::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #007bff; /* blue border */
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+/* Filled circle when checked */
+.radio-wrapper input[type="radio"]:checked ~ .radio-label::before {
+  background-color: #007bff;
+  box-shadow: inset 0 0 0 3px #fff;
+}
+
+/* Disabled state - highlight more */
+.radio-wrapper input[type="radio"]:disabled ~ .radio-label::before {
+  border-color: #999;          /* darker border */
+  background-color: #647ec7;   /* light red/pink background to highlight */
+  cursor: not-allowed;
+  opacity: 0.8;                /* slightly dimmed */
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #007bff;       /* Bootstrap link color */
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;           /* remove button padding */
+}
+.btn-link:disabled {
+  color: #0a84f0;       /* muted color when disabled */
+  text-decoration: underline;
+  text-decoration: none;
+  cursor: not-allowed;
+}
+
+
+/* Container spacing */
+.container-fluid {
+  padding: 1rem;
+}
+
+/* Label styling */
+.container-fluid label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+  color: #333;
+}
+
+/* Textarea styling */
+.container-fluid textarea.form-control {
+  width: 100%;
+  min-height: 150px;   /* ensures large height */
+  resize: vertical;    /* allow vertical resize only */
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Focus effect */
+.container-fluid textarea.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0,123,255,0.3);
+  outline: none;
+}
+
+/* Row spacing */
+.row.g-3 {
+  margin-bottom: 1rem;
+}
+
+/* Optional: make last single field span full width */
+.col-md-12 textarea.form-control {
+  min-height: 180px;
+}

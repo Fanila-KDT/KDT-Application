@@ -29,9 +29,11 @@ export class ProductMasterModel {
     category_name :string="";
     brand_name :string="";
     item_category :string="";
-    prev_pur: string="0";
-    last_invoice:any;
+    prev_pur_cost: string="0";
+    last_Invoice:any;
     user_id:any;
+    dead_stock_days:any;
+    movement_rate:any;
 }
 
 export class MachineFeaturesList{
@@ -52,6 +54,9 @@ export class ProductMasterModelSearch {
     category_name :any = null;
     product_type :any = null;
     brand_name :any = null;
+    main_category :any = null;
+    deptname :any = null;
+    item_type :any = null;
 }
 
 export class ProductClassList {

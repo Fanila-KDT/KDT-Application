@@ -6,6 +6,7 @@ import { SelectionType } from '@swimlane/ngx-datatable';
 import { StockVerificationService } from '../../../../Service/StockVerificationService/stock-verification-service';
 import { EndPointService } from '../../../../Service/end-point.services';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
+import { CommonService } from '../../../../Service/CommonService/common-service';
 
 @Component({
   selector: 'stock-verification-list',
@@ -49,7 +50,7 @@ export class StockVerificationList {
   clrFilterDisable = false;
   approval_status:string ='';
 
-  constructor(public stockVerificationService:StockVerificationService,public endPointService:EndPointService,public userAccessService:UserAccessService,
+  constructor(public commonService:CommonService,public stockVerificationService:StockVerificationService,public endPointService:EndPointService,public userAccessService:UserAccessService,
             private cdRef: ChangeDetectorRef) {
     this.gridHeight = this.endPointService.GridHeight;
 
@@ -76,7 +77,10 @@ export class StockVerificationList {
     }));
 
     this.subscription.push(this.stockVerificationService.ControlsEnableAndDisable.subscribe(data=>{
-      this.ControlsEnableAndDisable()
+      this.approval_status = this.rows.length > 0 ? this.rows[this.selectedStockVarification].approval_status : '';
+      if(data){
+        this.ControlsEnableAndDisable()
+      }
     }));
 
     this.subscription.push(this.stockVerificationService.addRowAfterModify.subscribe(data => {
@@ -86,9 +90,16 @@ export class StockVerificationList {
         this.approval_status = this.selected[0].approval_status;
       }
     }));
+
+    this.subscription.push(this.stockVerificationService.clickedStock.subscribe(async x=>{
+      if(x.voucher_id){
+        this.selected = [x];
+      }
+    }));
   }
 
   async ngOnInit() {
+    this.filterStockVerification = new StockVerificationModel();
     await this.stockVerificationService.getStockVerificationList(this.endPointService.year);
   }
 
@@ -225,7 +236,6 @@ export class StockVerificationList {
     const editDisabled = this.stockVerificationService.editDisabled.getValue();
 
     // 3. Only if user access allows (enabled), apply period rules
-    if ( !editDisabled) {
       let period_status = sessionStorage.getItem('period_status') || '';
       let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
       let approval_status = this.approval_status;
@@ -236,9 +246,13 @@ export class StockVerificationList {
         data_entry_status
       );
 
+      if(this.commonService.isSystemAdmin.value == true){
+        this.stockVerificationService.editDisabled.next(false);
+        return;
+      }
+
       this.stockVerificationService.editDisabled.next(
-        !periodAllowed || (this.approval_status).toUpperCase() !== 'STOCK CHECKING'
+        !(periodAllowed && this.approval_status?.toUpperCase() === 'STOCK CHECKING' && editDisabled)
       );
-    }
   }
 }

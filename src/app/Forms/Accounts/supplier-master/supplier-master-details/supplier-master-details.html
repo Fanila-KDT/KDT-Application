@@ -30,7 +30,7 @@
                     <div class="label-wrapper">
                         <label for="sub" class="form-label">Foreign Currency</label>
                     </div>
-                    <select class="label-input" id="cur_no"
+                    <select class="label-input" id="cur_no" (change)="CurrencyChange($event)"
                         name="cur_no" [(ngModel)]="supplierMasterModel.cur_no" #cur_no="ngModel" [disabled]="itemDisable" >
                         <option *ngFor="let cur of curList" [value]="cur.cur_no">{{ cur.cur_name }}</option>
                     </select>
@@ -63,9 +63,12 @@
                 <!-- sub -->
                 <div class="col-md-2">
                     <div class="label-wrapper">
-                        <label for="sub" class="form-label">Sub Group</label>
+                        <label for="sub" class="form-label">Sub Group
+                            <span class="required-star">*</span>
+
+                        </label>
                     </div>
-                    <select class="label-input" id="sub_group_code"
+                    <select class="label-input" id="sub_group_code" [ngClass]="{'is-invalid': isSupGrpInvalid}" (change)="SubGrpChange(supplierMasterModel.sub_group_code)"
                         name="sub_group_code" [(ngModel)]="supplierMasterModel.sub_group_code" #sub_group_code="ngModel" [disabled]="itemDisable" >
                         <option *ngFor="let sub of subList" [value]="sub.sub_group_code">{{ sub.sub_group_name }}</option>
                     </select>

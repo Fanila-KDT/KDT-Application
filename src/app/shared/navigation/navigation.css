@@ -5,7 +5,7 @@
   left: 0;
   width: 250px;
   height: 100vh;
-  background: linear-gradient(145deg, #eef2f7, #dfe6ed);
+  background: linear-gradient(white);
   box-shadow: 4px 0 12px rgba(0, 0, 0, 0.05);
   padding: 30px 20px;
   display: flex;
@@ -105,15 +105,8 @@
   border-radius: 8px; /* Optional: adds a soft rounded look */
 }
 
-.main-button {
-  font-weight: bold;
-  cursor: pointer;
-  padding: 10px;
-  color: #333;
-}
-
 .sub-list {
-  padding-left: 15px;
+  margin-left: -16px;
 }
 
 .sub-list li a {
@@ -154,6 +147,10 @@
   transform: translateX(2px);
 }
 
+.main-button.active {
+  background-color: #e0e0e0;
+  font-weight: bold;
+}
 
 .sub-list {
   display: flex;
@@ -212,3 +209,5 @@
   background-color: rgba(0,0,0,0.3);
   border-radius: 4px;
 }
+
+

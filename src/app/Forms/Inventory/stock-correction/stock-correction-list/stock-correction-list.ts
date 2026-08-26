@@ -7,6 +7,7 @@ import { StockCorrectionService } from '../../../../Service/StockCorrectionServi
 import { EndPointService } from '../../../../Service/end-point.services';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
 import { PurchaseOrderService } from '../../../../Service/PurchaseOrderService/purchase-order-service';
+import { CommonService } from '../../../../Service/CommonService/common-service';
 
 @Component({
   selector: 'stock-correction-list',
@@ -47,7 +48,7 @@ export class StockCorrectionList {
 
   
   constructor(public stockCorrectionService:StockCorrectionService,public endPointService:EndPointService,public userAccessService:UserAccessService,
-            private cdRef: ChangeDetectorRef,public purchaseOrderService:PurchaseOrderService) {
+            private cdRef: ChangeDetectorRef,public purchaseOrderService:PurchaseOrderService,public commonService:CommonService,) {
     this.gridHeight = this.endPointService.GridHeight;
 
     this.subscription.push(this.stockCorrectionService.loadListStockCorrection.subscribe(async data => {
@@ -72,15 +73,17 @@ export class StockCorrectionList {
       this.disableGrid = data;
     }));
     
-    this.subscription.push(this.stockCorrectionService.selected.subscribe(async data=>{
-      if(!data){
-        return;
+    this.subscription.push(this.stockCorrectionService.clickedStockCorr.subscribe(async x=>{
+      if(x.voucher_id){
+        this.selected = [x];
       }
-      this.selected = data;
     }));
 
     this.subscription.push(this.stockCorrectionService.ControlsEnableAndDisable.subscribe(data=>{
-      this.ControlsEnableAndDisable()
+      this.approval_status = this.rows.length > 0 ? this.rows[this.selectedStockCorrection].approval_status : '';
+      if(data){
+        this.ControlsEnableAndDisable();
+      }
     }));
 
     this.subscription.push(this.stockCorrectionService.ngOnInit.subscribe(data=>{
@@ -94,6 +97,7 @@ export class StockCorrectionList {
   }
 
   async ngOnInit() {
+    this.filterStockCorrection = new StockCorrectionModel();
     await this.stockCorrectionService.getStockCorrectionList(this.endPointService.year,1);
   }
 
@@ -220,25 +224,36 @@ export class StockCorrectionList {
     this.userAccessService.CheckUserAccess(this.stockCorrectionService.FormName, this.stockCorrectionService);
 
     // 2. Read current disable flags after CheckUserAccess
-    const newDisable = this.stockCorrectionService.newDisable.getValue();
+    const newDisable = this.stockCorrectionService.newDisabled.getValue();
     const editDisabled = this.stockCorrectionService.editDisabled.getValue();
-    const deleteDisabled = this.stockCorrectionService.editDisabled.getValue();
+    const deleteDisabled = this.stockCorrectionService.deleteDisabled.getValue();
 
     // 3. Only if user access allows (enabled), apply period rules
-    if ( !newDisable ||  !editDisabled || !deleteDisabled) {
-      let period_status = sessionStorage.getItem('period_status') || '';
-      let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
-      let approval_status = this.approval_status;
+    let period_status = sessionStorage.getItem('period_status') || '';
+    let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
+    let approval_status = this.approval_status;
 
-      const periodAllowed = this.userAccessService.CheckPeriodAccess(
-        approval_status,
-        period_status,
-        data_entry_status
-      );
+    const periodAllowed = this.userAccessService.CheckPeriodAccess(
+      approval_status,
+      period_status,
+      data_entry_status
+    );
 
-      this.stockCorrectionService.newDisable.next(!periodAllowed);
-      this.stockCorrectionService.editDisabled.next(!periodAllowed);
-      this.stockCorrectionService.deleteDisabled.next(!periodAllowed);
+    if(this.commonService.isSystemAdmin.value == true){
+      this.stockCorrectionService.newDisabled.next(false); 
+      this.stockCorrectionService.editDisabled.next(false);
+      this.stockCorrectionService.deleteDisabled.next(false);
+      return;
     }
+
+    this.stockCorrectionService.newDisabled.next(!(periodAllowed && newDisable));
+    
+    this.stockCorrectionService.editDisabled.next(
+      !(periodAllowed && this.approval_status?.toUpperCase() === 'DRAFT' && editDisabled)
+    );
+    
+    this.stockCorrectionService.deleteDisabled.next(
+      !(periodAllowed && this.approval_status?.toUpperCase() === 'DRAFT' && deleteDisabled)
+    ); 
   }
 }

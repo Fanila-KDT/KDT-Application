@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { UserMasterService } from '../../../../Service/UserMasterService/user-master-service';
 import { UserMasterModel } from '../../../../Model/UserMaster/user-master.model';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
+import { CommonService } from '../../../../Service/CommonService/common-service';
 
 @Component({
   selector: 'user-master-list',
@@ -47,7 +48,7 @@ export class UserMasterList {
   isLoading: boolean = false;
   reorderable = true;
 
-  constructor(public userMasterService:UserMasterService,public userAccessService:UserAccessService) {
+  constructor(private commonService: CommonService,public userMasterService:UserMasterService,public userAccessService:UserAccessService) {
     this.subscription = new Array<Subscription>();
 
     this.subscription.push(this.userMasterService.loadList.subscribe(async data => {
@@ -88,8 +89,10 @@ export class UserMasterList {
       }
     }));
     
-    this.subscription.push(this.userMasterService.isLoading.subscribe(data=>{
-      this.isLoading = data;
+    this.subscription.push(this.userMasterService.ControlsEnableAndDisable.subscribe(data=>{
+      if(data){
+        this.ControlsEnableAndDisable();
+      }
     }));
 
     this.subscription.push(this.userMasterService.ngOnInit.subscribe(data=>{
@@ -103,10 +106,10 @@ export class UserMasterList {
   }    
 
   async ngOnInit() {
+    this.filterUserMaster = new UserMasterModel();
     this.userMasterService.isLoading.next(true);
     await this.userMasterService.getUserMasterList();
     this.userMasterService.isLoading.next(false);
-    this.userAccessService.CheckUserAccess(this.userMasterService.FormName,this.userMasterService);
   }
 
   ngOnDestroy(): void {
@@ -254,23 +257,33 @@ export class UserMasterList {
     }
   }
 
-  // CheckUserAccess(){
-  //   const cached = localStorage.getItem('userAccessList');
-  //   if (cached) {
-  //     this.userAccessList = JSON.parse(cached);
-  //   }
+  ControlsEnableAndDisable() {
+    // 1. Run user access check first
+    this.userAccessService.CheckUserAccess(this.userMasterService.FormName, this.userMasterService);
 
-  //   const Permissions = this.userAccessList.filter(
-  //     p => p.permissionName.trim().toUpperCase() === this.userMasterService.FormName
-  //   );
+    // 2. Read current disable flags after CheckUserAccess
+    const newDisable = this.userMasterService.newDisabled.getValue();
+    const editDisabled = this.userMasterService.editDisabled.getValue();
+    const deleteDisabled = this.userMasterService.deleteDisabled.getValue();
 
-  //   // Pick the one with max level_of_rights
-  //   const LargestPermissions = Permissions.reduce((prev:any, current:any) =>
-  //     current.level_of_rights > prev.level_of_rights ? current : prev
-  //   );
-  //   let level = LargestPermissions ? LargestPermissions.level_of_rights : 0;
-  //   this.userMasterService.newDisabled.next(level < 2);    // enabled from level 2+
-  //   this.userMasterService.editDisabled.next(level < 3);   // enabled from level 3+
-  //   this.userMasterService.deleteDisabled.next(level < 4); // enabled from level 4+
-  // }
+    // 3. Only if user access allows (enabled), apply period rules
+    let period_status = sessionStorage.getItem('period_status') || '';
+    let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
+
+    const periodAllowed = this.userAccessService.CheckPeriodAccess(
+      '',
+      period_status,
+      data_entry_status
+    );
+
+    if(this.commonService.isSystemAdmin.value == true){
+      this.userMasterService.newDisabled.next(false); 
+      this.userMasterService.editDisabled.next(false);
+      this.userMasterService.deleteDisabled.next(false);
+      return;
+    }
+    this.userMasterService.newDisabled.next(!(periodAllowed && newDisable));
+    this.userMasterService.editDisabled.next(!(periodAllowed  && editDisabled));
+    this.userMasterService.deleteDisabled.next(!(periodAllowed && deleteDisabled)); 
+  }
 }

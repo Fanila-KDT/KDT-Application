@@ -5,6 +5,8 @@ import { App } from '../../../app';
 import { Subscription } from 'rxjs';
 import { StockTransferSearch } from '../../../Model/StockTransfer/stock-transfer.model';
 import { StockTransferService } from '../../../Service/StockTransferService/stock-transfer-service';
+import { EndPointService } from '../../../Service/end-point.services';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'stock-transfer',
@@ -25,9 +27,11 @@ export class StockTransfer {
   year: number = new Date().getFullYear(); 
   stockTransferSearch:StockTransferSearch = new StockTransferSearch();
   subscription: Subscription[]= new Array<Subscription>();
+  showModalPrint: boolean = false;
+  reportType: string = '2';
 
-  constructor(public app:App,public stockTransferService:StockTransferService,private alertService:AlertService,public commonService:CommonService) {
-     this.subscription.push(this.stockTransferService.disabledItems.subscribe(data=>{
+  constructor(private router: Router,public endPointService:EndPointService,public app:App,public stockTransferService:StockTransferService,private alertService:AlertService,public commonService:CommonService) {
+    this.subscription.push(this.stockTransferService.disabledItems.subscribe(data=>{
       this.modifyDisable = data;
       this.deleteDisable = data;
       this.newDisable = data;
@@ -37,7 +41,7 @@ export class StockTransfer {
     }));
 
     const subs = [
-      { obs: this.stockTransferService.newDisable, setter: (val: boolean) => this.newDisable = val },
+      { obs: this.stockTransferService.newDisabled, setter: (val: boolean) => this.newDisable = val },
       { obs: this.stockTransferService.editDisabled, setter: (val: boolean) => this.modifyDisable = val },
       { obs: this.stockTransferService.deleteDisabled, setter: (val: boolean) => this.deleteDisable = val }
     ];
@@ -94,14 +98,27 @@ export class StockTransfer {
     });
   }
 
-  Search(){
+  Search() {
     this.showModalSearch = true;
+    this.showModalPrint = false;
   }
 
-  modalCancel(){
+  print() {
+    this.showModalPrint = true;
     this.showModalSearch = false;
-    this.stockTransferSearch.approval_status = null; 
-    this.stockTransferSearch.document_number = null;
+  }
+
+  modalCancel(type?: 'search' | 'print') {
+    if (type === 'search') {
+      this.stockTransferSearch.approval_status = null;
+      this.stockTransferSearch.document_number = null;
+      this.showModalSearch = false;
+    } else if (type === 'print') {
+      this.showModalPrint = false;
+    } else {
+      this.showModalSearch = false;
+      this.showModalPrint = false;
+    }
   }
 
   modalSearch() {
@@ -130,6 +147,20 @@ export class StockTransfer {
   toggleValue(){
     this.gridDisabled = !this.gridDisabled; 
     this.stockTransferService.disableGrid.next(this.gridDisabled);
+  }
+
+  printReport(){
+    const sID = this.router.routerState.root.firstChild?.snapshot.data['screenId']; //13
+    let apiHostingURL = this.endPointService.ReportURL + 'Inventory?sID='+sID;
+    let params = new URLSearchParams();
+
+    params.append("reportType", this.reportType);
+    params.append("voucher_id", this.stockTransferService.item.voucher_id?? null);
+    params.append("kdt_logo",  this.endPointService.Report_logo);
+
+    const finalUrl = apiHostingURL + "&" + params.toString();
+    window.open(finalUrl, "_blank");
+    this.showModalPrint = false;
   }
   
 }

@@ -10,7 +10,7 @@ import { EndPointService } from '../../../../Service/end-point.services';
 import Swal from 'sweetalert2';
 import { GRNModel } from '../../../../Model/RecieptEnry/reciept-enry.model';
 import { DatePipe } from '@angular/common';
-import { DateModel } from '../../../../Model/CommonModel';
+import { DateModelInventory } from '../../../../Model/CommonModel';
 
 
 @Component({
@@ -27,7 +27,7 @@ export class ExpenseEntryDetails {
   expenseHeaderModel:ExpenseHeaderModel = new ExpenseHeaderModel();
   expenseAccountModel:ExpenseAccountModel[] =[];  
   grnModelTemp: GRNModel = new GRNModel();
-  dateModel: DateModel = new DateModel();
+  dateModel: DateModelInventory = new DateModelInventory();
   
   saveDisable:boolean = true;
   cancelDisable:boolean = true;
@@ -57,7 +57,6 @@ export class ExpenseEntryDetails {
           this.inventoryRows =[];
           return;
         }
-      this.expenseEntryService.ControlsEnableAndDisable.next(true);
       if(!x){
         this.expenseEntry =  new ExpenseEntryModel();
         this.rows =[];
@@ -65,8 +64,9 @@ export class ExpenseEntryDetails {
         this.inventoryRows =[];
         return;
       }
+      this.expenseEntryService.ControlsEnableAndDisable.next(true);
       this.expenseEntry = {...x};
-     
+      this.expenseEntryService.item = x;
       await this.expenseEntryService.getExpenseEntryDetails(this.expenseEntry.counter_vid).then((res) => {});
       this.cdRef.markForCheck();
     }));
@@ -294,10 +294,10 @@ export class ExpenseEntryDetails {
 
 
   ForiegnCreditAmountChange = this.debounce((fcredit: number, row: any) => {
-    if(row.fgn_credit_amount < 0){
-      this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
-      row.credit_amount = 0;
-    }
+    // if(row.fgn_credit_amount < 0){
+    //   this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
+    //   row.credit_amount = 0;
+    // }
     row.credit_amount =  (row.fgn_credit_amount * this.expenseEntry.exch_rate).toFixed(3) ;
     this.CreditAmountChange(row.credit_amount, row);
   }, 200);
@@ -330,6 +330,7 @@ export class ExpenseEntryDetails {
     
     this.expenseEntryService.disabledItems.next(false);
     this.expenseEntryService.btnClick.next('');
+    this.expenseEntryService.ControlsEnableAndDisable.next(true);
     if(this.dashboardService.ExpenseEntry == 1){
       this.dashboardService.ExpenseEntry = 0;
       this.dashboardService.clickedExpenseEntry.next(null);
@@ -355,7 +356,7 @@ export class ExpenseEntryDetails {
     // this.expenseEntry.godown_code = data.godown_code;
     this.expenseEntry.ref_grn = data.document_number;
     this.expenseEntry.counter_vid = data.ref_grn_id;
-    this.expenseEntry.discount = this.rows[0]?.main_discount || 0;
+    this.expenseEntry.discount = data.discount || 0;
 
     await this.expenseEntryService.getProfitCenter(data.godown_code).then((res: any[]) => {
       if(!res[0]){
@@ -403,6 +404,12 @@ export class ExpenseEntryDetails {
         return;
       }
 
+      const creditAmountEmpty = this.expenseRows.some(row => !row.credit_amount);
+      if (creditAmountEmpty) {
+        this.alertService.triggerAlert('The credit amount should not be empty', 3000, 'error');
+        return ;
+      }
+
       const voucher_Date = new Date(this.expenseEntry.voucher_date);
       const periodFrom = new Date(sessionStorage.getItem('period_from') || '');
       const periodTo   = new Date(sessionStorage.getItem('period_to') || '');
@@ -438,6 +445,12 @@ export class ExpenseEntryDetails {
           }else{
             this.alertService.triggerAlert('Row modified successfully...', 4000, 'success');
           }
+          this.distinctGodownCodes= [];
+          this.expenseRows= [];
+          this.inventoryRows=[];
+          this.expenseRowsTemp= [];
+          this.InventoryAccounts= [];
+          this.expenseAccountModel=[];
           await this.expenseEntryService.getExpenseEntryList(sessionStorage.getItem('year'),2);
           let item: ExpenseEntryModel | undefined = this.expenseEntryService.mainList.find(item => item.voucher_id === response.expenceEntryModel.voucher_id);
           if (item) {
@@ -452,10 +465,6 @@ export class ExpenseEntryDetails {
           this.expenseEntryService.disabledItems.next(false);
           this.expenseEntryService.disableGrid.next(false);
           this.expenseEntryService.ControlsEnableAndDisable.next(true);
-          this.distinctGodownCodes= [];
-          //this.expenseRows= [];
-          this.inventoryRows=[];
-          this.expenseRowsTemp= [];
         },
         error: () => {
           this.alertService.triggerAlert('Failed to save the Row...', 4000, 'error');

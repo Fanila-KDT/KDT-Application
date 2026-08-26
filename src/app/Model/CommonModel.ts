@@ -58,7 +58,7 @@ export class StockDataDetails
     ref_row_id: any;
 }
 
-export class DateModel{
+export class DateModelInventory{
     voucher_date: any;
     user_enter_date: any;
     posted_date: any;
@@ -66,4 +66,15 @@ export class DateModel{
     order_date :any;
     stock_date: any;
     verified_date: any;
+}
+
+export class DateModelSales{
+    warranty_enddate: any = null;
+    warranty_startdate: any = null;
+    voucher_date: any = null;
+}
+
+export class DateModelAccounts{
+    voucher_date: any = null;
+    user_enter_date: any = null;
 }

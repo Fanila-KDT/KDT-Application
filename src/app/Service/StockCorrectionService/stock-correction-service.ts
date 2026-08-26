@@ -4,7 +4,7 @@ import { BehaviorSubject, firstValueFrom, lastValueFrom, Observable, Subject } f
 import { AlertService } from '../../shared/alert/alert.service';
 import { StockCorrectionEndpointService } from './stock-correction-end-point.service';
 import {  StockCorrectionDetailModel, StockCorrectionModel, StockCorrectionSearch } from '../../Model/StockCorrection/stock-correction.model';
-import { DateModel, FinancialDataHeader } from '../../Model/CommonModel';
+import { DateModelInventory, FinancialDataHeader } from '../../Model/CommonModel';
 
 @Injectable({
   providedIn: 'root'
@@ -12,13 +12,12 @@ import { DateModel, FinancialDataHeader } from '../../Model/CommonModel';
 export class StockCorrectionService {
   FormName = 'STOCK_CORRECTION';
   public mainList:StockCorrectionModel[]=[];  
-  public disableGrid = new BehaviorSubject<boolean>(false);  
-  public selected = new BehaviorSubject<any[]>([]);
+  public disableGrid = new BehaviorSubject<boolean>(false); 
   public disabledItems = new BehaviorSubject<boolean>(false);
   public isLoading = new BehaviorSubject<boolean>(false);
   public btnClick = new BehaviorSubject<string>('');
   public ngOnInit = new BehaviorSubject<boolean>(false);
-  public newDisable = new BehaviorSubject<boolean>(false);
+  public newDisabled = new BehaviorSubject<boolean>(false);
   public editDisabled = new BehaviorSubject<boolean>(false);
   public deleteDisabled = new BehaviorSubject<boolean>(false);
   public cancelClick = new BehaviorSubject<boolean>(false);
@@ -26,7 +25,7 @@ export class StockCorrectionService {
   public clickedStockCorr = new BehaviorSubject<StockCorrectionModel>(new StockCorrectionModel()) ;
   public loadListStockCorrection = new BehaviorSubject<StockCorrectionModel[]>([]); 
   public ItemList : any[] = [];  
-  
+  item:any;
     
   constructor(private httpClient:HttpClient, public endpointService: StockCorrectionEndpointService,private alertService:AlertService) { }
 
@@ -80,7 +79,7 @@ export class StockCorrectionService {
     }
   }
 
-  saveStockCorrection(headerModel: FinancialDataHeader, gridModel: any[],dateModel:DateModel) {
+  saveStockCorrection(headerModel: FinancialDataHeader, gridModel: any[],dateModel:DateModelInventory) {
     const payload = {
       headerModel: headerModel,
       gridModel: gridModel,

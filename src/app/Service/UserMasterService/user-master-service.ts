@@ -26,6 +26,7 @@ export class UserMasterService {
   public ngOnInit = new BehaviorSubject<boolean>(false);
   public cancelClick = new BehaviorSubject<boolean>(false);
   public btnClick = new BehaviorSubject<string>('');
+  public ControlsEnableAndDisable = new BehaviorSubject<boolean>(false);
 
   FormName='USER_MASTER';
   public selectedUserId : string =""
@@ -181,7 +182,7 @@ export class UserMasterService {
     } 
   }
 
-   async GetUserRoleById(userId: number): Promise<any> {
+  async GetUserRoleById(userId: number): Promise<any> {
     try {
       const res = await firstValueFrom(
         this.httpClient.get<any>(`${this.endpointService.GetUserRoleById}/${userId}`)
@@ -193,18 +194,18 @@ export class UserMasterService {
     }
   }
 
-   async GetPermissionList(user_id: any): Promise<any[]> {
-      try {
-        const params = new HttpParams().set('user_id', user_id);  
-        const res = await firstValueFrom(
-          this.httpClient.get<any[]>(this.endpointService.GetPermissionList, { params })
-        );
-        return res; // ✅ Return the response
-      } catch (error) {
-        console.error('GetSubListByMainCode : ', error);
-        const message = 'Something went wrong while Fetching Sub Group List. Please try again.';
-        this.alertService.triggerAlert(message, 4000, 'error');
-        return []; // Return empty array on error
-      } 
-    }
+  async GetPermissionList(user_id: any): Promise<any[]> {
+    try {
+      const params = new HttpParams().set('user_id', user_id);  
+      const res = await firstValueFrom(
+        this.httpClient.get<any[]>(this.endpointService.GetPermissionList, { params })
+      );
+      return res; // ✅ Return the response
+    } catch (error) {
+      console.error('GetSubListByMainCode : ', error);
+      const message = 'Something went wrong while Fetching Sub Group List. Please try again.';
+      this.alertService.triggerAlert(message, 4000, 'error');
+      return []; // Return empty array on error
+    } 
+  }
 }

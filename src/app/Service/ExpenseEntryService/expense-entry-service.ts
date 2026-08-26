@@ -4,13 +4,14 @@ import { BehaviorSubject, firstValueFrom, lastValueFrom, Observable, Subject } f
 import { AlertService } from '../../shared/alert/alert.service';
 import { ExpenseEntryServiceEndpointService } from './expense-entry-end-point.service';
 import { ExpenseAccountModel, ExpenseDetailsModel, ExpenseEntryModel, ExpenseEntrySearch, ExpenseHeaderModel } from '../../Model/ExpenseEntry/expense-entry.model';
-import { DateModel } from '../../Model/CommonModel';
+import { DateModelInventory } from '../../Model/CommonModel';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExpenseEntryService {
   FormName = 'PURCHASE_EXPENSE';
+  item:any;
   public mainList:ExpenseEntryModel[]=[];  
   public loadListExpenseEntry = new BehaviorSubject<ExpenseEntryModel[]>([]); 
   public disableGrid = new BehaviorSubject<boolean>(false);
@@ -54,8 +55,8 @@ export class ExpenseEntryService {
         return;
       }
       await this.httpClient.get<any>(this.endpointService.GetExpenseEntryDetails +'/'+counter_vid).subscribe({
-      next: res => {
-        this.assignExpenseDetails.next(res);
+      next:async res => {
+        await this.assignExpenseDetails.next(res);
       },
       error: err =>{
         console.log(err);
@@ -123,7 +124,7 @@ export class ExpenseEntryService {
     return this.httpClient.post<any>(this.endpointService.FindInventoryAccounts, payload)
   }
 
-  savePurchaseExpenseEntry(expenseHeaderModel: ExpenseHeaderModel, accountGridModel: any[],dateModel: DateModel) {
+  savePurchaseExpenseEntry(expenseHeaderModel: ExpenseHeaderModel, accountGridModel: any[],dateModel: DateModelInventory) {
     const payload = {
       expenceEntryModel: expenseHeaderModel,
       expenseGridModel: accountGridModel,

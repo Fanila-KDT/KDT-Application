@@ -5,6 +5,8 @@ import { App } from '../../../app';
 import { StockVerificationService } from '../../../Service/StockVerificationService/stock-verification-service';
 import { CommonService } from '../../../Service/CommonService/common-service';
 import { AlertService } from '../../../shared/alert/alert.service';
+import { Router } from '@angular/router';
+import { EndPointService } from '../../../Service/end-point.services';
 
 @Component({
   selector: 'stock-verification',
@@ -23,8 +25,10 @@ export class StockVerification {
   subscription: Subscription[]= new Array<Subscription>();
   years: any[] = [];
   year: number = new Date().getFullYear(); 
+  showModalPrint: boolean = false;
+  reportType: any = '2';
 
-  constructor(public app:App,public stockVerificationService:StockVerificationService,private alertService:AlertService,public commonService:CommonService) {
+  constructor(private router: Router,public endPointService:EndPointService,public app:App,public stockVerificationService:StockVerificationService,private alertService:AlertService,public commonService:CommonService) {
 
     this.subscription.push(this.stockVerificationService.disabledItems.subscribe(data=>{
       this.modifyDisable = data;
@@ -129,5 +133,22 @@ export class StockVerification {
   toggleValue(){
     this.gridDisabled = !this.gridDisabled; 
     this.stockVerificationService.disableGrid.next(this.gridDisabled);
+  }
+
+  print(){
+    this.showModalPrint = true;
+  }
+
+  printReport(){
+    const sID = this.router.routerState.root.firstChild?.snapshot.data['screenId']; //11
+    let apiHostingURL = this.endPointService.ReportURL + 'Inventory?sID='+sID;
+    let params = new URLSearchParams();
+
+    params.append("reportType", this.reportType);
+    params.append("voucher_id", this.stockVerificationService.item.voucher_id?? null);
+
+    const finalUrl = apiHostingURL + "&" + params.toString();
+    window.open(finalUrl, "_blank");
+    this.showModalPrint = false;
   }
 }

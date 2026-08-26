@@ -7,6 +7,7 @@ import { PrevCodeSave } from '../../../Model/ProductMaster/product-master-save.m
 import { HttpResponse } from '@angular/common/http';
 import { ProductMasterService } from '../../../Service/ProductMasterService/product-master-service';
 import { App } from '../../../app';
+import { ReportService } from '../../../Service/ReportService/report-service';
 
 
 @Component({
@@ -16,7 +17,7 @@ import { App } from '../../../app';
   styleUrls: ['./product-master.css', '../../common.css']
 })
 export class ProductMaster {
- newDisable: boolean = true;
+  newDisable: boolean = true;
   modifyDisable: boolean = true;
   deleteDisable: boolean = true;
   searchDisable: boolean = false;
@@ -32,8 +33,13 @@ export class ProductMaster {
   subscription: Subscription[];
   productMasterModelSearch:ProductMasterModelSearch;
   prevCodeSave:PrevCodeSave = new PrevCodeSave();
+  mainList: any[] = [];
+  subList: any[] = [];
+  subListTemp: any[] = [];
+  productColorList: any[] = [];
+  productClassList: any[] = [];
 
-  constructor(public app:App,public productMasterService:ProductMasterService,private alertService:AlertService ,public endPointService:EndPointService) {
+  constructor(public reportService:ReportService,public app:App,public productMasterService:ProductMasterService,private alertService:AlertService ,public endPointService:EndPointService) {
     this.productMasterModelSearch = new ProductMasterModelSearch();
     this.subscription = new Array<Subscription>();
     this.subscription.push(this.productMasterService.disabledItems.subscribe(data=>{
@@ -57,7 +63,15 @@ export class ProductMaster {
   }
 
   ngOnInit(): void {
-    
+    this.reportService.getMainCategoryList().then((res: any[]) => {
+      this.mainList = res;
+    });
+    var temp: any[] = [];
+
+    this.reportService.getSubCategoryList(temp).then((res: any[]) => {
+      this.subList = res;
+      this.subListTemp = res;
+    });
   }
 
   ngOnDestroy(): void {
@@ -79,6 +93,8 @@ export class ProductMaster {
 
   Search(){
     this.showModalSearch = true;
+    this.productColorList = this.productMasterService.productColorList;
+    this.productClassList = this.productMasterService.productClassList;
   }
 
   modalCancel(){
@@ -89,6 +105,8 @@ export class ProductMaster {
     this.productMasterModelSearch.category_name = null; 
     this.productMasterModelSearch.product_type = null; 
     this.productMasterModelSearch.brand_name = null; 
+    this.productMasterModelSearch.main_category = null; 
+    this.productMasterModelSearch.deptname = null; 
   }
 
   modalSearch(){
@@ -101,6 +119,10 @@ export class ProductMaster {
       this.productMasterModelSearch.category_name = null; 
       this.productMasterModelSearch.product_type = null; 
       this.productMasterModelSearch.brand_name = null;
+      this.productMasterModelSearch.main_category = null; 
+      this.productMasterModelSearch.deptname = null; 
+      this.subList = this.subListTemp;
+
     }catch (error) {
       console.error('Error while search Item:', error);
       this.alertService.triggerAlert('Something went wrong while fetching Searching...',4000, 'error');
@@ -168,5 +190,13 @@ export class ProductMaster {
   toggleValue(){
     this.gridDisabled = !this.gridDisabled; 
     this.productMasterService.disableGrid.next(this.gridDisabled);
+  }
+
+    mainCategoryChange(event: any) {
+    this.productMasterModelSearch.deptname = null;
+    let maingroup = event?event.main_category:[];
+    this.reportService.getSubCategoryList(maingroup).then((res:any)=>{
+      this.subList = res;
+    });
   }
 }

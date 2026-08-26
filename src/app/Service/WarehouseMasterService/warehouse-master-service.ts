@@ -26,6 +26,7 @@ export class WarehouseMasterService {
   public newDisabled = new BehaviorSubject<boolean>(false);
   public editDisabled = new BehaviorSubject<boolean>(false);
   public deleteDisabled = new BehaviorSubject<boolean>(false);
+  public ControlsEnableAndDisable = new BehaviorSubject<boolean>(false);
   
   FormName='WAREHOUSE_MASTER';
   selectedWerNo: number = 0;

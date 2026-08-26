@@ -6,6 +6,7 @@ import { Pagination } from '../../../../Model/pagingResponse';
 import { WarehouseMasterService } from '../../../../Service/WarehouseMasterService/warehouse-master-service';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
 import { EndPointService } from '../../../../Service/end-point.services';
+import { CommonService } from '../../../../Service/CommonService/common-service';
 
 @Component({
   selector: 'warehouse-master-list',
@@ -46,7 +47,7 @@ export class WarehouseMasterList {
   scroll: boolean = true;
   clrFilterDisable = false;
 
-  constructor(public warehouseMasterService:WarehouseMasterService,public userAccessService:UserAccessService, public endPointService: EndPointService) {
+  constructor(private commonService: CommonService,public warehouseMasterService:WarehouseMasterService,public userAccessService:UserAccessService, public endPointService: EndPointService) {
     this.gridHeight = this.endPointService.GridHeight;
     this.subscription = new Array<Subscription>();
 
@@ -98,11 +99,17 @@ export class WarehouseMasterList {
         this.warehouseMasterService.cancelClick.next(true);
       }
     }));
+
+    this.subscription.push(this.warehouseMasterService.ControlsEnableAndDisable.subscribe(data=>{
+      if(data){
+        this.ControlsEnableAndDisable();
+      }
+    }));
   }
 
   ngOnInit(){
+    this.filterWarehouseMaster = new WarehouseMasterModel();
     this.warehouseMasterService.getWarehouseMasterList();
-    this.userAccessService.CheckUserAccess(this.warehouseMasterService.FormName,this.warehouseMasterService);
   }
 
   ngOnDestroy(): void {
@@ -198,7 +205,7 @@ export class WarehouseMasterList {
       return 'text-left';
     }
 
-    onActivate(event: any) {
+  onActivate(event: any) {
     let rowItem = event.row;
     let rowIndex = this.rows.indexOf(rowItem);
 
@@ -230,5 +237,35 @@ export class WarehouseMasterList {
         //this.ControlsEnableDisable(1,indexv)
       }
     }
+  }
+
+  ControlsEnableAndDisable() {
+    // 1. Run user access check first
+    this.userAccessService.CheckUserAccess(this.warehouseMasterService.FormName, this.warehouseMasterService);
+
+    // 2. Read current disable flags after CheckUserAccess
+    const newDisable = this.warehouseMasterService.newDisabled.getValue();
+    const editDisabled = this.warehouseMasterService.editDisabled.getValue();
+    const deleteDisabled = this.warehouseMasterService.deleteDisabled.getValue();
+
+    // 3. Only if user access allows (enabled), apply period rules
+    let period_status = sessionStorage.getItem('period_status') || '';
+    let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
+
+    const periodAllowed = this.userAccessService.CheckPeriodAccess(
+      '',
+      period_status,
+      data_entry_status
+    );
+
+    if(this.commonService.isSystemAdmin.value == true){
+      this.warehouseMasterService.newDisabled.next(false); 
+      this.warehouseMasterService.editDisabled.next(false);
+      this.warehouseMasterService.deleteDisabled.next(false);
+      return;
+    }
+    this.warehouseMasterService.newDisabled.next(!(periodAllowed && newDisable));
+    this.warehouseMasterService.editDisabled.next(!(periodAllowed  && editDisabled));
+    this.warehouseMasterService.deleteDisabled.next(!(periodAllowed && deleteDisabled)); 
   }
 }

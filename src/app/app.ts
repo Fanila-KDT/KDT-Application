@@ -60,19 +60,20 @@ export class App {
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     window.addEventListener('beforeunload', async () => {
       if (localStorage.getItem('LoginUser') == 'IN'){
-        if (localStorage.getItem('user_id') != ''){
-          await this.commonService.getItemList();
-          await this.commonService.getItemListNew();
-        }
         localStorage.setItem('authToken','success')
         this.userAccessService.ngOnInit();
         this.userAccessService.HeaderName.next(sessionStorage.getItem('HeaderName')||'dashboard');
         this.isLoginPage = false;
       }
     });
+
+    if (localStorage.getItem('user_id') != ''){
+      await this.commonService.getItemList();
+      //await this.commonService.getItemListNew();
+    }
     
     window.addEventListener('unload', () => {
       if (localStorage.getItem('LoginUser') === 'IN'){

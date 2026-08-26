@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 import { ExpenseEntryService } from '../../../Service/ExpenseEntryService/expense-entry-service';
 import { App } from '../../../app';
 import { ExpenseEntrySearch } from '../../../Model/ExpenseEntry/expense-entry.model';
+import { EndPointService } from '../../../Service/end-point.services';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'expense-entry',
@@ -24,8 +26,10 @@ export class ExpenseEntry {
   subscription: Subscription[]= new Array<Subscription>();
   years: any[] = [];
   year: number = new Date().getFullYear(); 
+  showModalPrint: boolean = false;
+  reportType: any = '2';
 
-  constructor(public app:App,public expenseEntryService:ExpenseEntryService,private alertService:AlertService,public commonService:CommonService) {
+  constructor(private router: Router,public endPointService:EndPointService,public app:App,public expenseEntryService:ExpenseEntryService,private alertService:AlertService,public commonService:CommonService) {
     this.subscription.push(this.expenseEntryService.disabledItems.subscribe(data=>{
       this.modifyDisable = data;
       this.deleteDisable = data;
@@ -46,7 +50,6 @@ export class ExpenseEntry {
   }
   
   ngOnInit() {
-   
   }
 
   yearChange(event:any){
@@ -130,6 +133,24 @@ export class ExpenseEntry {
   toggleValue(){
     this.gridDisabled = !this.gridDisabled; 
     this.expenseEntryService.disableGrid.next(this.gridDisabled);
+  }
+
+  print(){
+    this.showModalPrint = true;
+  }
+
+  printReport(){
+    const sID = this.router.routerState.root.firstChild?.snapshot.data['screenId']; //12
+    let apiHostingURL = this.endPointService.ReportURL + 'Inventory?sID='+sID;
+    let params = new URLSearchParams();
+
+    params.append("reportType", this.reportType);
+    params.append("voucher_id", this.expenseEntryService.item.voucher_id?? null);
+    params.append("kdt_logo",  this.endPointService.Report_logo);
+
+    const finalUrl = apiHostingURL + "&" + params.toString();
+    window.open(finalUrl, "_blank");
+    this.showModalPrint = false;
   }
   
 }

@@ -2,12 +2,16 @@
   <div class="logo-container">
     <img [src]="urlConfig.Local.Logo_Url" alt="Logo" class="logo" />
   </div>
-  <ul class="nav-list">
 
+  <ul class="nav-list" *ngIf="activeHeader !== 'dashboard'">
     <!-- Masters -->
-    <ng-container *ngIf="activeHeader !== 'dashboard' && sidebarConfig[activeHeader]?.masters?.length">
-      <li class="main-button">Masters</li>
-      <div class="sub-list">
+    <ng-container *ngIf="sidebarConfig[activeHeader]?.masters?.length">
+      <li class="main-button"
+          [class.active]="openSection === 'masters'"
+          (click)="toggleSection('masters')">
+        Masters
+      </li>
+      <div class="sub-list" *ngIf="openSection === 'masters'">
         <a *ngFor="let item of sidebarConfig[activeHeader]?.masters"
            [routerLink]="item.path"
            routerLinkActive="active">
@@ -17,9 +21,13 @@
     </ng-container>
 
     <!-- Transactions -->
-    <ng-container *ngIf="activeHeader !== 'dashboard' && sidebarConfig[activeHeader]?.transactions?.length">
-      <li class="main-button">Transactions</li>
-      <div class="sub-list">
+    <ng-container *ngIf="sidebarConfig[activeHeader]?.transactions?.length">
+      <li class="main-button"
+          [class.active]="openSection === 'transactions'"
+          (click)="toggleSection('transactions')">
+        Transactions
+      </li>
+      <div class="sub-list" *ngIf="openSection === 'transactions'">
         <a *ngFor="let item of sidebarConfig[activeHeader]?.transactions"
            [routerLink]="item.path"
            routerLinkActive="active">
@@ -29,9 +37,13 @@
     </ng-container>
 
     <!-- Reports -->
-    <ng-container *ngIf="activeHeader !== 'dashboard' && sidebarConfig[activeHeader]?.reports?.length">
-      <li class="main-button">Reports</li>
-      <div class="sub-list">
+    <ng-container *ngIf="sidebarConfig[activeHeader]?.reports?.length">
+      <li class="main-button"
+          [class.active]="openSection === 'reports'"
+          (click)="toggleSection('reports')">
+        Reports
+      </li>
+      <div class="sub-list" *ngIf="openSection === 'reports'">
         <a *ngFor="let item of sidebarConfig[activeHeader]?.reports"
            [routerLink]="item.path"
            routerLinkActive="active">
@@ -39,6 +51,6 @@
         </a>
       </div>
     </ng-container>
-
   </ul>
 </div>
+

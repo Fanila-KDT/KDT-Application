@@ -36,6 +36,7 @@
           </select>
         </div>
       </div>
+      <br>
       <div class="row">
         <!--Allow FRQ -->
         <div class="col-md-2"> 
@@ -59,17 +60,6 @@
             </label>
           </div>
         </div>
-        <!--Allow Purchase -->
-        <div class="col-md-2">
-          <div class="form-group-wh ">
-            <label class="checkbox-wrapper">
-              <input type="checkbox" class="checkbox style-0" [(ngModel)]="warehouseMasterModel.purchase" 
-              name="purchase" #purchase="ngModel" [disabled]="itemDisable" style="margin-top:45px">
-              <span class="checkmark"></span>
-              <span class="checkbox-label">Allow Purchase</span> 
-            </label>
-          </div>
-        </div>
         <!--Inhouse Store -->
         <div class="col-md-2">
           <div class="form-group-wh ">
@@ -89,6 +79,17 @@
               name="virtual_store" #virtual_store="ngModel" [disabled]="itemDisable" style="margin-top:45px">
               <span class="checkmark"></span>
               <span class="checkbox-label">Virtual Store</span> 
+            </label>
+          </div>
+        </div>
+        <!--Allow Purchase -->
+        <div class="col-md-3">
+          <div class="form-group-wh ">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" class="checkbox style-0" [(ngModel)]="warehouseMasterModel.purchase" 
+              name="purchase" #purchase="ngModel" [disabled]="itemDisable" style="margin-top:45px">
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Allow Purchase</span> 
             </label>
           </div>
         </div>
@@ -139,7 +140,7 @@
                       <ng-template let-row="row" ngx-datatable-cell-template>
                         <div class="input-wrapper">
                           <ng-select [items]="acccodeList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="row.accounT_CODE" [searchable]="true"
-                            [clearable]="false" [disabled]="itemDisable" [appendTo]="'body'"  class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
+                            [clearable]="false" [disabled]="itemDisable" [appendTo]="'body'"   class="form-control grid-select" [ngModelOptions]="{ standalone: true }"
                             (change)="onAccNAmeChange($event, row, 'accounT_CODE')"  [ngClass]="{'is-invalid': isAcctNameInvalid}"
                           >
                           </ng-select>

@@ -8,7 +8,7 @@ import { CommonService } from '../../../../Service/CommonService/common-service'
 import { HttpResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { DatePipe } from '@angular/common';
-import { DateModel } from '../../../../Model/CommonModel';
+import { DateModelInventory } from '../../../../Model/CommonModel';
 
 @Component({
   selector: 'stock-verification-details',
@@ -21,7 +21,7 @@ export class StockVerificationDetails {
   @ViewChild(DatatableComponent) table?: DatatableComponent;
   stockVerification: StockVerificationModel = new StockVerificationModel();
   stockVerificationTemp: StockVerificationModel = new StockVerificationModel();  
-  dateModel: DateModel = new DateModel();
+  dateModel: DateModelInventory = new DateModelInventory();
   itemDisable:boolean=true;
   saveDisable:boolean=true;
   cancelDisable:boolean=true;
@@ -43,12 +43,13 @@ export class StockVerificationDetails {
     this.subscription = new Array<Subscription>();
     this.subscription.push(this.stockVerificationService.clickedStock.subscribe(async x=>{
       this.stockVerificationService.ControlsEnableAndDisable.next(true);
-      if(!x){
+      if(!x){ 
         this.stockVerification =  new StockVerificationModel();
         this.rows =[];
         return;
       }
       this.stockVerification = {...x};
+      this.stockVerificationService.item = {...x};
       await this.stockVerificationService.getStockVerificationDetails(this.stockVerification.voucher_id).then((res) => {});
     }));
 
@@ -165,8 +166,8 @@ export class StockVerificationDetails {
     this.rows = [...this.rowsTemp];
     this.stockVerification = {...this.stockVerificationTemp};
     this.recQty = this.sumRows('verified_qty');
-    this.stockVerificationService.ControlsEnableAndDisable.next(true);
     this.stockVerificationService.btnClick.next('');
+    this.stockVerificationService.ControlsEnableAndDisable.next(true);
   }
 
   onSubListActivate(event: any) {

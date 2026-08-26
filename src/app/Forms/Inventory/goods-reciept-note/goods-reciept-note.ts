@@ -36,8 +36,10 @@ export class GoodsRecieptNote {
   localPoNoList: any[] = [];
   foreignPoNoList: any[] = [];
   gridDisabled: boolean = false;
-  
-  constructor(public app:App,public grnModelService:RecieptEntryService,public endPointService:EndPointService,private cdRef: ChangeDetectorRef,public alertService:AlertService,
+  showModalPrint: boolean = false;
+  reportType: any = '2';
+
+  constructor(public router:Router,public app:App,public grnModelService:RecieptEntryService,public endPointService:EndPointService,private cdRef: ChangeDetectorRef,public alertService:AlertService,
     private purchaseOrderService:PurchaseOrderService,private accessService: UserAccessService, private commonService: CommonService) {
     this.subscription = new Array<Subscription>();
     this.grnModelModalSearch =  new GRNModelModalSearch();
@@ -203,7 +205,7 @@ export class GoodsRecieptNote {
       if (result.isConfirmed) {
         this.grnModelService.sendForStockVerification(this.grnModelService.selectedGRN).then(() => {
          this.alertService.triggerAlert('Sent for stock verification', 4000, 'success');
-         this.grnModelService.approvalStatus.next('Stock Checking');
+         this.grnModelService.approvalStatus.next('STOCK CHECKING');
         }
         ).catch((error) => {
           console.error('Error while sending for stock verification:', error);
@@ -215,5 +217,23 @@ export class GoodsRecieptNote {
   toggleValue(){
     this.gridDisabled = !this.gridDisabled; 
     this.grnModelService.disableGrid.next(this.gridDisabled);
+  }
+
+  print(){
+    this.showModalPrint = true;
+  }
+
+  printReport(){
+    const sID = this.router.routerState.root.firstChild?.snapshot.data['screenId']; //10
+    let apiHostingURL = this.endPointService.ReportURL + 'Inventory?sID='+sID;
+    let params = new URLSearchParams();
+
+    params.append("reportType", this.reportType);
+    params.append("voucher_id", this.grnModelService.item.voucher_id?? null);
+    params.append("kdt_logo",  this.endPointService.Report_logo);
+
+    const finalUrl = apiHostingURL + "&" + params.toString();
+    window.open(finalUrl, "_blank");
+    this.showModalPrint = false;
   }
 }

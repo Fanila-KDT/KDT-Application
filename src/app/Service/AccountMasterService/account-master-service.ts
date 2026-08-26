@@ -24,6 +24,7 @@ export class AccountMasterService {
   public deleteDisabled = new BehaviorSubject<boolean>(false);
   public ngOnInit = new BehaviorSubject<boolean>(false);
   public cancelClick = new BehaviorSubject<boolean>(false);
+  public ControlsEnableAndDisable = new BehaviorSubject<boolean>(false);
   public btnClick = new BehaviorSubject<string>('');
 
   selectedAccNo:string="";

@@ -5,6 +5,8 @@ import { Pagination } from '../../../../Model/pagingResponse';
 import { Subscription } from 'rxjs';
 import { SupplierMasterService } from '../../../../Service/SupplierMasterService/supplier-master-service';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
+import { CommonService } from '../../../../Service/CommonService/common-service';
+import { EndPointService } from '../../../../Service/end-point.services';
 
 @Component({
   selector: 'supplier-master-list',
@@ -41,11 +43,12 @@ export class SupplierMasterList {
   rightArrwDisable: boolean = false;
   totRowCounts: number=0;
   endCount: number=0;
-  gridHeight:number=384;
+  gridHeight:number;
   scroll: boolean = true;
   clrFilterDisable = false;
 
-  constructor(public supplierMasterService:SupplierMasterService,public userAccessService:UserAccessService) {
+  constructor(private commonService: CommonService,public supplierMasterService:SupplierMasterService,public userAccessService:UserAccessService,public endPointService:EndPointService) {
+    this.gridHeight = this.endPointService.GridHeight;
     this.subscription = new Array<Subscription>();
     this.subscription.push(this.supplierMasterService.loadList.subscribe(async data => {
       if(data){
@@ -85,9 +88,11 @@ export class SupplierMasterList {
       }
     }));
 
-    // this.subscription.push(this.supplierMasterService.isLoading.subscribe(data=>{
-    //   this.isLoading = data;
-    // }));
+     this.subscription.push(this.supplierMasterService.ControlsEnableAndDisable.subscribe(data=>{
+      if(data){
+        this.ControlsEnableAndDisable();
+      }
+    }));
 
     this.subscription.push(this.supplierMasterService.ngOnInit.subscribe(data=>{
       if(data){
@@ -100,8 +105,8 @@ export class SupplierMasterList {
   }
 
   async ngOnInit() {
+    this.filterSupplierMaster = new SupplierMasterModel();
     await this.supplierMasterService.getSupplierMasterList();
-    this.userAccessService.CheckUserAccess(this.supplierMasterService.FormName,this.supplierMasterService);
   }
 
   ngOnDestroy(): void {
@@ -243,5 +248,35 @@ export class SupplierMasterList {
         //this.ControlsEnableDisable(1,indexv)
       }
     }
+  }
+
+  ControlsEnableAndDisable() {
+    // 1. Run user access check first
+    this.userAccessService.CheckUserAccess(this.supplierMasterService.FormName, this.supplierMasterService);
+
+    // 2. Read current disable flags after CheckUserAccess
+    const newDisable = this.supplierMasterService.newDisabled.getValue();
+    const editDisabled = this.supplierMasterService.editDisabled.getValue();
+    const deleteDisabled = this.supplierMasterService.deleteDisabled.getValue();
+
+    // 3. Only if user access allows (enabled), apply period rules
+    let period_status = sessionStorage.getItem('period_status') || '';
+    let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
+
+    const periodAllowed = this.userAccessService.CheckPeriodAccess(
+      '',
+      period_status,
+      data_entry_status
+    );
+
+    if(this.commonService.isSystemAdmin.value == true){
+      this.supplierMasterService.newDisabled.next(false); 
+      this.supplierMasterService.editDisabled.next(false);
+      this.supplierMasterService.deleteDisabled.next(false);
+      return;
+    }
+    this.supplierMasterService.newDisabled.next(!(periodAllowed && newDisable));
+    this.supplierMasterService.editDisabled.next(!(periodAllowed  && editDisabled));
+    this.supplierMasterService.deleteDisabled.next(!(periodAllowed && deleteDisabled)); 
   }
 }

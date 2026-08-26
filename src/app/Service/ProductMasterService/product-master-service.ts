@@ -16,7 +16,6 @@ export class ProductMasterService {
   
   public pushprevCode= new BehaviorSubject<PrevCodeSave>(new PrevCodeSave()) ;
   public loadList = new BehaviorSubject<ProductMasterModel[]>([]);
-  public productClassList = new BehaviorSubject<ProductClassList[]>([]);
   public mainList:ProductMasterModel[]=[];    
 
   public disableGrid = new BehaviorSubject<boolean>(false);
@@ -26,6 +25,7 @@ export class ProductMasterService {
   public cancelClick = new BehaviorSubject<boolean>(false);
   public newDisabled = new BehaviorSubject<boolean>(false);
   public editDisabled = new BehaviorSubject<boolean>(false);
+  public ControlsEnableAndDisable = new BehaviorSubject<boolean>(false);
   public deleteDisabled = new BehaviorSubject<boolean>(false);
   public btnClick = new BehaviorSubject<string>('');
 
@@ -33,6 +33,9 @@ export class ProductMasterService {
   selectedItemCode:string="";
   NewItemCode: string='';
   FormName='PRODUCT_MASTER';
+  productClassList: any[] = [];
+  productColorList: any[] = [];
+  
   constructor(private httpClient:HttpClient, private endpointService: ProductMasterEndpointService,private alertService:AlertService) { }
 
   async getProductMasterList(){

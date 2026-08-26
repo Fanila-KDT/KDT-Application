@@ -15,7 +15,12 @@ import { Header } from './shared/header/header';
 import { NavigationComponent } from './shared/navigation/navigation';
 import { LoginPage } from './Forms/Main/login-page/login-page';
 import { CustomInterceptor } from './Service/AuthenticationService/custom-interceptor';
-import { ItemReorderRequest } from './Forms/Inventory/item-reorder-request/item-reorder-request';
+import { ItemMovementReport } from './Forms/InventoryReports/item-movement-report/item-movement-report';
+import { CustomerMaster } from './Forms/Sales/customer-master/customer-master';
+import { SalesmanMaster } from './Forms/Sales/salesman-master/salesman-master';
+import { EngineerMaster } from './Forms/Sales/engineer-master/engineer-master';
+import { PaymentTermsMaster } from './Forms/Sales/payment-terms-master/payment-terms-master';
+import { AreaMaster } from './Forms/Sales/area-master/area-master';
 
 @NgModule({
   declarations: [

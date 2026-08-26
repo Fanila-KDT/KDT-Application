@@ -25,6 +25,7 @@ export class SupplierMasterDetails {
   saveDisable: boolean = true;
   cancelDisable: boolean = true;
   isSupNameInvalid: boolean = false;
+  isSupGrpInvalid: boolean = false;
   btnType: string="";
   subList: any[] = [];
   curList: any[] = []; 
@@ -42,6 +43,7 @@ export class SupplierMasterDetails {
         this.supplierAddressModel =  new SupplierAddressModel();
         return;
       }
+      this.supplierMasterService.ControlsEnableAndDisable.next(true);
       this.supplierMasterModel={...data}
       this.supplierAddressModel.address = data.address;
       this.supplierAddressModel.address1 = data.address1;
@@ -122,7 +124,7 @@ export class SupplierMasterDetails {
         this.supplierMasterService.disabledItems.next(false);
         this.supplierMasterService.btnClick.next('');
         this.supplierMasterService.selectedSupName = this.supplierMasterModel.account_name;
-        this.userAccessService.CheckUserAccess(this.supplierMasterService.FormName,this.supplierMasterService);
+        this.supplierMasterService.ControlsEnableAndDisable.next(true);
       }).catch(error => {
           console.error('SaveSupplierMaster error:', error);
           this.alertService.triggerAlert('Failed to save account. Please try again.', 4000, 'error');
@@ -131,15 +133,15 @@ export class SupplierMasterDetails {
     }else{
       this.alertService.triggerAlert('Supplier Name is already exists. Please try again.', 4000, 'error');
     }
-    
   }
 
   async validateForm(model: SupplierMasterModel): Promise<boolean> {
     // Reset all flags
     this.isSupNameInvalid = !model.account_name?.trim();
+    this.isSupGrpInvalid = !model.sub_group_code;
         // Final validity check
     const isValid = !(
-      this.isSupNameInvalid 
+      this.isSupNameInvalid || this.isSupGrpInvalid
     );
 
     return isValid;
@@ -154,8 +156,9 @@ export class SupplierMasterDetails {
     this.cancelDisable = true;
     this.supplierMasterService.disabledItems.next(false);
     this.isSupNameInvalid = false;
+    this.isSupGrpInvalid = false;
     this.supplierMasterService.btnClick.next('');
-    this.userAccessService.CheckUserAccess(this.supplierMasterService.FormName,this.supplierMasterService);
+    this.supplierMasterService.ControlsEnableAndDisable.next(true);
   }
 
   btnClickFunction(x: string) {
@@ -174,6 +177,20 @@ export class SupplierMasterDetails {
       this.itemDisable = false;
     }else if(x=='D'){
       this.onDelete()
+    }
+  }
+
+  SubGrpChange(subGroupCode: any){
+    if(subGroupCode == "64"){
+      this.supplierMasterModel.cur_no = '5eaf8e62-081b-4cbc-ae2a-9654d735118e';
+    }
+  }
+
+  CurrencyChange(event: any) {
+
+    if (this.supplierMasterModel.sub_group_code == "64") {
+      event.target.value = "5eaf8e62-081b-4cbc-ae2a-9654d735118e";
+      this.supplierMasterModel.cur_no = "5eaf8e62-081b-4cbc-ae2a-9654d735118e";
     }
   }
 

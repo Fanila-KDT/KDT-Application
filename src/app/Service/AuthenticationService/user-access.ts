@@ -59,10 +59,19 @@ export class UserAccessService {
       current.level_of_rights > prev.level_of_rights ? current : prev
     );
     let level = LargestPermissions ? LargestPermissions.level_of_rights : 0;
-    Service.newDisabled?.next(level < 2);    // enabled from level 2+
-    Service.editDisabled?.next(level < 3);   // enabled from level 3+
-    Service.deleteDisabled?.next(level < 4); // enabled from level 4+
+    Service.newDisabled?.next(level >= 2);    // enabled from level 2+
+    Service.editDisabled?.next(level >= 3);   // enabled from level 3+
+    Service.deleteDisabled?.next(level >= 4); // enabled from level 4+
     //Service.ControlsEnableAndDisable?.next(false);
+
+    // Rule 3: Allow modify only if Draft 
+    const isSystemAdmin = this.userAccessList?.some( (u: any) => u.permissionName === 'SYSTEM_ADMIN' );
+    if (isSystemAdmin ) {
+      this.commonService.isSystemAdmin.next(true);
+    }else{
+      this.commonService.isSystemAdmin.next(false);
+    }
+
   }
 
   CheckPeriodAccess(approval_status:string,period_status: string, data_entry_status: string): boolean {
@@ -80,14 +89,6 @@ export class UserAccessService {
     const hasAdjustmentPermission = this.userAccessList?.some( (u: any) => u.permissionName === 'PERIOD_POST_ADJUSTMENT' );
     if (period_status === 'Open' && data_entry_status === 'Closed' && !hasAdjustmentPermission) {
       return false;
-    }
-
-    // Rule 3: Allow modify only if Draft 
-    const isSystemAdmin = this.userAccessList?.some( (u: any) => u.permissionName === 'SYSTEM_ADMIN' );
-    if (!isSystemAdmin ) {
-      return false;
-    }else{
-      this.commonService.isSystemAdmin.next(true);
     }
     // ✅ Passed all checks
     return true;

@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 import { CurrencyMasterService } from '../../../../Service/CurrencyMasterService/currency-master-service';
 import { CurrencyMasterModel } from '../../../../Model/CurrencyMaster/currency-master.model';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
+import { CommonService } from '../../../../Service/CommonService/common-service';
+import { EndPointService } from '../../../../Service/end-point.services';
 
 @Component({
   selector: 'currency-master-list',
@@ -41,11 +43,12 @@ export class CurrencyMasterList {
   rightArrwDisable: boolean = false;
   totRowCounts: number=0;
   endCount: number=0;
-  gridHeight:number=384;
+  gridHeight:number;
   scroll: boolean = true;
   clrFilterDisable = false;
 
-  constructor(public currencyMasterService:CurrencyMasterService,public userAccessService:UserAccessService) {
+  constructor(private commonService: CommonService,public currencyMasterService:CurrencyMasterService,public userAccessService:UserAccessService,public endPointService:EndPointService) {
+    this.gridHeight = this.endPointService.GridHeight;
     this.subscription = new Array<Subscription>();
 
     this.subscription.push(this.currencyMasterService.loadList.subscribe(async data => {
@@ -86,9 +89,11 @@ export class CurrencyMasterList {
       }
     }));
     
-    // this.subscription.push(this.currencyMasterService.isLoading.subscribe(data=>{
-    //   this.isLoading = data;
-    // }));
+    this.subscription.push(this.currencyMasterService.ControlsEnableAndDisable.subscribe(data=>{
+      if(data){
+        this.ControlsEnableAndDisable();
+      }
+    }));
 
     this.subscription.push(this.currencyMasterService.ngOnInit.subscribe(data=>{
       if(data){
@@ -101,8 +106,8 @@ export class CurrencyMasterList {
   }    
 
   async ngOnInit() {
+    this.filterCurrencyMaster = new CurrencyMasterModel();
     await this.currencyMasterService.getCurrencyMasterList();
-    this.userAccessService.CheckUserAccess(this.currencyMasterService.FormName,this.currencyMasterService);
   }
 
   ngOnDestroy(): void {
@@ -244,5 +249,35 @@ export class CurrencyMasterList {
         //this.ControlsEnableDisable(1,indexv)
       }
     }
+  }
+
+  ControlsEnableAndDisable() {
+    // 1. Run user access check first
+    this.userAccessService.CheckUserAccess(this.currencyMasterService.FormName, this.currencyMasterService);
+
+    // 2. Read current disable flags after CheckUserAccess
+    const newDisable = this.currencyMasterService.newDisabled.getValue();
+    const editDisabled = this.currencyMasterService.editDisabled.getValue();
+    const deleteDisabled = this.currencyMasterService.deleteDisabled.getValue();
+
+    // 3. Only if user access allows (enabled), apply period rules
+    let period_status = sessionStorage.getItem('period_status') || '';
+    let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
+
+    const periodAllowed = this.userAccessService.CheckPeriodAccess(
+      '',
+      period_status,
+      data_entry_status
+    );
+
+    if(this.commonService.isSystemAdmin.value == true){
+      this.currencyMasterService.newDisabled.next(false); 
+      this.currencyMasterService.editDisabled.next(false);
+      this.currencyMasterService.deleteDisabled.next(false);
+      return;
+    }
+    this.currencyMasterService.newDisabled.next(!(periodAllowed && newDisable));
+    this.currencyMasterService.editDisabled.next(!(periodAllowed  && editDisabled));
+    this.currencyMasterService.deleteDisabled.next(!(periodAllowed && deleteDisabled)); 
   }
 }

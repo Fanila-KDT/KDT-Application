@@ -6,7 +6,7 @@ import { CommonService } from '../../../../Service/CommonService/common-service'
 import { Subscription } from 'rxjs';
 import { DatatableComponent, SelectionType } from '@swimlane/ngx-datatable';
 import { PurchaseOrderService } from '../../../../Service/PurchaseOrderService/purchase-order-service';
-import { DateModel, FinancialDataHeader, StockDataDetails } from '../../../../Model/CommonModel';
+import { DateModelInventory, FinancialDataHeader, StockDataDetails } from '../../../../Model/CommonModel';
 import Swal from 'sweetalert2';
 import { StockTransferService } from '../../../../Service/StockTransferService/stock-transfer-service';
 import { DatePipe } from '@angular/common';
@@ -24,7 +24,7 @@ export class StockTransferDetails {
   stockTransferHeader: FinancialDataHeader = new FinancialDataHeader();
   stockTransferTemp: StockTransferModel = new StockTransferModel();
   stockTransGridModel: StockDataDetails[] =[];  
-  dateModel: DateModel = new DateModel();
+  dateModel: DateModelInventory = new DateModelInventory();
   subscription: Subscription[] = new Array<Subscription>();
   saveDisable:boolean = true;
   cancelDisable:boolean = true;
@@ -60,6 +60,8 @@ export class StockTransferDetails {
       }
       this.stockTransferService.ControlsEnableAndDisable.next(true);
       this.stockTransfer = {...x};
+      this.stockTransferService.item = this.stockTransfer;
+      
       try {
         const items = await this.stockTransferService.getStockTransferDetails(this.stockTransfer.voucher_id);
         if (items && items.length) {
@@ -84,15 +86,14 @@ export class StockTransferDetails {
     }));
 
     this.subscription.push(this.stockTransferService.btnClick.subscribe(async x=>{
-      if(x !==''){
-        await this.btnClickFunction(x);
-      }
+        if(x != ''){
+        this.btnClickFunction(x);
+     }
     }));
   }
 
   async ngOnInit(){
-    this.ItemListTemp = JSON.parse(sessionStorage.getItem('ItemList')||'');
-    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
+    this.ItemList = JSON.parse(localStorage.getItem('ItemListNew')||'');
     this.stockTransferService.getGodownList(this.endPointService.companycode).then((res: any[]) => {
       this.godownList = res;
     });
@@ -119,7 +120,7 @@ export class StockTransferDetails {
     this.stockTransferTemp = {...this.stockTransfer};
     this.totalQtyTemp = this.totalQty;
     this.ItemListTemp = [...this.ItemList];
-    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
+    this.ItemList = JSON.parse(localStorage.getItem('ItemListNew')||'');
     this.rowTemp = this.clone(this.rows);
     if(x =='N'){
       this.stockTransfer = new StockTransferModel();
@@ -218,6 +219,7 @@ export class StockTransferDetails {
       rowItemNos.includes(item.item_no)
     );
     this.ItemList = filteredItems;
+    this.ItemListTemp = this.ItemList;
   }
 
   addRow(){
@@ -280,7 +282,7 @@ export class StockTransferDetails {
   }
 
   QtyChange = this.debounce((qty: number, row: any) => {
-    if(row.receipt_quantity <= 0){
+    if(row.receipt_quantity < 0){
       this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
       row.receipt_quantity = 1;
     }
@@ -306,7 +308,7 @@ export class StockTransferDetails {
     if (hasDuplicates) {
       this.alertService.triggerAlert('Duplicate Item found', 3000, 'error');
       return ;
-    } 
+    }  
 
     const itemEmpty = this.rows.some(row => !row.item_no);
     if (itemEmpty) {
@@ -501,6 +503,7 @@ export class StockTransferDetails {
     this.stockTransfer = {...this.stockTransferTemp};
     this.stockTransferService.disabledItems.next(false);
     this.stockTransferService.btnClick.next('');
+    this.stockTransferService.ControlsEnableAndDisable.next(true);
   }
 
   async onDelete(){

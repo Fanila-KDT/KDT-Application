@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { ProductMasterService } from '../../../../Service/ProductMasterService/product-master-service';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
 import { EndPointService } from '../../../../Service/end-point.services';
+import { CommonService } from '../../../../Service/CommonService/common-service';
 
 @Component({
   selector: 'product-master-list',
@@ -40,7 +41,7 @@ export class ProductMasterList {
   gridHeight: number = 0;
   scroll: boolean = true;
   disableGrid: boolean =false;
-  constructor(public productMasterService:ProductMasterService,public userAccessService:UserAccessService, public endPointService: EndPointService) {
+  constructor(public commonService:CommonService,public productMasterService:ProductMasterService,public userAccessService:UserAccessService, public endPointService: EndPointService) {
     this.gridHeight = this.endPointService.GridHeight;
 
     this.subscription = new Array<Subscription>();
@@ -102,11 +103,17 @@ export class ProductMasterList {
         this.productMasterService.cancelClick.next(true);
       }
     }));
+
+    this.subscription.push(this.productMasterService.ControlsEnableAndDisable.subscribe(data=>{
+      if(data){
+        this.ControlsEnableAndDisable();
+      }
+    }));
   }
 
   ngOnInit() {
+    this.filterProductMaster = new ProductMasterModel();
     this.productMasterService.getProductMasterList();
-    this.userAccessService.CheckUserAccess(this.productMasterService.FormName,this.productMasterService);
   }
 
   ngOnDestroy(): void {
@@ -241,4 +248,33 @@ export class ProductMasterList {
     return 'text-left';
   }
 
+  ControlsEnableAndDisable() {
+    // 1. Run user access check first
+    this.userAccessService.CheckUserAccess(this.productMasterService.FormName, this.productMasterService);
+
+    // 2. Read current disable flags after CheckUserAccess
+    const newDisable = this.productMasterService.newDisabled.getValue();
+    const editDisabled = this.productMasterService.editDisabled.getValue();
+    const deleteDisabled = this.productMasterService.deleteDisabled.getValue();
+
+    // 3. Only if user access allows (enabled), apply period rules
+    let period_status = sessionStorage.getItem('period_status') || '';
+    let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
+
+    const periodAllowed = this.userAccessService.CheckPeriodAccess(
+      '',
+      period_status,
+      data_entry_status
+    );
+
+    if(this.commonService.isSystemAdmin.value == true){
+      this.productMasterService.newDisabled.next(false); 
+      this.productMasterService.editDisabled.next(false);
+      this.productMasterService.deleteDisabled.next(false);
+      return;
+    }
+    this.productMasterService.newDisabled.next(!(periodAllowed && newDisable));
+    this.productMasterService.editDisabled.next(!(periodAllowed  && editDisabled));
+    this.productMasterService.deleteDisabled.next(!(periodAllowed && deleteDisabled)); 
+  }
 }

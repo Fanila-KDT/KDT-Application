@@ -17,7 +17,6 @@ import { MatInputModule } from '@angular/material/input';
    UserMaster,
    UserMasterList,
    UserMasterDetails,
-   OrderByPipe,
    OrderByPipe   
   ],
   imports: [

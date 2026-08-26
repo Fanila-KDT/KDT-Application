@@ -40,13 +40,18 @@ export class AccountMasterDetails {
         this.accountMasterModel =  new AccountMasterModel();
         return;
       }
+      this.accountMasterService.ControlsEnableAndDisable.next(true);
       this.accountMasterModel={...x}
       this.accountMasterService.selectedAccNo = this.accountMasterModel.account_code;
       this.accountMasterService.selectedAccName = this.accountMasterModel.account_name;
     }));
 
     this.subscription.push(this.accountMasterService.btnClick.subscribe(x=>{
-     this.btnClickFunction(x);
+      if(x != ''){
+         if(x != ''){
+        this.btnClickFunction(x);
+     }
+      }
     }));
 
     this.subscription.push(this.accountMasterService.cancelClick.subscribe(x=>{
@@ -107,7 +112,7 @@ export class AccountMasterDetails {
     this.isMainGrpInvalid = false;
     this.isAccNameInvalid = false;
     this.accountMasterService.btnClick.next('');
-    this.userAccessService.CheckUserAccess(this.accountMasterService.FormName,this.accountMasterService);
+    this.accountMasterService.ControlsEnableAndDisable.next(true);
   }
 
   async onSubmit(acctForm:any){
@@ -145,7 +150,7 @@ export class AccountMasterDetails {
         this.accountMasterService.disabledItems.next(false);
         this.subList = [...this.subListTemp];
         this.accountMasterService.btnClick.next('');
-        this.userAccessService.CheckUserAccess(this.accountMasterService.FormName,this.accountMasterService);
+        this.accountMasterService.ControlsEnableAndDisable.next(true);
         this.accountMasterService.selectedAccName = this.accountMasterModel.account_name;
       }).catch(error => {
         console.error('SaveAccountMaster error:', error);

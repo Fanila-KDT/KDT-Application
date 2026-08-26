@@ -4,7 +4,7 @@ import { AlertService } from '../../shared/alert/alert.service';
 import { RecieptEntryEndpointService } from './reciept-entry-end-point.service';
 import { BehaviorSubject, firstValueFrom, lastValueFrom, Observable, Subject } from 'rxjs';
 import { GRNHeaderModel, GRNModel, GRNDetailsModel, ItemDetailsModel, RecieptEntryModel, GRNModelModalSearch } from '../../Model/RecieptEnry/reciept-enry.model';
-import { DateModel } from '../../Model/CommonModel';
+import { DateModelInventory } from '../../Model/CommonModel';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +12,7 @@ import { DateModel } from '../../Model/CommonModel';
 export class RecieptEntryService {
   FormName = 'GOODS_RECEIPT_NOTE';
   selectedGRN:any;
+  item:any;
   public mainList:GRNModel[]=[];  
   public loadListGRN = new BehaviorSubject<GRNModel[]>([]);
   public assignItemDetails = new BehaviorSubject<ItemDetailsModel>(new ItemDetailsModel()) ;
@@ -189,7 +190,7 @@ export class RecieptEntryService {
     } 
   }
 
-  saveGoodsRecieptNote(grnheaderModel: GRNHeaderModel, grnGridModel: any[],grnDetailsModel:GRNDetailsModel,dateModel:DateModel) {
+  saveGoodsRecieptNote(grnheaderModel: GRNHeaderModel, grnGridModel: any[],grnDetailsModel:GRNDetailsModel,dateModel:DateModelInventory) {
     const payload = {
       grnheaderModel: grnheaderModel,
       grnGridModel: grnGridModel,

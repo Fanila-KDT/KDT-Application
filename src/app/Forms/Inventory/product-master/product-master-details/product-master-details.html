@@ -76,7 +76,7 @@
       <!-- Nav tabs -->
    
       <!-- Tab content -->
-        <div class="tab-content p-3 border border-top-0" id="componentTabsContent">
+        <div class="tab-content p-2 border border-top-0" id="componentTabsContent">
           <div class="tab-pane fade show active" id="product" role="tabpanel">
             <div class="row">
               <!-- Brand -->
@@ -88,7 +88,7 @@
                   </button>
                 </div>
                 <select class="form-control" id="brand_id"
-                name="brand_id" [(ngModel)]="productMasterModel.brand_id" #itemCode="ngModel" [disabled]="itemDisable" >
+                name="brand_id" [(ngModel)]="productMasterModel.brand_id" #brand_id="ngModel" [disabled]="itemDisable" >
                   <option *ngFor="let brand of brandList" [value]="brand.brand_id">{{ brand.brand_name }}</option>
                 </select>
               </div>
@@ -107,10 +107,12 @@
               <!-- Product Type -->
               <div class="col-md-2">
                 <div class="label-wrapper d-flex align-items-center">
-                  <label for="product_type" class="form-label">Product Type</label>
+                  <label for="product_type" class="form-label">Product Type
+                    <span class="required-star">*</span>
+                  </label>
                 </div>
-                <select class="form-control label-input" id="product_type" [ngClass]="{'is-invalid': isProductYeildInvalid}"
-                name="product_type" [(ngModel)]="productMasterModel.product_type" #itemCode="ngModel" [disabled]="itemDisable" style="height: 33px;">
+                <select class="form-control label-input" id="product_type" [ngClass]="{'is-invalid': isProductTypeInvalid}"
+                name="product_type" [(ngModel)]="productMasterModel.product_type" #product_type="ngModel" [disabled]="itemDisable" style="height: 33px;">
                   <option *ngFor="let productType of productTypeList" [value]="productType">{{ productType }}</option>
                 </select>
               </div>
@@ -129,15 +131,15 @@
                 <div class="label-wrapper d-flex align-items-center">
                   <label for="bin_location" class="form-label">Bin Location</label>
                 </div>
-                <input type="text" class="form-control label-input" id="modelName" [ngClass]="{'is-invalid': isBinLocationInvalid}"
-                name="bin_location" [(ngModel)]="productMasterModel.bin_location" #itemCode="ngModel" [disabled]="itemDisable" style="height: 33px;">
+                <input type="text" class="form-control label-input" id="bin_location" [ngClass]="{'is-invalid': isBinLocationInvalid}"
+                name="bin_location" [(ngModel)]="productMasterModel.bin_location" #bin_location="ngModel" [disabled]="itemDisable" style="height: 33px;">
               </div>
               <!-- Product Yield -->
               <div class="col-md-2">
                 <div class="label-wrapper d-flex align-items-center">
                   <label for="product_yield" class="form-label">Yield(Life)</label>
                 </div>
-                <input type="number" class="form-control  label-input" id="product_yield" style="height: 33px;"
+                <input type="number" class="form-control  label-input" id="product_yield" style="height: 33px;" [ngClass]="{'is-invalid': isProductYeildInvalid}"
                 name="product_yield" [(ngModel)]="productMasterModel.product_yield" #product_yield="ngModel" [disabled]="itemDisable" (wheel)="onScrollChange($event)">
               </div>
             </div>
@@ -156,7 +158,7 @@
                   <label for="retail_rate" class="form-label">List Price</label>
                 </div>
                 <input type="number" class="form-control label-input" id="retail_rate"  [ngClass]="{'is-invalid': isRetailRateInvalid}"
-                name="retail_rate" [(ngModel)]="productMasterModel.retail_rate" #itemCode="ngModel" [disabled]="itemDisable" (wheel)="onScrollChange($event)">
+                name="retail_rate" [(ngModel)]="productMasterModel.retail_rate" #retail_rate="ngModel" [disabled]="itemDisable" (wheel)="onScrollChange($event)">
               </div>
               <!-- Wholesale Price -->
               <div class="col-md-2">
@@ -166,8 +168,25 @@
                 <input type="number" class="form-control label-input" id="final_rate"  [ngClass]="{'is-invalid': isFinalRateInvalid}"
                 name="final_rate" [(ngModel)]="productMasterModel.final_rate" #final_rate="ngModel" [disabled]="itemDisable" (wheel)="onScrollChange($event)">
               </div>
+              <!-- Dead Stock Days -->
+              <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="dead_stock_days" class="form-label">Dead Stock Days</label>
+                </div>
+                <input type="number" class="form-control label-input" id="dead_stock_days" 
+                name="dead_stock_days" [(ngModel)]="productMasterModel.dead_stock_days" #dead_stock_days="ngModel" [disabled]="itemDisable" (wheel)="onScrollChange($event)">
+              </div>
+              <!-- Movement Rate -->
+              <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                  <label for="movement_rate" class="form-label">Movement Rate</label>
+                </div>
+                <input type="number" class="form-control label-input" id="movement_rate" 
+                name="movement_rate" [(ngModel)]="productMasterModel.movement_rate" #movement_rate="ngModel" [disabled]="itemDisable" (wheel)="onScrollChange($event)">
+              </div>
+              <div class="col-md-2"></div>
               <!--Tag Item -->
-              <div class="col-md-2"> 
+              <div class="col-md-1"> 
                 <div class="form-group">
                   <label class="checkbox-wrapper">
                     <input type="checkbox" class="checkbox style-0" [(ngModel)]="productMasterModel.tag_item" 
@@ -178,7 +197,7 @@
                 </div>
               </div>
               <!--Service Item -->
-              <div class="col-md-2">
+              <div class="col-md-1">
                 <div class="form-group ">
                   <label class="checkbox-wrapper">
                     <input type="checkbox" class="checkbox style-0" [(ngModel)]="productMasterModel.service_item" 
@@ -189,7 +208,7 @@
                 </div>
               </div>
               <!--Inactive-->
-              <div class="col-md-2">
+              <div class="col-md-1">
                 <div class="form-group ">
                   <label class="checkbox-wrapper">
                     <input type="checkbox" class="checkbox style-0" [(ngModel)]="productMasterModel.inactive_item" 
@@ -221,10 +240,10 @@
                 <!-- Last Invoice No. -->
                 <div class="col-md-2">
                   <div class="label-wrapper d-flex align-items-center">
-                    <label for="last_invoice" class="form-label">Last Invoice No.</label>
+                    <label for="last_Invoice" class="form-label">Last Invoice No.</label>
                   </div>
-                  <input type="number" class="form-control" id="last_invoice"
-                  name="last_invoice" [(ngModel)]="productMasterModel.last_invoice" #last_invoice="ngModel"  disabled  (wheel)="onScrollChange($event)">
+                  <input type="text" class="form-control" id="last_Invoice"
+                  name="last_Invoice" [(ngModel)]="productMasterModel.last_Invoice" #last_Invoice="ngModel"  disabled  (wheel)="onScrollChange($event)">
                 </div>
                 <!-- Cpp Wc-->
                 <div class="col-md-2">
@@ -248,12 +267,10 @@
                  <!-- Prev Landing Cost (KD) -->
                 <div class="col-md-3">
                   <div class="label-wrapper d-flex align-items-center">
-                    <label for="prev_pur" class="form-label">Prev Landing Cost (KD)</label>
+                    <label for="prev_pur_cost" class="form-label">Prev Landing Cost (KD)</label>
                   </div>
-                  <!-- <input type="text" class="form-control" id="prev_pur"
-                  name="prev_pur" [(ngModel)]="productMasterModel.prev_pur" #prev_pur="ngModel"  disabled  (wheel)="onScrollChange($event)"> -->
-                  <input type="text" class="form-control" id="prev_pur"
-                  name="prev_pur" [value]="0"  disabled  (wheel)="onScrollChange($event)">
+                  <input type="text" class="form-control" id="prev_pur_cost"
+                  name="prev_pur_cost" [(ngModel)]="productMasterModel.prev_pur_cost" #prev_pur_cost="ngModel"  disabled  (wheel)="onScrollChange($event)">
                 </div>
                 <!-- Curr FOB -->
                 <div class="col-md-3">
@@ -419,6 +436,7 @@
                                   name="compulsory_{{rowIndex}}"
                                   [disabled]="isEditable"
                                   class="form-control grid-input"
+                                  [ngModelOptions]="{ standalone: true }"
                                 />
                                 <span class="slider"></span>
                               </label>
@@ -540,6 +558,7 @@
                                   name="compulsory_{{rowIndex}}"
                                   [disabled]="isEditable"
                                   class="form-control grid-input"
+                                  [ngModelOptions]="{ standalone: true }"
                                 />
                                 <span class="slider"></span>
                               </label>

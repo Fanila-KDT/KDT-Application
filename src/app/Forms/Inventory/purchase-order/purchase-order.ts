@@ -5,6 +5,8 @@ import { AlertService } from '../../../shared/alert/alert.service';
 import { PurchaseOrderService } from '../../../Service/PurchaseOrderService/purchase-order-service';
 import { PurchaseOrderModalSearch } from '../../../Model/PurchaseOrder/purchase-order.model';
 import { CommonService } from '../../../Service/CommonService/common-service';
+import { EndPointService } from '../../../Service/end-point.services';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'purchase-order',
@@ -27,8 +29,9 @@ export class PurchaseOrder {
   subscription: Subscription[]= new Array<Subscription>();
   years: any[] = [];
   year: number = new Date().getFullYear(); 
-
-  constructor(public app:App,public purchaseOrderService:PurchaseOrderService,private alertService:AlertService,public commonService:CommonService) {
+  showModalPrint: boolean = false;
+  reportType: any = '2';
+  constructor(private router: Router,public endPointService:EndPointService,public app:App,public purchaseOrderService:PurchaseOrderService,private alertService:AlertService,public commonService:CommonService) {
 
     this.subscription.push(this.purchaseOrderService.disabledItems.subscribe(data=>{
       this.newDisable = data;
@@ -155,5 +158,23 @@ export class PurchaseOrder {
   toggleValue(){
     this.gridDisabled = !this.gridDisabled; 
     this.purchaseOrderService.disableGrid.next(this.gridDisabled);
+  }
+  
+  print(){
+    this.showModalPrint = true;
+  }
+
+  printReport(){
+    const sID = this.router.routerState.root.firstChild?.snapshot.data['screenId']; //7
+    let apiHostingURL = this.endPointService.ReportURL + 'Inventory?sID='+sID;
+    let params = new URLSearchParams();
+
+    params.append("reportType", this.reportType);
+    params.append("voucher_id", this.purchaseOrderService.item.voucher_id?? null);
+    params.append("kdt_logo",  this.endPointService.Report_logo);
+
+    const finalUrl = apiHostingURL + "&" + params.toString();
+    window.open(finalUrl, "_blank");
+    this.showModalPrint = false;
   }
 }

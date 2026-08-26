@@ -74,17 +74,17 @@
           <div class="input-wrapper">
             <select [(ngModel)]="stockCorrection.narration"  class="form-control label-input" [disabled]="isEditable" dropdownPanelClass="'black-dropdown'"
               [ngModelOptions]="{ standalone: true }" style="height: 28px;line-height:20px; padding-top:2px;"  [ngClass]="{'is-invalid': isReasonInvalid}">
-                <option value="Wastage">Wastage</option>
                 <option value="Complimentary">Complimentary</option>
                 <option value="Customer Taste">Customer Taste</option>
-                <option value="Stolen">Stolen</option>
-                <option value="Unknown">Unknown</option>
-                <option value="Others">Others</option>
+                <option value="Excess">Excess</option>
                 <option value="Expiry">Expiry</option>
                 <option value="Gift">Gift</option>
-                <option value="Shortage">Shortage</option>
-                <option value="Excess">Excess</option>
+                <option value="Others">Others</option>
                 <option value="Scrap">Scrap</option>
+                <option value="Shortage">Shortage</option>
+                <option value="Stolen">Stolen</option>
+                <option value="Unknown">Unknown</option>
+                <option value="Wastage">Wastage</option>
             </select>
           </div>
         </div>
@@ -129,7 +129,7 @@
             <input 
             type="text" 
               class="form-control" 
-              value ="{{ rowIndex + 1 }}"
+              value ="{{ rowIndex + 1 }}" disabled
               />
           </ng-template>
         </ngx-datatable-column>
@@ -188,7 +188,7 @@
             type="number" 
             class="form-control grid-input" 
             [(ngModel)]="row.receipt_quantity" 
-            [disabled]="isEditable" (change)="ReceiptQtyChange(row.receipt_quantity,row)"
+            [disabled]="isEditable" (input)="ReceiptQtyChange(row.receipt_quantity,row)"
             [ngModelOptions]="{ standalone: true }" />
         </ng-template>
       </ngx-datatable-column>
@@ -197,10 +197,10 @@
       <ngx-datatable-column name="Iss Qty(-)" prop="issue_quantity">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <input 
-            type="number" 
+            type="text" 
             class="form-control grid-input" 
             [(ngModel)]="row.issue_quantity" 
-            [disabled]="isEditable" (change)="IssueQtyChange(row.issue_quantity,row)"
+            [disabled]="isEditable" (input)="IssueQtyChange(row.issue_quantity,row)"
             [ngModelOptions]="{ standalone: true }" />
         </ng-template>
       </ngx-datatable-column>
@@ -212,7 +212,7 @@
             type="number" 
             class="form-control grid-input" 
             [(ngModel)]="row.avG_COST" 
-            [disabled]="isEditable" (change)="RateChange(row.avG_COST,row)"
+            [disabled]="isEditable" (input)="RateChange(row.avG_COST,row)"
             [ngModelOptions]="{ standalone: true }"  />
         </ng-template>
       </ngx-datatable-column>
@@ -248,7 +248,7 @@
             type="text" 
             class="form-control grid-input" 
             [(ngModel)]="row.fgn_total" 
-            [disabled]="isEditable" (change)="FgnTotalChange(row.fgn_total,row)"
+            [disabled]="isEditable" (input)="FgnTotalChange(row.fgn_total,row)"
             [ngModelOptions]="{ standalone: true }"  />
         </ng-template>
       </ngx-datatable-column>

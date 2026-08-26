@@ -48,6 +48,7 @@ export class ProductMasterDetails{
   isRetailRateInvalid: boolean = false;
   isFinalRateInvalid: boolean = false;
   isUnitInvalid: boolean = false;
+  isProductTypeInvalid: boolean = false;
   isProductColourInvalid: boolean = false;
   isProductYeildInvalid: boolean = false;
   isBinLocationInvalid: boolean = false;
@@ -92,6 +93,7 @@ export class ProductMasterDetails{
         this.cdRef.markForCheck();
         return;
       }
+      this.productMasterService.ControlsEnableAndDisable.next(true);
       await this.fetchingData(x);
       this.productMasterService.selectedItemNo = x.item_no;
       this.productMasterService.selectedItemCode = x.item_code;
@@ -162,12 +164,14 @@ export class ProductMasterDetails{
   async ngOnInit() {
     try {
       this.productClassList = await this.productMasterService.GetproductClassList();
-      this.productColorList = await this.productMasterService.GetproductColorList(); 
+      this.productColorList = await this.productMasterService.GetproductColorList();
+      this.productMasterService.productColorList = this.productColorList;
+      this.productMasterService.productClassList = this.productClassList;
       this.brandList = await this.productMasterService.GetBrandList();  
       this.unitList = await this.productMasterService.GetUnitList();  
     } catch (error) {
       console.error('Error while fetching Product Class List:', error);
-      this.alertService.triggerAlert('Something went wrong while fetching Product Class List...',4000, 'error');
+      this.alertService.triggerAlert('Something went wrong ...',4000, 'error');
     }
   }
 
@@ -494,6 +498,12 @@ export class ProductMasterDetails{
       case 'cpP_Clr_woc':
         this.productMasterModel.cpP_Clr_woc += event.deltaY < 0 ? step : -step;
         break;
+      case 'dead_stock_days':
+        this.productMasterModel.dead_stock_days += event.deltaY < 0 ? step : -step;
+        break;
+      case 'movement_rate':
+        this.productMasterModel.movement_rate += event.deltaY < 0 ? step : -step;
+        break;
       }
       if (this.productMasterModel.warranty < 0) this.productMasterModel.warranty = 0;
       if (this.productMasterModel.retail_rate < 0) this.productMasterModel.retail_rate = 0;
@@ -507,6 +517,8 @@ export class ProductMasterDetails{
       if (this.productMasterModel.fgn_last_pur_rate < 0) this.productMasterModel.fgn_last_pur_rate = 0;
       if (this.productMasterModel.cpP_Bw_woc < 0) this.productMasterModel.cpP_Bw_woc = 0;
       if (this.productMasterModel.cpP_Clr_woc < 0) this.productMasterModel.cpP_Clr_woc = 0;
+      if (this.productMasterModel.dead_stock_days < 0) this.productMasterModel.dead_stock_days = 0;
+      if (this.productMasterModel.movement_rate < 0) this.productMasterModel.movement_rate = 0;
     }
   }
 
@@ -530,11 +542,12 @@ export class ProductMasterDetails{
     this.isRetailRateInvalid = false;
     this.isFinalRateInvalid = false;
     this.isUnitInvalid = false;
+    this.isProductTypeInvalid = false;
     this.isProductColourInvalid = false;
     this.isProductYeildInvalid = false;
     this.isBinLocationInvalid = false;
     this.productMasterService.btnClick.next('');
-    this.userAccessService.CheckUserAccess(this.productMasterService.FormName,this.productMasterService);
+    this.productMasterService.ControlsEnableAndDisable.next(true);
   }
   
   async onSubmit(ProductMasterForm:any){
@@ -560,7 +573,6 @@ export class ProductMasterDetails{
       this.AssignValueProductMaster();
       if(this.btnType === 'N')
       {
-        this.productMasterModelSave.user_id = localStorage.getItem('user_id');
         const item_No = await this.productMasterService.getItemNo();
         this.productMasterModelSave.item_no = item_No.value;
         this.machineFeaturesList.item_no = item_No.value;
@@ -569,13 +581,13 @@ export class ProductMasterDetails{
         });
       
       }if(this.btnType === 'M'){
-        this.productMasterModelSave.user_id = this.productMasterModel.user_id;
         this.machineFeaturesList.item_no = this.productMasterModelSave.item_no;
         this.AcessoryList.forEach(item => {
           item.m_item_no = this.productMasterModelSave.item_no;
         });
       }
-    
+
+      this.productMasterModelSave.user_id = localStorage.getItem('user_id');
       this.productMasterModelSave.company_code = this.endPointService.companycode;
       this.productMasterService.SaveProductMaster(this.productMasterModelSave,this.machineFeaturesList,this.AcessoryList).then(async (res: any) => {
         if (res && res.productMaster) {
@@ -599,9 +611,9 @@ export class ProductMasterDetails{
         this.productMasterService.disableGrid.next(false);
         this.productMasterService.disabledItems.next(false);
         this.productMasterService.btnClick.next('');
-        this.userAccessService.CheckUserAccess(this.productMasterService.FormName,this.productMasterService);
+        this.productMasterService.ControlsEnableAndDisable.next(true);
         await this.commonService.getItemList();
-        await this.commonService.getItemListNew();
+        //await this.commonService.getItemListNew();
       }).catch(error => { 
         console.error('SaveAccountMaster error:', error);
         this.alertService.triggerAlert('Failed to save account. Please try again.', 4000, 'error');
@@ -645,6 +657,7 @@ export class ProductMasterDetails{
     this.isDescriptionInvalid = !model.item_name?.trim();
     this.isProductClassInvalid = !model.category_code;
     this.isUnitInvalid = !model.unitid;
+    this.isProductTypeInvalid =!model.product_type?.trim();
 
     // Conditional flags based on tag_item
     this.isWarrantyInvalid = false;

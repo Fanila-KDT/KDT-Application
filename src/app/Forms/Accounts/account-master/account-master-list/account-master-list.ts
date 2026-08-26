@@ -6,6 +6,8 @@ import { Subscription } from 'rxjs';
 import { AccountMasterService } from '../../../../Service/AccountMasterService/account-master-service';
 import { App } from '../../../../app';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
+import { CommonService } from '../../../../Service/CommonService/common-service';
+import { EndPointService } from '../../../../Service/end-point.services';
 
 @Component({
   selector: 'account-master-list',
@@ -43,11 +45,12 @@ export class AccountMasterList {
   rightArrwDisable: boolean = false;
   totRowCounts: number=0;
   endCount: number=0;
-  gridHeight:number=384;
+  gridHeight:number;
   scroll: boolean = true;
   clrFilterDisable = false;
 
-  constructor(public accountMasterService:AccountMasterService,public userAccessService:UserAccessService) {
+  constructor(private commonService: CommonService,public accountMasterService:AccountMasterService,public userAccessService:UserAccessService,public endPointService:EndPointService) {
+    this.gridHeight = this.endPointService.GridHeight;
     this.subscription = new Array<Subscription>();
     this.subscription.push(this.accountMasterService.loadList.subscribe(async data => {
       if(data){
@@ -87,9 +90,11 @@ export class AccountMasterList {
       }
     }));
 
-    // this.subscription.push(this.accountMasterService.isLoading.subscribe(data=>{
-    //   this.isLoading = data;
-    // }));
+    this.subscription.push(this.accountMasterService.ControlsEnableAndDisable.subscribe(data=>{
+      if(data){
+        this.ControlsEnableAndDisable();
+      }
+    }));
 
     this.subscription.push(this.accountMasterService.ngOnInit.subscribe(data=>{
       if(data){
@@ -101,8 +106,8 @@ export class AccountMasterList {
     }));
   }
 
-  async ngOnInit() {
-    this.userAccessService.CheckUserAccess(this.accountMasterService.FormName,this.accountMasterService);
+  async ngOnInit() {    
+    this.filterAccountMaster = new AccountMasterModel();
     await this.accountMasterService.getAccountMasterList();
   }
 
@@ -244,5 +249,35 @@ export class AccountMasterList {
         //this.ControlsEnableDisable(1,indexv)
       }
     }
+  }
+
+    ControlsEnableAndDisable() {
+    // 1. Run user access check first
+    this.userAccessService.CheckUserAccess(this.accountMasterService.FormName, this.accountMasterService);
+
+    // 2. Read current disable flags after CheckUserAccess
+    const newDisable = this.accountMasterService.newDisabled.getValue();
+    const editDisabled = this.accountMasterService.editDisabled.getValue();
+    const deleteDisabled = this.accountMasterService.deleteDisabled.getValue();
+
+    // 3. Only if user access allows (enabled), apply period rules
+    let period_status = sessionStorage.getItem('period_status') || '';
+    let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
+
+    const periodAllowed = this.userAccessService.CheckPeriodAccess(
+      '',
+      period_status,
+      data_entry_status
+    );
+
+    if(this.commonService.isSystemAdmin.value == true){
+      this.accountMasterService.newDisabled.next(false); 
+      this.accountMasterService.editDisabled.next(false);
+      this.accountMasterService.deleteDisabled.next(false);
+      return;
+    }
+    this.accountMasterService.newDisabled.next(!(periodAllowed && newDisable));
+    this.accountMasterService.editDisabled.next(!(periodAllowed  && editDisabled));
+    this.accountMasterService.deleteDisabled.next(!(periodAllowed && deleteDisabled)); 
   }
 }

@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { DatatableComponent, SelectionType } from '@swimlane/ngx-datatable';
 import { StockCorrectionDetailModel, StockCorrectionModel } from '../../../../Model/StockCorrection/stock-correction.model';
-import { DateModel, FinancialDataHeader, StockDataDetails } from '../../../../Model/CommonModel';
+import { DateModelInventory, FinancialDataHeader, StockDataDetails } from '../../../../Model/CommonModel';
 import { Subscription } from 'rxjs';
 import { StockCorrectionService } from '../../../../Service/StockCorrectionService/stock-correction-service';
 import { AlertService } from '../../../../shared/alert/alert.service';
@@ -26,7 +26,7 @@ export class StockCorrectionDetails {
   stockCorrectionTemp: StockCorrectionModel = new StockCorrectionModel();
   stockTransGridModel: StockDataDetails[] =[];
   subscription: Subscription[] = new Array<Subscription>();
-  dateModel: DateModel = new DateModel();
+  dateModel: DateModelInventory = new DateModelInventory();
   saveDisable:boolean = true;
   cancelDisable:boolean = true;
   rows: any[] = []; 
@@ -69,6 +69,7 @@ export class StockCorrectionDetails {
         return;
       }
       this.stockCorrection = {...x};
+      this.stockCorrectionService.item = this.stockCorrection;
       try {
         const items = await this.stockCorrectionService.getStockCorrectionDetails(this.stockCorrection.voucher_id);
         if (items && items.length) {
@@ -98,9 +99,8 @@ export class StockCorrectionDetails {
       if(x !==''){
         this.stockCorrectionTemp = {...this.stockCorrection};
         this.rowTemp = this.clone(this.rows);
-        
-        await this.btnClickFunction(x);
-      }
+        this.btnClickFunction(x);
+     }
     }));
 
     this.subscription.push(this.commonService.isSystemAdmin.subscribe(data=>{
@@ -117,8 +117,6 @@ export class StockCorrectionDetails {
       this.accountList = res;
     });
     
-    this.ItemListTemp = JSON.parse(sessionStorage.getItem('ItemList')||'');
-    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
   }
 
   ngOnDestroy(): void {
@@ -139,7 +137,7 @@ export class StockCorrectionDetails {
   
   async btnClickFunction(x: string) {
     this.ItemListTemp = [...this.ItemList];
-    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
+    this.ItemList = JSON.parse(localStorage.getItem('ItemListNew')||'');
     this.btnType = x;
     this.totalQtyTemp = this.totalQty;
     this.totalAmountTemp = this.totalAmount;
@@ -234,6 +232,7 @@ export class StockCorrectionDetails {
       rowItemNos.includes(item.item_no)
     );
     this.ItemList = filteredItems;
+    this.ItemListTemp = this.ItemList;
   }
 
   addRow(){
@@ -301,7 +300,7 @@ export class StockCorrectionDetails {
     if(row.receipt_quantity < 0){
       this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
     }
-    if(row.receipt_quantity <= 0){
+    if(row.receipt_quantity < 0){
       row.receipt_quantity = 1;
     }
       row.issue_quantity = 0;
@@ -309,10 +308,10 @@ export class StockCorrectionDetails {
   }, 200);
 
   IssueQtyChange = this.debounce((qty: number, row: any) => {
-     if(row.issue_quantity < 0){
+     if(qty < 0){
       this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
     }
-    if(row.issue_quantity <= 0){
+    if(qty < 0){
       row.issue_quantity = 1;
     }
       row.receipt_quantity = 0;
@@ -408,9 +407,6 @@ export class StockCorrectionDetails {
         if (item) {
           await this.stockCorrectionService.loadListStockCorrection.next(this.stockCorrectionService.mainList);
           this.stockCorrectionService.clickedStockCorr.next(item); // pass single object
-          let temp =[];
-          temp.push(item)
-          this.stockCorrectionService.selected.next(temp); // pass single object
         }
         this.stockCorrectionService.btnClick.next('');
         this.saveDisable = true;
@@ -546,7 +542,9 @@ export class StockCorrectionDetails {
     this.totalAmount = this.totalAmountTemp;
     this.totalIssuedAmount = this.totalIssuedAmountTemp;
     this.totalIssuedQty = this.totalIssuedQtyTemp;
+    this.stockCorrectionService.ControlsEnableAndDisable.next(true);
   }
+    
 
   async onDelete(){
     const confirmed = await showconfirm("Are you sure you want to delete this item?");

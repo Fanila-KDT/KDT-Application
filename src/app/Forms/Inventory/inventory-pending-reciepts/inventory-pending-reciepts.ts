@@ -117,7 +117,7 @@ export class InventoryPendingReciepts {
     const newDisabled = this.recieptEntryService.newDisabled.getValue();
 
     // Step 2: if user access disables, block navigation
-    if (newDisabled) {
+    if (!newDisabled) {
       this.alertService.triggerAlert('You do not have permission to create new entries.', 4000, 'error');
       return;
     }

@@ -4,19 +4,17 @@ import {NgxDatatableModule} from "@swimlane/ngx-datatable";
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Dashboard } from './dashboard';
 import { DashboardRouting } from './dashboard.routing';
 import { DashboardService } from '../../../Service/DashboardService/dashboard-service';
+import { SharedMaterialModule } from '../../../shared.module';
 @NgModule({
   declarations: [
     Dashboard
   ], 
   imports: [
-    MatIconModule,
-    MatButtonModule,
+    SharedMaterialModule,
     DashboardRouting,
     CommonModule,
     FormsModule,

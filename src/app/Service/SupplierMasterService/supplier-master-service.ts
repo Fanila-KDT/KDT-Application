@@ -25,6 +25,7 @@ export class SupplierMasterService {
   public editDisabled = new BehaviorSubject<boolean>(false);
   public deleteDisabled = new BehaviorSubject<boolean>(false);
   public btnClick = new BehaviorSubject<string>('');
+  public ControlsEnableAndDisable = new BehaviorSubject<boolean>(false);
   
   selectedSupNo:string="";
   FormName='SUPPLIER_MASTER';

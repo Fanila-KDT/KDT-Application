@@ -7,6 +7,7 @@ import { EndPointService } from '../../../../Service/end-point.services';
 import { UserAccessService } from '../../../../Service/AuthenticationService/user-access';
 import { PurchaseOrderService } from '../../../../Service/PurchaseOrderService/purchase-order-service';
 import { StockTransferService } from '../../../../Service/StockTransferService/stock-transfer-service';
+import { CommonService } from '../../../../Service/CommonService/common-service';
 
 @Component({
   selector: 'stock-transfer-list',
@@ -46,7 +47,7 @@ export class StockTransferList {
   approval_status:string ='';
 
   
-  constructor(public stockTransferService:StockTransferService,public endPointService:EndPointService,public userAccessService:UserAccessService,
+  constructor(public stockTransferService:StockTransferService,public commonService:CommonService,public endPointService:EndPointService,public userAccessService:UserAccessService,
             private cdRef: ChangeDetectorRef,public purchaseOrderService:PurchaseOrderService) {
     this.gridHeight = this.endPointService.GridHeight;
 
@@ -73,7 +74,10 @@ export class StockTransferList {
     }));
 
     this.subscription.push(this.stockTransferService.ControlsEnableAndDisable.subscribe(data=>{
-      this.ControlsEnableAndDisable()
+      this.approval_status = this.rows.length > 0 ? this.rows[this.selectedStockTransfer].approval_status : '';
+      if(data){
+        this.ControlsEnableAndDisable()
+      } 
     }));
 
     this.subscription.push(this.stockTransferService.ngOnInit.subscribe(data=>{
@@ -84,9 +88,16 @@ export class StockTransferList {
         this.stockTransferService.cancelClick.next(true);
       }
     }));
+
+    this.subscription.push(this.stockTransferService.clickedStockTras.subscribe(async x=>{
+      if(x.voucher_id){
+        this.selected = [x];
+      }
+    }));
   }
 
   async ngOnInit() {
+    this.filterStockTransfer = new StockTransferModel();
     await this.stockTransferService.getStockTransferList(this.endPointService.year,1);
   }
 
@@ -213,25 +224,36 @@ export class StockTransferList {
     this.userAccessService.CheckUserAccess(this.stockTransferService.FormName, this.stockTransferService);
 
     // 2. Read current disable flags after CheckUserAccess
-    const newDisable = this.stockTransferService.newDisable.getValue();
+    const newDisable = this.stockTransferService.newDisabled.getValue();
     const editDisabled = this.stockTransferService.editDisabled.getValue();
-    const deleteDisabled = this.stockTransferService.editDisabled.getValue();
+    const deleteDisabled = this.stockTransferService.deleteDisabled.getValue();
 
     // 3. Only if user access allows (enabled), apply period rules
-    if ( !newDisable ||  !editDisabled || !deleteDisabled) {
-      let period_status = sessionStorage.getItem('period_status') || '';
-      let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
-      let approval_status = this.approval_status;
+    let period_status = sessionStorage.getItem('period_status') || '';
+    let data_entry_status = sessionStorage.getItem('data_entry_status') || ''; 
+    let approval_status = this.approval_status;
 
-      const periodAllowed = this.userAccessService.CheckPeriodAccess(
-        approval_status,
-        period_status,
-        data_entry_status
-      );
+    const periodAllowed = this.userAccessService.CheckPeriodAccess(
+      approval_status,
+      period_status,
+      data_entry_status
+    );
 
-      this.stockTransferService.newDisable.next(!periodAllowed);
-      this.stockTransferService.editDisabled.next(!periodAllowed);
-      this.stockTransferService.deleteDisabled.next(!periodAllowed);
+    if(this.commonService.isSystemAdmin.value == true){
+      this.stockTransferService.newDisabled.next(false); 
+      this.stockTransferService.editDisabled.next(false);
+      this.stockTransferService.deleteDisabled.next(false);
+      return;
     }
+
+    this.stockTransferService.newDisabled.next(!(periodAllowed && newDisable));
+    
+    this.stockTransferService.editDisabled.next(
+      !(periodAllowed && this.approval_status?.toUpperCase() === 'DRAFT' && editDisabled)
+    );
+    
+    this.stockTransferService.deleteDisabled.next(
+      !(periodAllowed && this.approval_status?.toUpperCase() === 'DRAFT' && deleteDisabled)
+    );
   }
 }

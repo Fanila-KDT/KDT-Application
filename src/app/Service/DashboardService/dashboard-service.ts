@@ -11,9 +11,12 @@ export class DashboardService {
   RecieptEntry:number = 0;
   ExpenseEntry:number = 0;
   PurchaseOrder:number = 0;
+  IssueItem:number = 0;
 
   public clickedRecieptEntry = new BehaviorSubject<any>(null);
   public clickedExpenseEntry = new BehaviorSubject<any>(null);
   public clickedPurchaseOrder = new BehaviorSubject<any>(null);
+  public clickedIssueItems = new BehaviorSubject<any[]>([]);
+  public clickedIssueRow= new BehaviorSubject<any>(null);
   constructor(private httpClient:HttpClient, private endpointService: DashboardEndpointService,private alertService:AlertService) {}
 }

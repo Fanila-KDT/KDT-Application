@@ -5,8 +5,8 @@
         "Logo_Url": "http://localhost:4200/assets/img/kdt_logo.jpg",
         "UI_Url": "http://localhost:4200/QtCtErpUi/",
         "BaseURL": "http://localhost:4000/",
-        "Report_Url":"http://localhost:51305/"
-    
+        "Report_Url":"https://localhost:44353/Web_Forms/",
+        "Report_logo":"G:\\Work_Space\\Erp_Project\\ERPMasterForms\\src\\assets\\img\\"
     },
 
     "endPointLive_ASG92":{           

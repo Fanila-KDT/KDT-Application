@@ -48,12 +48,17 @@ export class UserMasterDetails {
         this.ShoePermissionList = [];
         return;
       }
+      this.userMasterService.ControlsEnableAndDisable.next(true);
       this.userMasterModel={...x};
       this.Fetchvalues();
     }));
 
     this.subscription.push(this.userMasterService.btnClick.subscribe(x=>{
-      this.btnClickFunction(x);
+       if(x != ''){
+         if(x != ''){
+        this.btnClickFunction(x);
+     }
+      }
     }));
 
     this.subscription.push(this.userMasterService.cancelClick.subscribe(x=>{
@@ -135,7 +140,7 @@ export class UserMasterDetails {
       this.userMasterService.disableGrid.next(false);
       this.userMasterService.disabledItems.next(false);
       this.userMasterService.btnClick.next('');
-      this.userAccessService.CheckUserAccess(this.userMasterService.FormName,this.userMasterService);
+      this.userMasterService.ControlsEnableAndDisable.next(true);
     })
     .catch(error => {
       console.error('SaveuserMaster error:', error);
@@ -158,7 +163,7 @@ export class UserMasterDetails {
     this.isRoleInvalid = false;
     this.ShoePermissionList  = [...this.ShoePermissionListTemp];
     this.selectedRoles = [...this.selectedRolesTemp];
-    this.userAccessService.CheckUserAccess(this.userMasterService.FormName,this.userMasterService);
+    this.userMasterService.ControlsEnableAndDisable.next(true);
   }
 
   async onDelete(){
@@ -235,7 +240,6 @@ export class UserMasterDetails {
     // Update tracker AFTER processing
     this.previousRoles = [...currentRoles];
   }
-
 
   Fetchvalues(){
     this.userMasterService.selectedUserId = this.userMasterModel.user_id;

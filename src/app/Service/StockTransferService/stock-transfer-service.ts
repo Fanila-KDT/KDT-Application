@@ -4,7 +4,7 @@ import { BehaviorSubject, firstValueFrom, lastValueFrom, Observable, Subject } f
 import { AlertService } from '../../shared/alert/alert.service';
 import { StockTransferEndpointService } from './stock-transfer-end-point.service';
 import { StockTransferDetailModel, StockTransferModel, StockTransferSearch } from '../../Model/StockTransfer/stock-transfer.model';
-import { DateModel, FinancialDataHeader } from '../../Model/CommonModel';
+import { DateModelInventory, FinancialDataHeader } from '../../Model/CommonModel';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,7 @@ export class StockTransferService {
   public isLoading = new BehaviorSubject<boolean>(false);
   public btnClick = new BehaviorSubject<string>('');
   public ngOnInit = new BehaviorSubject<boolean>(false);
-  public newDisable = new BehaviorSubject<boolean>(false);
+  public newDisabled = new BehaviorSubject<boolean>(false);
   public editDisabled = new BehaviorSubject<boolean>(false);
   public deleteDisabled = new BehaviorSubject<boolean>(false);
   public cancelClick = new BehaviorSubject<boolean>(false);
@@ -25,6 +25,7 @@ export class StockTransferService {
   public clickedStockTras = new BehaviorSubject<StockTransferModel>(new StockTransferModel()) ;
   public loadListStockTransfer = new BehaviorSubject<StockTransferModel[]>([]); 
   public ItemList : any[] = [];
+  item:any;
     
   constructor(private httpClient:HttpClient, public endpointService: StockTransferEndpointService,private alertService:AlertService) { }
 
@@ -78,7 +79,7 @@ export class StockTransferService {
     }
   }
 
-  saveStockTransfer(stockTransferModel: FinancialDataHeader, stockTransGridModel: any[],transfer_godown_code:any,dateModel:DateModel){
+  saveStockTransfer(stockTransferModel: FinancialDataHeader, stockTransGridModel: any[],transfer_godown_code:any,dateModel:DateModelInventory){
     const payload = {
       stockTransferModel: stockTransferModel,
       stockTransGridModel: stockTransGridModel,

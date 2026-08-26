@@ -70,7 +70,7 @@
                   placeholder="Enter model name">
           </div>
 
-          <div class="col-md-6">
+          <div class="col-md-12">
             <label for="item_name" class="form-label fw-semibold">Description</label>
             <input type="text" class="form-control form-control-sm" id="item_name"
                   name="item_name" [(ngModel)]="productMasterModelSearch.item_name" #item_name="ngModel"
@@ -78,10 +78,43 @@
           </div>
 
           <div class="col-md-6">
+            <label for="product_type" class="form-label fw-semibold">Main Category</label>
+            <ng-select [items]="mainList" 
+              bindLabel="main_category"
+              bindValue="main_category"
+              [(ngModel)]="productMasterModelSearch.main_category"
+              dropdownPanelClass="'black-dropdown'"
+              [ngModelOptions]="{ standalone: true }"
+              (change)="mainCategoryChange($event)"
+              placeholder="Enter main category"
+              >
+            </ng-select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="brand_name" class="form-label fw-semibold">Sub Category</label>
+            <ng-select [items]="subList" 
+              bindLabel="deptname"
+              bindValue="deptname"
+              [(ngModel)]="productMasterModelSearch.deptname"
+              dropdownPanelClass="'black-dropdown'"
+              [ngModelOptions]="{ standalone: true }"
+              placeholder="Enter sub category"
+              >
+            </ng-select>
+          </div>
+
+          <div class="col-md-6">
             <label for="category_name" class="form-label fw-semibold">Product Class</label>
-            <input type="text" class="form-control form-control-sm" id="category_name"
-                  name="category_name" [(ngModel)]="productMasterModelSearch.category_name" #category_name="ngModel"
-                  placeholder="Enter product class">
+            <ng-select [items]="productClassList" 
+              bindLabel="category_name"
+              bindValue="category_name"
+              [(ngModel)]="productMasterModelSearch.category_name"
+              dropdownPanelClass="'black-dropdown'"
+              [ngModelOptions]="{ standalone: true }"
+              placeholder="Select product class"
+              >
+              </ng-select>
           </div>
 
           <div class="col-md-6">
@@ -97,13 +130,26 @@
                   name="brand_name" [(ngModel)]="productMasterModelSearch.brand_name" #brand_name="ngModel"
                   placeholder="Enter brand"> 
           </div>
+
+          <div class="col-md-6">
+            <label for="item_type" class="form-label fw-semibold">Color</label>
+            <ng-select [items]="productColorList" 
+              bindLabel="item_type"
+              bindValue="item_type"
+              [(ngModel)]="productMasterModelSearch.item_type"
+              dropdownPanelClass="'black-dropdown'"
+              [ngModelOptions]="{ standalone: true }"
+              placeholder="Select color"
+              >
+              </ng-select>
+          </div>
         </div>
-      </div>
       <div class="modal-footer bg-light border-top">
-        <button class="btn btn-outline-secondary" (click)="modalCancel()">Cancel</button>
+        <button class="btn btn-danger" (click)="modalCancel()">Cancel</button>
         <button class="btn btn-primary" (click)="modalSearch()">Search</button>
       </div>
     </div>
+  </div>
   </div>
 </div>
 
@@ -180,5 +226,3 @@
     </div>
   </div>
 </div>
-
-

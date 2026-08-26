@@ -4,7 +4,7 @@ import { AlertService } from '../../shared/alert/alert.service';
 import { BehaviorSubject, firstValueFrom, lastValueFrom, map, Observable } from 'rxjs';
 import { PurchaseOrderEndpointService } from './purchase-order.end-point.service';
 import { ItemDetailsModel, PurchaseOrderModalSearch, PurchaseOrderModel } from '../../Model/PurchaseOrder/purchase-order.model';
-import { DateModel } from '../../Model/CommonModel';
+import { DateModelInventory } from '../../Model/CommonModel';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +30,7 @@ export class PurchaseOrderService {
   public ControlsEnableAndDisable = new BehaviorSubject<boolean>(false);
   FormName = 'PURCHASE_ORDER';
   selectedDocNo :any;
+  item:any;
 
   constructor(private httpClient:HttpClient, public endpointService: PurchaseOrderEndpointService,private alertService:AlertService) { }
 
@@ -151,7 +152,7 @@ export class PurchaseOrderService {
     }
   }
 
-  savePurchaseOrder(purchaseOrderModel: PurchaseOrderModel, ItemList: any[],temp:any, dateModel: DateModel) {
+  savePurchaseOrder(purchaseOrderModel: PurchaseOrderModel, ItemList: any[],temp:any, dateModel: DateModelInventory) {
     const payload = {
       POSave: purchaseOrderModel,
       ItemList: ItemList,

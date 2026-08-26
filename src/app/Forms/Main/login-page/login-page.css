@@ -5,7 +5,7 @@
   align-items: center;       /* horizontal centering */
   height: 100vh;             /* full viewport height */
   width: 100vw;              /* full viewport width */
-  background: linear-gradient(135deg, #a7c2e2, #d2deeb,#7aced4,#97b2d4,#7aa4d4, #fdfdfd); /* optional background */
+  background: linear-gradient(135deg, #e5edf5, #c9d8e9,#f0f4f5,#ecedf0,#aebfc7, #f3eeee); /* optional background */
   color: #fff;
 }
 .login-wrapper {

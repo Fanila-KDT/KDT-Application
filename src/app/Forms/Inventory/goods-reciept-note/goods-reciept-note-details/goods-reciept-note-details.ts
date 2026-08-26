@@ -15,7 +15,7 @@ import { HttpResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { DashboardService } from '../../../../Service/DashboardService/dashboard-service';
-import { DateModel } from '../../../../Model/CommonModel';
+import { DateModelInventory } from '../../../../Model/CommonModel';
 
 @Component({
   selector: 'goods-reciept-note-details',
@@ -65,7 +65,7 @@ export class GoodsRecieptNoteDetails implements OnDestroy{
   grnheaderModel: GRNHeaderModel = new GRNHeaderModel();
   grnDetailsModel:GRNDetailsModel = new GRNDetailsModel();
   grnGridModel:GRNGridModel[] =[];  
-  dateModel: DateModel = new DateModel();
+  dateModel: DateModelInventory = new DateModelInventory();
   grnModelTemp: GRNModel = new GRNModel();
   subscription: Subscription[] = new Array<Subscription>();
   ItemList: any[] = [];
@@ -123,6 +123,7 @@ export class GoodsRecieptNoteDetails implements OnDestroy{
 
         // Assign GRN model
         this.grnModel = { ...x };
+        this.grnService.item = this.grnModel;
         this.grnModelTemp = {...this.grnModel};
 
         this.grnService.selectedGRN = this.grnModel.voucher_id;
@@ -158,8 +159,8 @@ export class GoodsRecieptNoteDetails implements OnDestroy{
     }));
 
     this.subscription.push(this.grnService.btnClick.subscribe(async x=>{
-      if(x !==''){
-        await this.btnClickFunction(x);
+      if(x != ''){
+        this.btnClickFunction(x);
       }
     }));
 
@@ -191,8 +192,6 @@ export class GoodsRecieptNoteDetails implements OnDestroy{
 
   async ngOnInit() {
     try {
-      this.ItemListTemp = JSON.parse(sessionStorage.getItem('ItemList')||'');
-      this.ItemList = JSON.parse(sessionStorage.getItem('ItemList')||'');
       const companyCode = this.endPointService.companycode;
       this.cdRef.markForCheck();
 
@@ -245,7 +244,7 @@ export class GoodsRecieptNoteDetails implements OnDestroy{
     this.refNoListTemp = this.refNoList;
     this.PoNoList = [];
     this.warehouseListTemp = [...this.warehouseList];
-    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
+    this.ItemList = JSON.parse(localStorage.getItem('ItemListNew')||'');
     this.grnService.getWarehouseList(this.endPointService.companycode).then((res: any[]) => {
       this.warehouseList = res;
     });
@@ -853,7 +852,7 @@ export class GoodsRecieptNoteDetails implements OnDestroy{
   }
 
   QtyChange = this.debounce((qty: number, row: any) => {
-    if(qty <= 0){
+    if(qty < 0){
       this.alertService.triggerAlert('Please enter a valid quantity.',3000,'error');
       row.receipt_quantity = 1;
     }
@@ -1007,11 +1006,12 @@ export class GoodsRecieptNoteDetails implements OnDestroy{
       rowItemNos.includes(item.item_no)
     );
     this.ItemList = filteredItems;
+    this.ItemListTemp = this.ItemList;
   }
 
   async DashboardRecieptEntryClick(data: any){
     this.rows = [];
-    this.ItemList = JSON.parse(sessionStorage.getItem('ItemListNew')||'');
+    this.ItemList = JSON.parse(localStorage.getItem('ItemListNew')||'');
     await this.grnService.getVendorList(this.endPointService.companycode).then((res: any[]) => {
       this.vendorList = res;
     });

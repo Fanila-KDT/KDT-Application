@@ -38,22 +38,22 @@
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column name="Description" prop="item_name" [cellClass]="leftAlignCell">
-      <ng-template ngx-datatable-header-template>
-        <div class="d-flex flex-column">
-          <input class="form-control search mb-1" [(ngModel)]="filterProductMaster.item_name" 
-            placeholder="Description" (keyup)="updateFilter()" />
-          <span class="datatable-heading">Description</span>
-        </div>
-      </ng-template>
-    </ngx-datatable-column>
-
     <ngx-datatable-column name="Model Name" prop="item_name_abbr" [cellClass]="leftAlignCell">
       <ng-template ngx-datatable-header-template>
         <div class="d-flex flex-column">
           <input class="form-control search mb-1" [(ngModel)]="filterProductMaster.item_name_abbr" 
             placeholder="Model Name" (keyup)="updateFilter()" />
           <span class="datatable-heading">Model Name</span>
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Description" prop="item_name" [cellClass]="leftAlignCell">
+      <ng-template ngx-datatable-header-template>
+        <div class="d-flex flex-column">
+          <input class="form-control search mb-1" [(ngModel)]="filterProductMaster.item_name" 
+            placeholder="Description" (keyup)="updateFilter()" />
+          <span class="datatable-heading">Description</span>
         </div>
       </ng-template>
     </ngx-datatable-column>

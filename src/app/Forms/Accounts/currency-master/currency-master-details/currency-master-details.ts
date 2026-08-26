@@ -51,6 +51,7 @@ export class CurrencyMasterDetails {
         this.rows = [];
         return;
       }
+      this.currencyMasterService.ControlsEnableAndDisable.next(true);
       this.currencyMasterModel={...x}
       this.currencyMasterService.selectedCurNo = this.currencyMasterModel.cur_no;
       this.currencyMasterService.getExchangeRateList(this.currencyMasterModel.cur_no);
@@ -71,7 +72,11 @@ export class CurrencyMasterDetails {
     }));
 
     this.subscription.push(this.currencyMasterService.btnClick.subscribe(x=>{
-     this.btnClickFunction(x);
+      if(x != ''){
+         if(x != ''){
+        this.btnClickFunction(x);
+     }
+      }
     }));
 
     this.subscription.push(this.currencyMasterService.cancelClick.subscribe(x=>{
@@ -110,7 +115,7 @@ export class CurrencyMasterDetails {
     this.isCurNameInvalid = false;
     this.isDescriptionInvalid = false;
     this.currencyMasterService.btnClick.next('');
-     this.userAccessService.CheckUserAccess(this.currencyMasterService.FormName,this.currencyMasterService);
+    this.currencyMasterService.ControlsEnableAndDisable.next(true);
   }
 
   btnClickFunction(x: string) {
@@ -262,6 +267,11 @@ export class CurrencyMasterDetails {
   }
 
   async onSubmit(CurrencyMasterForm: any) {
+    var rowslength = this.rows.length;
+    if (rowslength == 0) {
+     this.alertService.triggerAlert('Please add row Items',4000,'error');
+     return;
+    }
     const invalidRows = this.rows.filter(row => !this.isToDateValid(row));
     if (invalidRows.length > 0) {
      this.alertService.triggerAlert('Please ensure To date',4000,'error');
@@ -314,7 +324,7 @@ export class CurrencyMasterDetails {
             this.currencyMasterService.disableGrid.next(false);
             this.alertService.triggerAlert('Row saved successfully...',4000, 'success');
             this.currencyMasterService.btnClick.next('');
-            this.userAccessService.CheckUserAccess(this.currencyMasterService.FormName,this.currencyMasterService);
+            this.currencyMasterService.ControlsEnableAndDisable.next(true);
           },
         error: (err) => {
           this.alertService.triggerAlert('Failed to save the Row...',4000, 'error');
@@ -347,7 +357,7 @@ export class CurrencyMasterDetails {
           this.currencyMasterService.disableGrid.next(false);
           this.alertService.triggerAlert('Row updated successfully...', 4000, 'success');
           this.currencyMasterService.btnClick.next(''); 
-          this.userAccessService.CheckUserAccess(this.currencyMasterService.FormName,this.currencyMasterService);
+          this.currencyMasterService.ControlsEnableAndDisable.next(true);
         },
         error: (err) => {
           this.alertService.triggerAlert('Failed to update the Row...', 4000, 'error');
@@ -382,7 +392,7 @@ export class CurrencyMasterDetails {
         this.currencyMasterService.loadList.next(updatedList);
         this.currencyMasterService.clickedCurrency.next(updatedList[0]);
         this.alertService.triggerAlert('Row deleted successfully...', 4000, 'success');
-        this.currencyMasterService.btnClick.next('')
+        this.currencyMasterService.btnClick.next('');
       },
       (error) => {
         this.alertService.triggerAlert('Failed to delete the Row...', 4000, 'error');
