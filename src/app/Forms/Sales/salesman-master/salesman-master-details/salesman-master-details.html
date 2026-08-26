@@ -1,0 +1,532 @@
+ <div class="container-fluid">
+  <form ngForm #SalesmanMasterForm="ngForm" name="form" (ngSubmit)="SalesmanMasterForm.form.valid && onSubmit(SalesmanMasterForm)" novalidate>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="componentTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="salesman-tab" data-bs-toggle="tab" data-bs-target="#salesman" type="button" role="tab" (click)="setActiveTab('SalesManDetails')">
+          Salesman Details
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="area-tab" data-bs-toggle="tab" data-bs-target="#area" type="button" role="tab" (click)="setActiveTab('AreaDetails')">
+          Area Details
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="customer-tab" data-bs-toggle="tab" data-bs-target="#customer" type="button" role="tab" (click)="setActiveTab('CustomerDetails')">
+          Customer Details
+        </button>
+      </li>
+    </ul>
+
+    <!-- Tab content -->
+    <div class="tab-content p-2 border border-top-0" id="componentTabsContent">
+      <div class="tab-pane fade show active" id="salesman" role="tabpanel">
+          <div class="row">
+            <!-- Salesman Code-->
+            <div class="col-md-2">
+              <div class="label-wrapper">
+                <label for="salesman_code" class="form-label">Salesman Code 
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="salesman_code" [disabled]="true" name="salesman_code" [(ngModel)]="salesmanMasterModel.salesman_code" #salesman_code="ngModel">
+              </div>
+            </div> 
+            <!-- Salesman Name-->
+            <div class="col-md-3">
+              <div class="label-wrapper">
+                <label for="salesman_name" class="form-label">Salesman Name 
+                  <span class="required-star">*</span>
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="salesman_name" [disabled]="itemDisable" name="salesman_name" [(ngModel)]="salesmanMasterModel.salesman_name" 
+                  #salesman_name="ngModel" [ngClass]="{'is-invalid': isNameInvalid}">
+              </div>
+            </div>
+            <!-- Short Name-->
+            <div class="col-md-1">
+              <div class="label-wrapper">
+                <label for="short_name" class="form-label">Short Name 
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="short_name" [disabled]="itemDisable" name="short_name" [(ngModel)]="salesmanMasterModel.short_name" #short_name="ngModel">
+              </div>
+            </div>  
+            <!-- Job Title-->
+            <div class="col-md-2">
+              <div class="label-wrapper">
+                <label for="job_title" class="form-label">Job Title
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="job_title" [disabled]="itemDisable" name="job_title" [(ngModel)]="salesmanMasterModel.job_title" #job_title="ngModel">
+              </div>
+            </div>
+            <!-- Mobile No-->
+            <div class="col-md-2">
+              <div class="label-wrapper">
+                <label for="mobile_no" class="form-label">Mobile No
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="mobile_no" [disabled]="itemDisable" name="mobile_no" [(ngModel)]="salesmanMasterModel.mobile_no" #mobile_no="ngModel">
+              </div>
+            </div>
+            <!-- Telephone-->
+            <div class="col-md-2">
+              <div class="label-wrapper">
+                <label for="telephone" class="form-label">Telephone
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="telephone" [disabled]="itemDisable" name="telephone" [(ngModel)]="salesmanMasterModel.telephone" #telephone="ngModel">
+              </div>
+            </div>
+          </div>
+          <br>
+          <div class="row">
+            <!-- Engineer Name-->
+            <div class="col-md-2">
+              <div class="label-wrapper d-flex align-items-center">
+                <label for="engineer" class="form-label mb-0">Engineer Name
+                </label>
+              </div>
+              <div class="input-wrapper">
+                  <ng-select  [items]="EngnrList" bindLabel="engineer" bindValue="sales_engineer_id" [(ngModel)]="salesmanMasterModel.sales_engineer_id" class="select-input"
+                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" name="sales_engineer_id" [ngModelOptions]="{ standalone: true }"> 
+                  </ng-select>
+              </div>
+            </div>
+            <!-- Email Id-->
+            <div class="col-md-2">
+              <div class="label-wrapper">
+                <label for="email" class="form-label">Email Id
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="email" [disabled]="itemDisable" name="email" [(ngModel)]="salesmanMasterModel.email" #email="ngModel">
+              </div>
+            </div>
+            <!--Active -->
+              <div class="col-md-1"> 
+                <div class="form-group">
+                  <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="salesmanMasterModel.active" 
+                        name="active" #active="ngModel" [disabled]="itemDisable"  style="margin-top:1px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Active</span>
+                  </label>
+                </div>
+              </div>
+              <!--Call Center -->
+              <div class="col-md-1"> 
+                <div class="form-group">
+                  <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="salesmanMasterModel.callcenter_agent" 
+                        name="callcenter_agent" #callcenter_agent="ngModel" [disabled]="itemDisable"  style="margin-top:1px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Call Center</span>
+                  </label>
+                </div>
+              </div>
+              <!--Manager -->
+              <div class="col-md-1"> 
+                <div class="form-group">
+                  <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="salesmanMasterModel.manager" 
+                        name="manager" #manager="ngModel" [disabled]="itemDisable"  style="margin-top:1px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Manager</span>
+                  </label>
+                </div>
+              </div>
+              <!--Sales Dept. -->
+              <div class="col-md-1"> 
+                <div class="form-group">
+                  <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="salesmanMasterModel.sales_dept" 
+                        name="sales_dept" #sales_dept="ngModel" [disabled]="itemDisable"  style="margin-top:1px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Sales Dept.</span>
+                  </label>
+                </div>
+              </div>
+              <!-- Only Cash Invoice -->
+              <div class="col-md-2"> 
+                <div class="form-group">
+                  <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="salesmanMasterModel.cash_invoice" 
+                        name="cash_invoice" #cash_invoice="ngModel" [disabled]="itemDisable"  style="margin-top:1px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Only Cash Invoice</span>
+                  </label>
+                </div>
+              </div>
+              <!--Service Dept. -->
+              <div class="col-md-2"> 
+                <div class="form-group">
+                  <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="salesmanMasterModel.service_dept" 
+                        name="service_dept" #service_dept="ngModel" [disabled]="itemDisable"  style="margin-top:1px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Service Dept.</span>
+                  </label>
+                </div>
+              </div>
+          </div>
+          <br>
+          <div class="row">
+            <!-- Area Group-->
+            <div class="col-md-4" >
+                <div class="label-wrapper d-flex align-items-center">
+                    <label for="outlet" class="form-label  fw-semibold">Area Group
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select [items]="AreaGropList" bindLabel="group_code" bindValue="group_id" [(ngModel)]="selectedAreas" [multiple]="true"  [disabled]="itemDisable" 
+                        dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" name="group_id" class="select-input" (change)="OnAreaGroupChange()">
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Category-->
+            <div class="col-md-2">
+              <div class="label-wrapper d-flex align-items-center">
+                <label for="product_type" class="form-label mb-0">Category
+                </label>
+              </div>
+              <div class="input-wrapper">
+                  <ng-select  [items]="CategoryList" bindLabel="product_type" bindValue="product_type" [(ngModel)]="salesmanMasterModel.product_type" class="select-input"
+                    [disabled]="itemDisable || selectedAreas.length==0" dropdownPanelClass="'black-dropdown'"[ngModelOptions]="{ standalone: true }" 
+                    (change)="OnCategorySelect($event)" [ngClass]="{'is-invalid': iscategoryInvalid}" name="product_type"> 
+                  </ng-select>
+              </div>
+            </div>
+          </div>
+          <br>
+          <div class="row">
+            <!-- Hardware BW Target-->
+            <div class="col-md-2">
+              <div class="label-wrapper">
+                <label for="hw_Bw_sales_target" class="form-label">Hardware BW Target
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="number" class="label-input" id="hw_Bw_sales_target" [disabled]="itemDisable" name="hw_Bw_sales_target" [(ngModel)]="salesmanMasterModel.hw_Bw_sales_target" #hw_Bw_sales_target="ngModel">
+              </div>
+            </div> 
+            <!-- Hardware Clr Target-->
+            <div class="col-md-2">
+              <div class="label-wrapper">
+                <label for="hw_Clr_sales_target" class="form-label">Hardware Clr Target
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="hw_Clr_sales_target" [disabled]="itemDisable" name="hw_Clr_sales_target" [(ngModel)]="salesmanMasterModel.hw_Clr_sales_target" 
+                  #hw_Clr_sales_target="ngModel">
+              </div>
+            </div>
+            <!-- Rental BW Target-->
+            <div class="col-md-2">
+              <div class="label-wrapper">
+                <label for="rental_Bw_sales_target" class="form-label">Rental BW Target 
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="rental_Bw_sales_target" [disabled]="itemDisable" name="rental_Bw_sales_target" [(ngModel)]="salesmanMasterModel.rental_Bw_sales_target" #rental_Bw_sales_target="ngModel">
+              </div>
+            </div>  
+            <!-- Rental Clr Target -->
+            <div class="col-md-2">
+              <div class="label-wrapper">
+                <label for="rental_Clr_sales_target" class="form-label">Rental Clr Target 
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="rental_Clr_sales_target" [disabled]="itemDisable" name="rental_Clr_sales_target" [(ngModel)]="salesmanMasterModel.rental_Clr_sales_target" #rental_Clr_sales_target="ngModel">
+              </div>
+            </div>
+            <!-- Rental BW Opening -->
+            <div class="col-md-2">
+              <div class="label-wrapper">
+                <label for="rental_Bw_sales_op" class="form-label">Rental BW Opening 
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="rental_Bw_sales_op" [disabled]="itemDisable" name="rental_Bw_sales_op" [(ngModel)]="salesmanMasterModel.rental_Bw_sales_op" #rental_Bw_sales_op="ngModel">
+              </div>
+            </div>
+            <!-- Rental Clr Opening-->
+            <div class="col-md-2">
+              <div class="label-wrapper">
+                <label for="rental_Clr_sales_op" class="form-label">Rental Clr Opening 
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" class="label-input" id="rental_Clr_sales_op" [disabled]="itemDisable" name="rental_Clr_sales_op" [(ngModel)]="salesmanMasterModel.rental_Clr_sales_op" #rental_Clr_sales_op="ngModel">
+              </div>
+            </div>
+          </div>
+          <BR>
+          <!-- Footer Buttons -->
+          <div class="inbox-compose-footer" style="overflow: hidden;">
+            <div class="btn-group pull-right">
+              <div class="badge bg-color-greenLight action mine"></div>
+              <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+                <i class="fa fa-save"></i>Save
+              </button>
+              <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+                <i class="fa fa-ban"></i>Cancel
+              </button>
+            </div>
+          </div>
+      </div>
+      
+      <div class="tab-pane fade" id="area" role="tabpanel">
+        <!-- Area form fields here -->
+        <ngx-datatable 
+          class="table table-bordered styled-grid"
+          [rows]="AreaRows"
+          [scrollbarV]="scroll"
+          [virtualization]="true"
+          [style.height.px]="550"
+          [columnMode]="'force'"
+          [headerHeight]="80"
+          [footerHeight]="60"
+          [rowHeight]="30"
+          [limit]="500"
+          [externalPaging]="false"
+          [selected]="selected"
+          [messages]="{ emptyMessage: 'No data to display' }"
+          [reorderable]="reorderable"
+          [selectionType]="SelectionType.single"
+          [rowIdentity]="getRowIdentity"
+          (activate)="onSubListActivate($event)">
+
+          <!-- Sl No -->
+          <ngx-datatable-column name="Sl No"  prop="seq_no" [maxWidth]="80">
+            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+              <input 
+              type="text" 
+                class="form-control" 
+                value ="{{ rowIndex + 1 }}" disabled
+                />
+            </ng-template>
+          </ngx-datatable-column>
+
+          <!-- Area Code -->
+          <ngx-datatable-column name="Area Code" prop="area_code" >
+            <ng-template ngx-datatable-header-template>
+              <div class="d-flex flex-column">
+                <span class="datatable-heading">Area Code</span>
+                <input class="form-control search mb-1" [(ngModel)]="filterArea.area_code"  name="area_code"
+                  placeholder="Area Code" (keyup)="updateFilter($event.target.value, 'area_code')" />
+              </div>
+            </ng-template>
+            <ng-template let-row="row" ngx-datatable-cell-template >
+              <input 
+                type="text" 
+                class="form-control grid-input" 
+                [(ngModel)]="row.area_code"  name="area_code" 
+                disabled 
+                [ngModelOptions]="{ standalone: true }"/>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <!-- Area Name -->
+          <ngx-datatable-column name="Area Name" prop="area_name" >
+            <ng-template ngx-datatable-header-template>
+              <div class="d-flex flex-column">
+                <span class="datatable-heading">Area Name</span>
+                <input class="form-control search mb-1" [(ngModel)]="filterArea.area_name"  name="area_name"
+                  placeholder="Area Name" (keyup)="updateFilter($event.target.value, 'area_name')" />
+              </div>
+            </ng-template>
+            <ng-template let-row="row" ngx-datatable-cell-template >
+              <input 
+                type="text" 
+                class="form-control grid-input" 
+                [(ngModel)]="row.area_name" 
+                name ="area_name"  
+                disabled 
+                [ngModelOptions]="{ standalone: true }"/>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <!-- Area Group -->
+          <ngx-datatable-column name="Area Group" prop="group_code" >
+            <ng-template let-row="row" ngx-datatable-cell-template >
+              <input 
+                type="text" 
+                class="form-control grid-input" 
+                [value]="row.group_code"   
+                disabled />
+            </ng-template>
+          </ngx-datatable-column>
+
+          <!-- Footer -->
+          <ngx-datatable-footer>
+            <ng-template ngx-datatable-footer-template>
+              <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 datatable-footer-border">
+                <span>Total Rows: {{ AreaRows.length }}</span>
+              </div>
+            </ng-template>
+          </ngx-datatable-footer>
+        </ngx-datatable>
+      </div>
+
+      <div class="tab-pane fade" id="customer" role="tabpanel">
+        <!-- Customer form fields here -->
+        <ngx-datatable 
+          class="table table-bordered styled-grid"
+          [rows]="CustomerRows"
+          [rowClass]="getRowClass"
+          [scrollbarV]="scroll"
+          [virtualization]="true"
+          [style.height.px]="550"
+          [columnMode]="'force'"
+          [headerHeight]="80"
+          [footerHeight]="60"
+          [rowHeight]="30"
+          [limit]="500"
+          [externalPaging]="false"
+          [selected]="selectedCust"
+          [messages]="{ emptyMessage: 'No data to display' }"
+          [reorderable]="reorderableCust"
+          [selectionType]="SelectionType.single"
+          [rowIdentity]="getRowIdentityCust"
+          (activate)="onSubListActivateCust($event)">
+
+          <!-- Sl No -->
+          <ngx-datatable-column name="Sl No"  prop="seq_no" [maxWidth]="80">
+            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+              <input 
+              type="text" 
+                class="form-control" 
+                value ="{{ rowIndex + 1 }}" disabled
+                />
+            </ng-template>
+          </ngx-datatable-column>
+
+          <!-- Customer Name -->
+          <ngx-datatable-column name="Customer Name" prop="creditcustomerid">
+            <ng-template ngx-datatable-header-template>
+              <div class="d-flex flex-column">
+                <span class="datatable-heading">Customer Name</span>
+                <input class="form-control search mb-1"
+                      [(ngModel)]="filterCustomer.name"
+                      name="name"
+                      placeholder="Customer Name"
+                      (keyup)="updateFilterCustomer($event.target.value, 'name')" />
+              </div>
+            </ng-template>
+
+            <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+              <ng-select 
+                [items]="AllCustomerList" 
+                bindLabel="name" 
+                name="name"
+                bindValue="creditcustomerid" 
+                [(ngModel)]="row.creditcustomerid"
+                [disabled]="getDisableState(rowIndex)"
+                class="form-control grid-select"
+                [ngModelOptions]="{ standalone: true }"
+                [appendTo]="'body'"
+                (change)="CustomerChange(row)">
+              </ng-select>
+            </ng-template>
+            
+          </ngx-datatable-column>
+
+
+          <!-- Area Code -->
+          <ngx-datatable-column name="Area Code" prop="area_code" >
+            <ng-template ngx-datatable-header-template>
+              <div class="d-flex flex-column">
+                <span class="datatable-heading">Area Code</span>
+                <input class="form-control search mb-1" [(ngModel)]="filterCustomer.area_code"  name="area_code"
+                  placeholder="Area Code" (keyup)="updateFilterCustomer($event.target.value, 'area_code')" />
+              </div>
+            </ng-template>
+            <ng-template let-row="row" ngx-datatable-cell-template >
+              <input 
+                type="text" 
+                class="form-control grid-input" 
+                [value]="row.area_code"   
+                disabled />
+            </ng-template>
+          </ngx-datatable-column>
+
+          <!-- Major Customer -->
+          <ngx-datatable-column name="Major Customer" prop="major_customer" [maxWidth]="150">
+            <ng-template ngx-datatable-header-template>
+              <div class="d-flex align-items-center">
+                <span class="datatable-heading">Major Customer</span>
+                <input type="checkbox"
+                      [(ngModel)]="filterCustomer.major_customer" name="major_customer"
+                      (change)="updateFilterCustomer($event.target.checked, 'major_customer')"
+                      class="ms-2" />
+              </div>
+              <button type="button" class="btn btn-info" (click)="ModifyMCbtn()" [disabled]="modifyDisable">
+                <i class="fa fa-save"></i>Modify
+              </button>
+            </ng-template>
+            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+              <label class="toggle-switch">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="row.major_customer"
+                  name="major_customer_{{rowIndex}}"
+                  class="custom-input"
+                  [ngModelOptions]="{ standalone: true }" disabled
+                />
+                <span class="slider"></span>
+              </label>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <!-- Delete -->
+          <ngx-datatable-column name="Delete" [maxWidth]="70">
+            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+              <button 
+                type="button" 
+                class="btn btn-danger btn-sm delete-btn" 
+                (click)="deleteRow(row)" 
+                [disabled]="row.major_customer == false || itemDisable">
+                🗑️
+              </button>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <!-- Footer -->
+          <ngx-datatable-footer>
+            <ng-template ngx-datatable-footer-template>
+              <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 datatable-footer-border">
+                <span>Total Rows: {{ CustomerRows.length }}</span>
+              </div>
+            </ng-template>
+          </ngx-datatable-footer>
+        </ngx-datatable>
+        <br>
+          <!-- Footer Buttons -->
+          <div class="inbox-compose-footer" style="overflow: hidden;">
+            <div class="btn-group pull-right">
+              <div class="badge bg-color-greenLight action mine"></div>
+              <button type="button" class="btn btn-info" style="margin-right: 5px" [disabled]="saveMcDisable" (click)="AddMajorCustomer()">
+                <i class="fa fa-plus"></i>Add Major Customer
+              </button>
+              <button type="button" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveMcDisable" (click)="SaveMajorCustomer()">
+                <i class="fa fa-save"></i>Save Major Customer
+              </button>
+              <button type="button" class="btn btn-danger" [disabled]="cancelMcDisable" (click)="cancelMCClickMethod()">
+                <i class="fa fa-ban"></i>Cancel
+              </button>
+            </div>
+          </div>
+      </div>
+    </div> 
+  </form>
+</div>

@@ -1,0 +1,616 @@
+<div class="container-fluid">
+  <form ngForm #SalesQuotationForm="ngForm" name="form" (ngSubmit)="SalesQuotationForm.form.valid && onSubmit(SalesQuotationForm)" novalidate>
+    <div class="row">
+        <!--  Quotation Ref.-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="document_number" class="form-label"> Quotation Ref.
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="document_number" [disabled]="true"  
+                    name="document_number" [(ngModel)]="salesQuotationModel.document_number" #document_number="ngModel"  >
+            </div>
+        </div>  
+
+        <!-- Entry Date -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="voucherDate" class="form-label">Entry Date
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <div class="datepicker-wrapper">
+                    <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="itemDisable"
+                    [bsConfig]="{
+                        dateInputFormat: 'DD/MM/YYYY',
+                        showWeekNumbers: false
+                    }"
+                    (bsValueChange)="onDateSelected($event)" [ngModel]="salesQuotationModel.voucherDate" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
+                    />
+                    <button type="button" class="btn btn-outline-secondary" (click)="dp.show()" [disabled]="itemDisable">
+                    📅
+                    </button>
+                </div> 
+            </div>
+        </div>
+        
+        <!-- Salesman Code -->
+        <div class="col-md-1">
+            <div class="label-wrapper">
+                <label for="salesman_code" class="form-label">Salesman Code 
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <ng-select  [items]="SalesManList" bindLabel="salesman_code" bindValue="salesman_id" [(ngModel)]="salesQuotationModel.salesman_id" class="select-input"
+                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                </ng-select>
+            </div>
+        </div>
+
+        <!-- Salesman Name -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="salesman_name" class="form-label">Salesman Name 
+                    <span class="required-star">*</span>
+                </label>
+            </div>
+           <ng-select  [items]="SalesManList" bindLabel="salesman_name" bindValue="salesman_id" [(ngModel)]="salesQuotationModel.salesman_id" class="select-input"
+                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"  [ngClass]="{'is-invalid': isSalesman}"> 
+                </ng-select>
+        </div>
+
+        <!-- Customer Code -->
+        <div class="col-md-2" *ngIf="CustomerDisable">
+            <div class="label-wrapper">
+                <label for="serial_no" class="form-label">Customer Code
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <ng-select  [items]="CustomerList" bindLabel="cardno" bindValue="creditcustomerid" [(ngModel)]="salesQuotationModel.cust_code" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"  
+                        (change)="CustomerChange(salesQuotationModel.cust_code,'code')"> 
+                    </ng-select>
+            </div>
+        </div>
+
+        
+        <!-- Customer Name -->
+        <div class="col-md-2" *ngIf="CustomerDisable">
+            <div class="label-wrapper"  >
+                <label for="item_no" class="form-label">Customer Name
+                    <span class="required-star">*</span>
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <ng-select  [items]="CustomerList" bindLabel="name" bindValue="name" [(ngModel)]="salesQuotationModel.card_holder_name" class="select-input" 
+                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" 
+                    (change)="CustomerChange(salesQuotationModel.card_holder_name,'name')"  [ngClass]="{'is-invalid': isCustomer}"> 
+                </ng-select>
+            </div>
+        </div>
+
+        <!-- Customer Name -->
+        <div class="col-md-2" *ngIf="!CustomerDisable">
+            <div class="label-wrapper">
+                <label for="card_holder_name" class="form-label">Customer Name 
+                    <span class="required-star">*</span>
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="card_holder_name" [disabled]="itemDisable"   [ngClass]="{'is-invalid': isCustomer}"
+                    name="card_holder_name" [(ngModel)]="salesQuotationModel.card_holder_name" #card_holder_name="ngModel" >
+            </div>
+        </div>
+
+        <!--New-->
+        <div class="col-md-1"> 
+            <div class="form-group">
+                <label class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox style-0" [(ngModel)]="salesQuotationModel.new" 
+                    name="new" #new="ngModel" [disabled]="itemDisable"  style="margin-top:1px" (change)="NewChange($event)"> 
+                <span class="checkmark"></span>
+                <span class="checkbox-label">New</span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="row">  
+
+        <!-- Attention-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="contact_person" class="form-label">Attention
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="contact_person" [disabled]="itemDisable"  
+                    name="contact_person" [(ngModel)]="salesQuotationModel.contact_person" #contact_person="ngModel"  >
+            </div>
+        </div>
+
+        <!--Email Id-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="email_id" class="form-label">Email Id
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="email_id" [disabled]="itemDisable"  
+                    name="email_id" [(ngModel)]="salesQuotationModel.email_id" #email_id="ngModel"  >
+            </div>
+        </div>  
+
+        <!--Contact No-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="contact_no" class="form-label">Contact No
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="contact_no" [disabled]="itemDisable"  
+                    name="contact_no" [(ngModel)]="salesQuotationModel.contact_no" #contact_no="ngModel"  >
+            </div>
+        </div>  
+
+        <!-- Location-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="location" class="form-label">Location
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="location" [disabled]="itemDisable"  
+                    name="location" [(ngModel)]="salesQuotationModel.location" #location="ngModel"  >
+            </div>
+        </div>  
+        <!-- Delivery -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="delivery" class="form-label">Delivery   
+                    <span class="required-star">*</span>
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="delivery" [disabled]="itemDisable"   [ngClass]="{'is-invalid': isDelivery}" 
+                    name="delivery" [(ngModel)]="salesQuotationModel.delivery" #delivery="ngModel">
+            </div>
+        </div>
+
+        <!-- Warranty-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="warranty" class="form-label">Warranty(Months)
+                    <span class="required-star">*</span>
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="warranty" [disabled]="itemDisable"  
+                    name="warranty" [(ngModel)]="salesQuotationModel.warranty" #warranty="ngModel"   [ngClass]="{'is-invalid': isWarranty}">
+            </div>
+        </div>  
+    </div>
+    <div class="row">  
+
+        <!-- Validity-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="validity" class="form-label">Validity
+                    <span class="required-star">*</span>
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="validity" [disabled]="itemDisable"  
+                    name="validity" [(ngModel)]="salesQuotationModel.validity" #validity="ngModel"   [ngClass]="{'is-invalid': isValidity}">
+            </div>
+        </div>
+
+        <!-- Payment Type -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="payment_type" class="form-label">Payment Type
+                    <span class="required-star">*</span>
+                </label>
+            </div>
+           <ng-select  [items]="PaymentTypeList" bindLabel="pay_term" bindValue="payterm_id" [(ngModel)]="salesQuotationModel.payterm_id" class="select-input"
+                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   [ngClass]="{'is-invalid': isPayTerm}"> 
+                </ng-select>
+        </div>
+
+        <!-- Subject -->
+        <div class="col-md-4">
+            <div class="label-wrapper">
+                <label for="subject" class="form-label">Subject
+                    <span class="required-star">*</span>
+                </label>
+            </div>
+           <div class="input-wrapper">
+                <input type="text" class="label-input" id="subject" [disabled]="itemDisable"    [ngClass]="{'is-invalid': isSubject}"
+                    name="subject" [(ngModel)]="salesQuotationModel.subject" #subject="ngModel">
+            </div>
+        </div>
+
+        <!-- Narration -->
+        <div class="col-md-4">
+            <div class="label-wrapper">
+                <label for="narration" class="form-label">Narration
+                </label>
+            </div>
+           <div class="input-wrapper">
+                <input type="text" class="label-input" id="narration" [disabled]="itemDisable"  
+                    name="narration" [(ngModel)]="salesQuotationModel.narration" #narration="ngModel">
+            </div>
+        </div>
+    </div>
+
+    <ngx-datatable 
+      class="table table-bordered styled-grid"
+      [rows]="rows"
+      [scrollbarV]="scroll"
+      [virtualization]="true"
+      [style.height.px]="gridHeight"
+      [columnMode]="'force'"
+      [headerHeight]="50"
+      [footerHeight]="60"
+      [rowHeight]="30"
+      [limit]="controls.pageSize"
+      [externalPaging]="false"
+      [selected]="selected"
+      [messages]="{ emptyMessage: 'No data to display' }"
+      [reorderable]="reorderable"
+      [selectionType]="SelectionType.single"
+      [rowIdentity]="getRowIdentity"
+      (activate)="onSubListActivate($event)">
+
+      <!-- Sl No -->
+      <ngx-datatable-column name="Sl No"  prop="seq_no" [maxWidth]="80">
+        <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+        <input 
+        type="text" 
+            class="form-control" 
+            value ="{{ rowIndex + 1 }}" disabled
+            />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Item Code -->
+      <ngx-datatable-column name="Item Code" prop="item_no">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <ng-select 
+            [items]="ItemList" 
+            bindLabel="item_code" 
+            bindValue="item_no" 
+            [(ngModel)]="row.item_no"
+            (change)="ItemCodeEnter(row.item_no, row)"
+            [disabled]="itemDisable"
+            class="form-control grid-select"
+            [ngModelOptions]="{ standalone: true }"
+            [appendTo]="'body'">
+          </ng-select>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Model Name -->
+      <ngx-datatable-column name="Model Name" prop="item_name_abbr" [minWidth]="300">
+         <ng-template let-row="row" ngx-datatable-cell-template>
+            <input 
+              list="ItemList" 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="row.item_name_abbr" 
+              [ngModelOptions]="{standalone: true}" 
+              (change)="ModelNameChange(row.item_name_abbr,row)" 
+              [disabled]="itemDisable" />
+
+            <datalist id="ItemList">
+              <option *ngFor="let item of ItemList" [value]="item.item_code + ' - ' + item.item_name_abbr">
+              </option>
+            </datalist>
+          </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Qty -->
+      <ngx-datatable-column name="Qty" prop="order_quantity">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <input 
+            type="number" 
+            class="form-control grid-input" 
+            [(ngModel)]="row.order_quantity" 
+            [disabled]="itemDisable" (input)="QtyChange(row)"
+            [ngModelOptions]="{ standalone: true }" />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Machine Rate -->
+      <ngx-datatable-column name="Machine Rate" prop="unit_price">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <input 
+            type="number" 
+            class="form-control grid-input" 
+            (focus)="row.previousRate = row.unit_price" 
+            [(ngModel)]="row.unit_price" 
+            [disabled]="itemDisable" (input)="QtyChange(row)" (change)="MachinePriceChange(row)"
+            [ngModelOptions]="{ standalone: true }" />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Total Amount-->
+      <ngx-datatable-column name="Total Amount" prop="total_price">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <input 
+            type="number" 
+            class="form-control grid-input" 
+            [(ngModel)]="row.total_price" 
+            [disabled]="itemDisable" (input)="TotalAmountChange(row.total_price,row)"
+            [ngModelOptions]="{ standalone: true }" />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Original Rate-->
+      <ngx-datatable-column name="Original Rate" prop="original_rate" *ngIf="false">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <input 
+            type="number" 
+            class="form-control grid-input" 
+            [(ngModel)]="row.original_rate" 
+            [ngModelOptions]="{ standalone: true }" />
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Features-->
+      <ngx-datatable-column name="Features" prop="total_price">
+        <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+            <button 
+            type="button"
+            class="btn-link" 
+            [disabled]="false"
+            (click)="openFeatures(row,rowIndex)">
+            Features
+            </button>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Approved -->
+       <ngx-datatable-column name="Approved" prop="approved">
+        <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              [(ngModel)]="row.approved"
+              name="approved{{rowIndex}}"
+              class="custom-input"
+              [disabled] ="itemDisable" 
+              [ngModelOptions]="{ standalone: true }" 
+            />
+            <span class="slider"></span>
+          </label>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Delete -->
+      <ngx-datatable-column name="Delete" [maxWidth]="70">
+        <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+          <button 
+            type="button" 
+            class="btn btn-danger btn-sm delete-btn" 
+            (click)="deleteRow(rowIndex)" 
+            [disabled]="itemDisable">
+            🗑️
+          </button>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- Footer -->
+      <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template>
+          <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 datatable-footer-border">
+            <span>Total Rows: {{ rows.length }}</span>
+            <div class="btn-group">
+              <button type="button" class="btn btn-add" (click)="addRow()" [disabled]="itemDisable">➕ Add</button>
+            </div>
+          </div>
+        </ng-template>
+      </ngx-datatable-footer>
+    </ngx-datatable>
+
+
+    <div class="row">
+    <!-- Approval Status -->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="approval_status" class="form-label">Status
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="approval_status" [disabled]="statusDisable"  
+              name="approval_status" [(ngModel)]="salesQuotationModel.approval_status" #approval_status="ngModel">
+        </div>
+      </div>
+
+      <!-- Status Remark -->
+      <div class="col-md-3">
+        <div class="label-wrapper">
+          <label for="status_remarks" class="form-label">Status Remark
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="status_remarks" [disabled]="statusDisable"  
+              name="status_remarks" [(ngModel)]="salesQuotationModel.status_remarks" #status_remarks="ngModel">
+        </div>
+      </div>
+      
+
+      <!-- Total Amount-->
+      <div class="col-md-1 ms-auto">
+        <div class="label-wrapper">
+          <label for="total_amount" class="form-label">Total Amount
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="total_amount" [disabled]="true"  
+              name="total_amount" [(ngModel)]="salesQuotationModel.total_amount" #total_amount="ngModel">
+        </div>
+      </div>
+
+      <!-- Discount-->
+      <div class="col-md-1">
+        <div class="label-wrapper">
+          <label for="discount" class="form-label">Discount
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="discount" [disabled]="itemDisable"  
+              name="discount" [(ngModel)]="salesQuotationModel.discount" #discount="ngModel" (keyup)="assignTotals()">
+        </div>
+      </div>
+
+      <!-- Trade-In Discount-->
+      <div class="col-md-1">
+        <div class="label-wrapper">
+          <label for="tradein_discount" class="form-label">Trade-In Discount
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="tradein_discount" [disabled]="itemDisable"  
+              name="tradein_discount" [(ngModel)]="salesQuotationModel.tradein_discount" #tradein_discount="ngModel" (keyup)="assignTotals()">
+        </div>
+      </div>
+
+      <!-- Net Amount-->
+      <div class="col-md-1">
+        <div class="label-wrapper">
+          <label for="net_amount" class="form-label">Net Amount
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="net_amount" [disabled]="true"  
+              name="net_amount" [(ngModel)]="salesQuotationModel.net_amount" #net_amount="ngModel">
+        </div>
+      </div>
+
+    </div>
+    <br>
+    <div class="row">
+        <!-- Created By-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="created_by" class="form-label">Created By
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="created_by" [disabled]="true"  
+                    name="created_by" [(ngModel)]="salesQuotationModel.created_by" #created_by="ngModel">
+            </div>
+        </div>
+        <!-- Created On-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="created_date" class="form-label">Created On
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="created_date" [disabled]="true"  
+                    name="created_date" [(ngModel)]="salesQuotationModel.created_date" #created_date="ngModel">
+            </div>
+        </div>
+        <!-- Updated By -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="modified_by" class="form-label">Modified By
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="modified_by" [disabled]="true"  
+                    name="modified_by" [(ngModel)]="salesQuotationModel.modified_by" #modified_by="ngModel">
+            </div>
+        </div>
+        <!-- Updated On -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="modified_date" class="form-label">Modified On
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="modified_date" [disabled]="true"  
+                    name="modified_date" [(ngModel)]="salesQuotationModel.modified_date" #modified_date="ngModel">
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer" style="overflow: hidden;">
+        <div class="btn-group pull-right">
+            <div class="badge bg-color-greenLight action mine"></div>
+            <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+            <i class="fa fa-save"></i>Save
+            </button>
+            <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+            <i class="fa fa-ban"></i>Cancel
+            </button>
+        </div>
+    </div> 
+  </form>
+</div>
+
+
+<!-- Features Modal -->
+<div *ngIf="showModalFeatures" class="modal fade show d-block" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg" style="min-width: 1700px;">
+        <div class="modal-content shadow-lg rounded">
+            <div class="modal-header bg-light border-bottom">
+                <h5 class="modal-title text-primary">Item :  {{selectedRow?.item_name_abbr}}</h5>
+                <button type="button" class="btn btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-3"
+                        (click)="modalCancel()" aria-label="Close" title="Close">
+                <i class="fas fa-times text-danger"></i>
+                </button>
+            </div>
+            <div class="modal-body px-4 py-3">
+                <div class="container-fluid">
+                    <div class="row g-3">
+                        <!-- Row 1 -->
+                        <div class="col-md-6">
+                        <label>General Features</label>
+                            <textarea class="form-control" rows="6"  [(ngModel)]="selectedRow.general_features" #general_features="ngModel" 
+                             id="general_features" name="general_features" [disabled] ="itemDisable"  ></textarea>
+                        </div>
+                        <div class="col-md-6">
+                        <label>Copier Features</label>
+                        <textarea class="form-control" rows="6" [(ngModel)]="selectedRow.copier_features" #copier_features="ngModel" 
+                             id="copier_features" name="copier_features" [disabled] ="itemDisable" ></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Row 2 -->
+                        <div class="col-md-6">
+                        <label>Printer Features</label>
+                        <textarea class="form-control" rows="6" [(ngModel)]="selectedRow.printer_features" #printer_features="ngModel" 
+                             id="printer_features" name="printer_features" [disabled] ="itemDisable" ></textarea>
+                        </div>
+                        <div class="col-md-6">
+                        <label>Scanner Features</label>
+                        <textarea class="form-control" rows="6" [(ngModel)]="selectedRow.scanner_features" #scanner_features="ngModel" 
+                             id="scanner_features" name="scanner_features" [disabled] ="itemDisable" ></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Row 3 -->
+                        <div class="col-md-6">
+                        <label>Paper Handling</label>
+                        <textarea class="form-control" rows="6" [(ngModel)]="selectedRow.paper_handling" #paper_handling="ngModel" 
+                             id="paper_handling" name="paper_handling" [disabled] ="itemDisable" ></textarea>
+                        </div>
+                        <div class="col-md-6">
+                        <!-- optional empty column or another field -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button class="btn btn-primary" (click)="modalSave()" [disabled] ="itemDisable" >Ok</button>
+                    <button class="btn btn-danger" (click)="modalCancel()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

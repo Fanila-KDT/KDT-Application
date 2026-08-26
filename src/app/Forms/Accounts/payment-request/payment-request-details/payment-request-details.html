@@ -1,0 +1,275 @@
+<div class="container-fluid">
+  <form ngForm #AccountMasterForm="ngForm" name="form" (ngSubmit)="AccountMasterForm.form.valid && onSubmit(AccountMasterForm)" novalidate>
+      <div class="row">
+        <!-- Doc No -->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="document_number" class="form-label">Doc No</label>
+          </div>
+          <input type="text" class="label-input" id="document_number" [disabled]="true"
+            name="document_number" [(ngModel)]="paymentRequestModel.document_number" #document_number="ngModel">
+        </div>
+        <!-- Entry Date -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+            <label for="voucher_date" class="form-label">
+                Entry Date
+            </label>
+            </div>
+            <div class="input-wrapper">
+            <div class="datepicker-wrapper">
+                <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="itemDisable"
+                [bsConfig]="{
+                    dateInputFormat: 'DD/MM/YYYY',
+                    showWeekNumbers: false
+                }"
+                (bsValueChange)="onDateSelected($event)" [ngModel]="paymentRequestModel.voucherDate" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
+                />
+                <button type="button" class="btn btn-outline-secondary" (click)="dp.show()" [disabled]="itemDisable">
+                📅
+                </button>
+                </div> 
+            </div>
+        </div>
+        <!-- Paid To -->
+        <div class="col-md-3">
+          <div class="label-wrapper">
+            <label for="paid_to" class="form-label">Paid To
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="paid_to" [disabled]="itemDisable" 
+              name="paid_to" [(ngModel)]="paymentRequestModel.paid_to" #paid_to="ngModel">
+            </div>
+        </div>
+        <!-- Reason -->
+        <div class="col-md-3">
+          <div class="label-wrapper">
+            <label for="reason" class="form-label">Reason
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="reason" [disabled]="itemDisable" 
+              name="reason" [(ngModel)]="paymentRequestModel.reason" #reason="ngModel">
+            </div>
+        </div>
+      </div>
+
+      <br>
+
+      <ngx-datatable 
+        class="table table-bordered styled-grid"
+        [rows]="rows"
+        [scrollbarV]="scroll"
+        [virtualization]="true"
+        [style.height.px]="350"
+        [columnMode]="'force'"
+        [headerHeight]="50"
+        [footerHeight]="60"
+        [rowHeight]="30"
+        [limit]="500"
+        [externalPaging]="false"
+        [selected]="selected"
+        [messages]="{ emptyMessage: 'No data to display' }"
+        [reorderable]="reorderable"
+        [selectionType]="SelectionType.single"
+        [rowIdentity]="getRowIdentity"
+        (activate)="onSubListActivate($event)">
+
+        <!-- Sl No -->
+        <ngx-datatable-column name="Sl No"  prop="seq_no" [maxWidth]="80">
+          <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+            <input 
+            type="text" 
+              class="form-control" 
+              value ="{{ rowIndex + 1 }}" disabled 
+              />
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- Description -->
+        <ngx-datatable-column name="Description" prop="description">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <input 
+              type="text" 
+              class="form-control grid-input" 
+              [(ngModel)] ="row.description"  
+              [ngModelOptions]="{ standalone: true }"
+              [disabled]="itemDisable"
+              />
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- Cheque No -->
+        <ngx-datatable-column name="Cheque No" prop="cheque_no">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <input 
+              type="text" 
+              class="form-control grid-input" 
+              [(ngModel)] ="row.cheque_no"  
+              [ngModelOptions]="{ standalone: true }"
+              [disabled]="itemDisable"
+              />
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- Line Reference-->
+        <ngx-datatable-column name="Line Reference" prop="details">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <input 
+              type="text" 
+              class="form-control grid-input" 
+              [(ngModel)] ="row.details"  
+              [ngModelOptions]="{ standalone: true }"
+              [disabled]="itemDisable"
+              />
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- Amount-->
+        <ngx-datatable-column name="Amount" prop="amount">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <input 
+              type="number" 
+              class="form-control grid-input" 
+              [(ngModel)] ="row.amount"  (input)="TotalChange(row)"
+              [ngModelOptions]="{ standalone: true }"
+              [disabled]="itemDisable"
+              />
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- Delete -->
+        <ngx-datatable-column name="Delete" [maxWidth]="70">
+          <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+            <button 
+              type="button" 
+              class="btn btn-danger btn-sm delete-btn" 
+              (click)="deleteRow(rowIndex)" 
+              [disabled]="itemDisable">
+              🗑️
+            </button>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- Footer -->
+        <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template>
+          <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 datatable-footer-border">
+            <span>Total Rows: {{ rows.length }}</span>
+            <div class="btn-group">
+              <button type="button" class="btn btn-add" (click)="addRow()" [disabled]="itemDisable">➕ Add</button>
+            </div>
+          </div>
+        </ng-template>
+      </ngx-datatable-footer>
+      </ngx-datatable>
+
+    <div class="row">
+      <!--Status-->
+      <div class="col-md-2">
+          <div class="label-wrapper d-flex align-items-center">
+          <label for="approval_status" class="form-label  mb-0">Status
+          </label>
+          </div>
+          <div class="input-wrapper">
+              <input type="text" class="label-input" id="approval_status" [disabled]="statusDisable" name="approval_status"  name="approval_status" 
+              [(ngModel)]="paymentRequestModel.approval_status" #approval_status="ngModel">
+          </div>
+      </div>
+
+      <!-- Total Amount -->
+      <div class="col-md-2 ms-auto">
+        <div class="label-wrapper">
+          <label for="line_amount" class="form-label">Total Amount</label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="line_amount" [disabled]="true" name="line_amount" [(ngModel)]="paymentRequestModel.line_amount" #line_amount="ngModel">
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <!-- Created By-->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="created_by" class="form-label">Created By
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="created_by" [disabled]="true"  
+              name="created_by" [(ngModel)]="paymentRequestModel.created_by" #created_by="ngModel">
+        </div>
+      </div>
+      <!-- Created On-->
+      <div class="col-md-1">
+        <div class="label-wrapper">
+          <label for="created_date" class="form-label">Created On
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="created_date" [disabled]="true"  
+              name="created_date" [(ngModel)]="paymentRequestModel.created_date" #created_date="ngModel">
+        </div>
+      </div>
+      <!-- Updated By -->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="modified_by" class="form-label">Modified By
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="modified_by" [disabled]="true"  
+              name="modified_by" [(ngModel)]="paymentRequestModel.modified_by" #modified_by="ngModel">
+        </div>
+      </div>
+      <!-- Updated On -->
+      <div class="col-md-1">
+        <div class="label-wrapper">
+          <label for="modified_date" class="form-label">Modified On
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="modified_date" [disabled]="true"  
+              name="modified_date" [(ngModel)]="paymentRequestModel.modified_date" #modified_date="ngModel">
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="approved_by" class="form-label">Approved By
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="approved_by" [disabled]="true"  
+              name="approved_by" [(ngModel)]="paymentRequestModel.approved_by" #approved_by="ngModel">
+        </div>
+      </div>
+      <!-- Remarks -->
+      <div class="col-md-4">
+        <div class="label-wrapper">
+          <label for="approver_remarks" class="form-label">Approval Remarks
+          </label>
+        </div>
+        <div class="input-wrapper">
+            <textarea class="label-input" id="approver_remarks" name="approver_remarks" rows="2"
+              [(ngModel)]="paymentRequestModel.approver_remarks" #approver_remarks="ngModel" [disabled]="true" >
+            </textarea>
+        </div>
+      </div>
+    </div>
+    <br>
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer" style="overflow: hidden;">
+      <div class="btn-group pull-right">
+        <div class="badge bg-color-greenLight action mine"></div>
+        <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+          <i class="fa fa-save"></i>Save
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+          <i class="fa fa-ban"></i>Cancel
+        </button>
+      </div>
+    </div> 
+    </form>
+</div>

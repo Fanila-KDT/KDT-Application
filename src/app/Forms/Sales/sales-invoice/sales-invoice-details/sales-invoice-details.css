@@ -1,0 +1,10 @@
+
+/* Black border for tab content */
+#componentTabsContent {
+  border: 1px solid black !important;
+}
+
+/* Optional: keep top border aligned with tabs */
+#componentTabsContent .tab-pane {
+  border-top: none !important;
+}

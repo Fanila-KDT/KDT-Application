@@ -1,0 +1,367 @@
+
+ <div class="container-fluid">
+  <form ngForm #salesLeadForm="ngForm" name="form" (ngSubmit)="salesLeadForm.form.valid && onSubmit(salesLeadForm)" novalidate>
+    <fieldset class="border">
+        <legend class="legend-left">
+            {{ 'Customer Details' }}
+        </legend>
+        <div class="row">
+            <!-- Document Number-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="document_number" class="form-label">Document Number
+                        
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="document_number" [disabled]="true"   
+                    name="document_number" [(ngModel)]="salesLeadModel.document_number" #document_number="ngModel">
+                </div>
+            </div> 
+            <!-- Entry Date -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="voucherDate" class="form-label">Entry Date
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <div class="datepicker-wrapper">
+                        <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="itemDisable"
+                        [bsConfig]="{
+                            dateInputFormat: 'DD/MM/YYYY',
+                            showWeekNumbers: false
+                        }"
+                        (bsValueChange)="onDateSelected($event)" [ngModel]="salesLeadModel.voucherDate" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
+                        />
+                        <button type="button" class="btn btn-outline-secondary" (click)="dp.show()" [disabled]="itemDisable">
+                        📅
+                        </button>
+                    </div> 
+                </div>
+            </div>
+            <!-- Company Name-->
+            <div class="col-md-4" *ngIf="CustomerDisable">
+                <div class="label-wrapper"  >
+                    <label for="item_no" class="form-label">Customer Name
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="CustomerList" bindLabel="name" bindValue="creditcustomerid" [(ngModel)]="salesLeadModel.customer_id" class="select-input"  
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"  (change)="CustomerChange(salesLeadModel.customer_id)" > 
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Customer Name -->
+            <div class="col-md-4" *ngIf="!CustomerDisable">
+                <div class="label-wrapper">
+                    <label for="customer_name" class="form-label">Customer Name 
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="customer_name" [disabled]="itemDisable" [ngClass]="{'is-invalid': isCustomer}"
+                        name="customer_name" [(ngModel)]="salesLeadModel.customer_name" #customer_name="ngModel" >
+                </div>
+            </div>
+            <!--New-->
+            <div class="col-md-1"> 
+                <div class="form-group">
+                    <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="salesLeadModel.new_check" 
+                        name="new" #new="ngModel" [disabled]="itemDisable"  style="margin-top:1px" (change)="NewChange($event)"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">New</span>
+                    </label>
+                </div>
+            </div>
+            <!-- Contact Person -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="contact_name" class="form-label">Contact Person
+                        
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="contact_name" [disabled]="itemDisable"   
+                    name="contact_name" [(ngModel)]="salesLeadModel.contact_name" #contact_name="ngModel">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Contact Number-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="contact_no" class="form-label">Contact Number
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="contact_no" [disabled]="itemDisable"   
+                    name="contact_no" [(ngModel)]="salesLeadModel.contact_no" #contact_no="ngModel">
+                </div>
+            </div> 
+            <!-- Area Name -->
+            <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                    <label for="area_id" class="form-label mb-0">Area Name
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="AreaList" bindLabel="area_name" bindValue="area_id" [(ngModel)]="salesLeadModel.area_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                    </ng-select>
+                </div>
+            </div>  
+        </div>
+    </fieldset>
+    <br>
+    <fieldset class="border">
+        <legend class="legend-left">
+            {{ 'Lead From' }}
+        </legend>
+        <div class="row">
+            <!-- Employee Name-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="employee_id" class="form-label">Employee Name
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="employee_id" [disabled]="itemDisable"    [ngClass]="{'is-invalid': isEmployee}"
+                    name="employee_id" [(ngModel)]="salesLeadModel.employee_id" #employee_id="ngModel">
+                </div>
+            </div> 
+
+            <!-- Mobile Number-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="eng_mobile" class="form-label">Mobile Number
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="eng_mobile" [disabled]="itemDisable"   
+                    name="eng_mobile" [(ngModel)]="salesLeadModel.eng_mobile" #eng_mobile="ngModel">
+                </div>
+            </div> 
+        </div>
+    </fieldset>
+    <br>
+    <fieldset class="border">
+        <legend class="legend-left">
+            {{ 'New Machine Details' }}
+        </legend>
+        <div class="row">
+            <!-- Suggested Model-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="new_machine_model" class="form-label">Suggested Model
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="new_machine_model" [disabled]="itemDisable"   [ngClass]="{'is-invalid': isModel}" 
+                    name="new_machine_model" [(ngModel)]="salesLeadModel.new_machine_model" #new_machine_model="ngModel">
+                </div>
+            </div> 
+            <!-- Color / BW-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="new_machine_type" class="form-label">Color / BW
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="new_machine_type" [disabled]="itemDisable"   
+                    name="new_machine_type" [(ngModel)]="salesLeadModel.new_machine_type" #new_machine_type="ngModel">
+                </div>
+            </div> 
+            <!-- Monthly Volume-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="monthly_volume" class="form-label">Monthly Volume
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="monthly_volume" [disabled]="itemDisable"   
+                    name="monthly_volume" [(ngModel)]="salesLeadModel.monthly_volume" #monthly_volume="ngModel">
+                </div>
+            </div> 
+            <!-- Price-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="price" class="form-label">Price
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="price" [disabled]="itemDisable"   
+                    name="price" [(ngModel)]="salesLeadModel.price" #price="ngModel">
+                </div>
+            </div> 
+        </div>
+    </fieldset>
+    <br>
+    <fieldset class="border">
+        <legend class="legend-left">
+            {{ 'Trade-In Machine' }}
+        </legend>
+        <div class="row">
+           <!-- Model-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="trade_in_model" class="form-label">Model
+                        
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="trade_in_model" [disabled]="itemDisable"   
+                    name="trade_in_model" [(ngModel)]="salesLeadModel.trade_in_model" #trade_in_model="ngModel">
+                </div>
+            </div> 
+            <!-- Color / BW-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="trade_in_type" class="form-label">Color / BW
+                        
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="trade_in_type" [disabled]="itemDisable"   
+                    name="trade_in_type" [(ngModel)]="salesLeadModel.trade_in_type" #trade_in_type="ngModel">
+                </div>
+            </div>  
+            <!-- Tag No-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="tag_no" class="form-label">Tag No
+                        
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="tag_no" [disabled]="itemDisable"   
+                    name="tag_no" [(ngModel)]="salesLeadModel.tag_no" #tag_no="ngModel">
+                </div>
+            </div> 
+            <!-- Condition-->
+            <div class="col-md-4">
+                <div class="label-wrapper">
+                    <label for="condition" class="form-label">Condition
+                        
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="condition" [disabled]="itemDisable"   
+                    name="condition" [(ngModel)]="salesLeadModel.condition" #condition="ngModel">
+                </div>
+            </div> 
+        </div>
+    </fieldset>
+    <br>
+    <div class="row">
+        <!-- Sales Person-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="price" class="form-label">Sales Person
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <ng-select  [items]="SalesManList" bindLabel="salesman_name" bindValue="salesman_id" [(ngModel)]="salesLeadModel.salesman_id" class="select-input"
+                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                </ng-select>
+            </div>
+        </div> 
+        <!-- Sales Manager-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="price" class="form-label">Sales Manager
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <ng-select  [items]="SalesManList" bindLabel="salesman_name" bindValue="salesman_id" [(ngModel)]="salesLeadModel.sales_manager_id" class="select-input"
+                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                </ng-select>
+            </div>
+        </div> 
+        <!-- Status-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="status" class="form-label">Status
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="status" [disabled]="statusDisable"   
+                name="status" [(ngModel)]="salesLeadModel.status" #status="ngModel">
+            </div>
+        </div>
+        <!-- Comments-->
+        <div class="col-md-4">
+            <div class="label-wrapper">
+                <label for="comments" class="form-label">Comments
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="comments" [disabled]="itemDisable"   
+                name="comments" [(ngModel)]="salesLeadModel.comments" #comments="ngModel">
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <!-- Created By-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="created_by" class="form-label">Created By
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="created_by" [disabled]="true"  
+                    name="created_by" [(ngModel)]="salesLeadModel.created_by" #created_by="ngModel">
+            </div>
+        </div>
+        <!-- Created On-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="created_date" class="form-label">Created On
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="created_date" [disabled]="true"  
+                    name="created_date" [(ngModel)]="salesLeadModel.created_date" #created_date="ngModel">
+            </div>
+        </div>
+        <!-- Updated By -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="modified_by" class="form-label">Modified By
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="modified_by" [disabled]="true"  
+                    name="modified_by" [(ngModel)]="salesLeadModel.modified_by" #modified_by="ngModel">
+            </div>
+        </div>
+        <!-- Updated On -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="modified_date" class="form-label">Modified On
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="modified_date" [disabled]="true"  
+                    name="modified_date" [(ngModel)]="salesLeadModel.modified_date" #modified_date="ngModel">
+            </div>
+        </div>
+    </div>
+    <br>
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer" style="overflow: hidden;">
+      <div class="btn-group pull-right">
+        <div class="badge bg-color-greenLight action mine"></div>
+        <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+          <i class="fa fa-save"></i>Save
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+          <i class="fa fa-ban"></i>Cancel
+        </button>
+      </div>
+    </div> 
+  </form>
+</div>

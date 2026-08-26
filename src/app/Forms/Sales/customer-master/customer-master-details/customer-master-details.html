@@ -1,0 +1,417 @@
+<div class="container-fluid">
+  <form ngForm #CustomerMasterForm="ngForm" name="form" (ngSubmit)="CustomerMasterForm.form.valid && onSubmit(CustomerMasterForm)" novalidate>
+    <fieldset class="border">
+      <legend class="legend-left">
+        {{ 'Customer Details' }}
+      </legend>
+      <div class="row">
+        <!-- Customer ID-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="cardno" class="form-label">Customer ID
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="cardno" [disabled]="true"  
+                name="cardno" [(ngModel)]="customerMasterModel.cardno" #cardno="ngModel">
+          </div>
+        </div>  
+        <!-- Name -->
+        <div class="col-md-3">
+          <div class="label-wrapper">
+            <label for="name" class="form-label">Name
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="name" [disabled]="itemDisable"  
+                name="name" [(ngModel)]="customerMasterModel.name" #name="ngModel"  [ngClass]="{'is-invalid': isNameInvalid}" >
+          </div>
+        </div>
+        <!-- Name in Arabic -->
+        <div class="col-md-3">
+          <div class="label-wrapper">
+            <label for="enter_amount" class="form-label">Name in Arabic
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="enter_amount" [disabled]="itemDisable"  
+                name="enter_amount" [(ngModel)]="customerMasterModel.arabic_name" #enter_amount="ngModel"  [ngClass]="{'is-invalid': isArabicNameInvalid}" >
+          </div>
+        </div>
+        <!-- Market Channel -->
+        <div class="col-md-3">
+          <div class="label-wrapper d-flex align-items-center">
+              <label for="market_channel_name" class="form-label mb-0">Market Channel
+                <span class="required-star">*</span>
+              </label>
+          </div>
+          <div class="input-wrapper">
+              <ng-select  [items]="MarketList" bindLabel="description" bindValue="market_channel_name" [(ngModel)]="customerMasterModel.market_channel_name" class="select-input"
+                [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"  [ngClass]="{'is-invalid': isMarketChannelInvalid}" > 
+              </ng-select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <!--Customer Contractor -->
+        <div class="col-md-2"> 
+          <div class="form-group">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" class="checkbox style-0" [(ngModel)]="customerMasterModel.contract_cust" 
+                  name="contract_cust" #contract_cust="ngModel" [disabled]="itemDisable"  style="margin-top:1px"> 
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Customer Contractor</span>
+            </label>
+          </div>
+        </div>
+        <!--Accrued Revenue -->
+        <div class="col-md-2">
+          <div class="form-group ">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" class="checkbox style-0" [(ngModel)]="customerMasterModel.accrued_rev" 
+              name="accrued_rev" #accrued_rev="ngModel" [disabled]="itemDisable" style="margin-top:1px">
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Accrued Revenue</span> 
+            </label>
+          </div>
+        </div>
+        <!--Priority Customer-->
+        <div class="col-md-2">
+          <div class="form-group ">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" class="checkbox style-0" [(ngModel)]="customerMasterModel.major_customer" 
+              name="major_customer" #major_customer="ngModel" [disabled]="priorityDisable" style="margin-top:1px"> 
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Priority Customer</span> 
+            </label>
+          </div>
+        </div>
+      </div>
+    </fieldset> 
+    <br>
+    <div class="row">
+      <!-- Main Group -->
+        <div class="col-md-2">
+            <div class="label-wrapper d-flex align-items-center">
+                <label for="productClass" class="form-label  mb-0">Main Group</label>
+            </div>
+            <select class="label-input" id="main_group_code"
+            name="main_group_code" [(ngModel)]="customerMasterModel.main_group_code" #main_group_code="ngModel" [disabled]="true" >
+                <option [value]="83">{{ 'SUNDRY DEBTORS' }}</option>
+            </select>
+        </div>
+      <!-- Sub Group-->
+      <div class="col-md-2">
+        <div class="label-wrapper d-flex align-items-center">
+            <label for="sub_group_code" class="form-label mb-0">Sub Group
+              <span class="required-star">*</span>
+            </label>
+        </div>
+        <div class="input-wrapper">
+            <ng-select  [items]="SubGroupList" bindLabel="sub_group_name" bindValue="sub_group_code" [(ngModel)]="customerMasterModel.sub_group_code" class="select-input"
+              [disabled]="AccDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+            </ng-select>
+        </div>
+      </div>
+      <!-- Collector-->
+      <div class="col-md-2">
+        <div class="label-wrapper d-flex align-items-center">
+            <label for="sub_group_code" class="form-label mb-0">Collector
+              <span class="required-star">*</span>
+            </label>
+        </div>
+        <div class="input-wrapper">
+            <ng-select  [items]="CollectorList" bindLabel="collector_name" bindValue="collector_id" [(ngModel)]="customerMasterModel.collector_id" class="select-input"
+              [disabled]="AccDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" [ngClass]="{'is-invalid': isCollectorInvalid}" > 
+            </ng-select>
+        </div>
+      </div>
+      <!-- Account Code-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="ac_code" class="form-label">Account Code
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="ac_code" [disabled]="true"  
+                name="ac_code" [(ngModel)]="customerMasterModel.ac_code" #ac_code="ngModel">
+          </div>
+        </div> 
+    </div>
+    <br> 
+    <fieldset class="border">
+      <legend class="legend-left">
+        {{ 'Address Details' }}
+      </legend>
+      <div class="row">
+        <!-- Contact Person-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="contact_person" class="form-label">Contact Person
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="contact_person" [disabled]="itemDisable"  
+                name="contact_person" [(ngModel)]="customerMasterModel.contact_person" #contact_person="ngModel">
+          </div>
+        </div> 
+        <!-- Mobile No-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="mobileno" class="form-label">Mobile No
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="mobileno" [disabled]="itemDisable"  
+                name="mobileno" [(ngModel)]="customerMasterModel.mobileno" #mobileno="ngModel">
+          </div>
+        </div> 
+        <!-- Telephone-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="telephone" class="form-label">Telephone
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="telephone" [disabled]="itemDisable"  
+                name="telephone" [(ngModel)]="customerMasterModel.telephone" #telephone="ngModel">
+          </div>
+        </div>
+        <!-- Fax-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="fax_no" class="form-label">Fax
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="fax_no" [disabled]="itemDisable"  
+                name="fax_no" [(ngModel)]="customerMasterModel.fax_no" #fax_no="ngModel">
+          </div>
+        </div>
+        <!-- Title-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="title" class="form-label">Title
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="title" [disabled]="itemDisable"  
+                name="title" [(ngModel)]="customerMasterModel.title" #title="ngModel">
+          </div>
+        </div>
+        <!-- Department-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="department" class="form-label">Department
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="department" [disabled]="itemDisable"  
+                name="department" [(ngModel)]="customerMasterModel.department" #department="ngModel">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <!-- Area Code -->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="area_code" class="form-label">Area Code 
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="area_code" [disabled]="true"  
+                name="area_code" [(ngModel)]="customerMasterModel.area_code" #area_code="ngModel">
+          </div>
+        </div>
+        <!-- Area Name -->
+        <div class="col-md-2">
+          <div class="label-wrapper d-flex align-items-center">
+              <label for="area_id" class="form-label mb-0">Area Name
+                <span class="required-star">*</span>
+              </label>
+          </div>
+          <div class="input-wrapper">
+              <ng-select  [items]="AreaList" bindLabel="area_name" bindValue="area_id" [(ngModel)]="customerMasterModel.area_id" class="select-input" [ngClass]="{'is-invalid': isAreaNameInvalid}"
+                [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"  (change)="onAreaChange($event)" > 
+              </ng-select>
+          </div>
+        </div>
+        <!-- House No-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="house_no" class="form-label">House No
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="house_no" [disabled]="itemDisable"  
+                name="house_no" [(ngModel)]="customerMasterModel.house_no" #house_no="ngModel">
+          </div>
+        </div>
+        <!-- Street -->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="street" class="form-label">Street 
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="street" [disabled]="itemDisable"  
+                name="street" [(ngModel)]="customerMasterModel.street" #street="ngModel">
+          </div>
+        </div>
+        <!-- Building No-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="building_no" class="form-label">Building No
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="building_no" [disabled]="itemDisable"  
+                name="building_no" [(ngModel)]="customerMasterModel.building_no" #building_no="ngModel">
+          </div>
+        </div>
+        <!-- Building Name-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="building_name" class="form-label">Building Name
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="building_name" [disabled]="itemDisable"  
+                name="building_name" [(ngModel)]="customerMasterModel.building_name" #building_name="ngModel">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <!-- Block No-->
+        <div class="col-md-1">
+          <div class="label-wrapper">
+            <label for="block_no" class="form-label">Block No
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="block_no" [disabled]="itemDisable"  
+                name="block_no" [(ngModel)]="customerMasterModel.block_no" #block_no="ngModel">
+          </div>
+        </div>
+        <!-- Floor No-->
+        <div class="col-md-1">
+          <div class="label-wrapper">
+            <label for="floor_no" class="form-label">Floor No
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="floor_no" [disabled]="itemDisable"  
+                name="floor_no" [(ngModel)]="customerMasterModel.floor_no" #floor_no="ngModel">
+          </div>
+        </div>
+        <!-- Flat No-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="flat_no" class="form-label">Flat No
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="flat_no" [disabled]="itemDisable"  
+                name="flat_no" [(ngModel)]="customerMasterModel.flat_no" #flat_no="ngModel">
+          </div>
+        </div>
+        <!-- Email-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="email_id" class="form-label">Email
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="email_id" [disabled]="itemDisable"  
+                name="email_id" [(ngModel)]="customerMasterModel.email_id" #email_id="ngModel" [ngClass]="{'is-invalid': isEmailInvalid}" >
+          </div>
+        </div>
+        <!-- Paci No-->
+        <div class="col-md-2">
+          <div class="label-wrapper">
+            <label for="paci_no" class="form-label">PACI No
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="paci_no" [disabled]="itemDisable"  
+                name="paci_no" [(ngModel)]="customerMasterModel.paci_no" #paci_no="ngModel">
+          </div>
+        </div>
+        <!-- Address-->
+        <div class="col-md-4">
+          <div class="label-wrapper">
+            <label for="address" class="form-label">Address
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="address" [disabled]="itemDisable"  
+                name="address" [(ngModel)]="customerMasterModel.address" #address="ngModel">
+          </div>
+        </div>
+      </div>
+    </fieldset>
+    <br>
+    <div class="row">
+      <!-- Black List -->
+      <div class="col-md-1"> 
+        <div class="form-group">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" class="checkbox style-0" [(ngModel)]="customerMasterModel.blacklist" 
+                name="blacklist" #blacklist="ngModel" [disabled]="itemDisable"  style="margin-top:1px" (change)="onBlacklistChange($event)"> 
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Black List</span>
+          </label>
+        </div>
+      </div>
+      <!-- Black List Reason -->
+      <div class="col-md-4">
+        <div class="label-wrapper">
+          <label for="blacklist_reason" class="form-label" style="color:red;">Black List Reason
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="blacklist_reason" [disabled]="ReasonDisable"  
+              name="blacklist_reason" [(ngModel)]="customerMasterModel.blacklist_reason" #blacklist_reason="ngModel">
+        </div>
+      </div>
+
+      <div class="col-md-7 d-flex ms-auto justify-content-end">
+      <!-- Salesman Name -->
+        <div class="col-md-3">
+          <div class="label-wrapper">
+            <label for="salesman_name" class="form-label">Salesman Name
+            </label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="label-input" id="salesman_name" [disabled]="true"  
+                name="salesman_name" [(ngModel)]="customerMasterModel.salesman_name" #salesman_name="ngModel">
+          </div>
+        </div>
+        <!-- Major Cust-->
+        <div class="col-md-1">
+          <div class="label-wrapper">
+            <label for="salesman_name" class="form-label">   
+            </label>
+          </div>
+          <div class="input-wrapper" style="margin-top:22px ;">
+            <input type="text" class="label-input" id="major_cust" [disabled]="true"  
+                name="major_cust" [(ngModel)]="customerMasterModel.major_cust" #major_cust="ngModel">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer" style="overflow: hidden;">
+      <div class="btn-group pull-right">
+        <div class="badge bg-color-greenLight action mine"></div>
+        <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+          <i class="fa fa-save"></i>Save
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+          <i class="fa fa-ban"></i>Cancel
+        </button>
+      </div>
+    </div> 
+  </form>
+</div>

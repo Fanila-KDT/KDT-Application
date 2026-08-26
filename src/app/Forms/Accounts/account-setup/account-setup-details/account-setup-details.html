@@ -1,0 +1,487 @@
+<div class="container-fluid">
+    <form ngForm #SupplierMasterForm="ngForm" name="form" (ngSubmit)="SupplierMasterForm.form.valid && onSubmit(SupplierMasterForm)" novalidate>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" id="componentTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="mainaccounts-tab" data-bs-toggle="tab" data-bs-target="#mainaccounts" type="button" role="tab" (click)="setActiveTab('MainAccounts')">
+            Main Accounts
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="hraccounts-tab" data-bs-toggle="tab" data-bs-target="#hraccounts" type="button" role="tab" (click)="setActiveTab('HRAccounts')">
+            HR Accounts
+            </button>
+        </li>
+        </ul>
+
+        <div class="tab-content p-2 border border-top-0" id="componentTabsContent">
+            <div class="tab-pane fade show active" id="mainaccounts" role="tabpanel">
+                <div class="fieldset-wrapper">
+                    <fieldset class="boaderinner-fieldset"   style="border: 1px solid #a3bcd6 !important; background-color: #f5f5f5!important;"> 
+                        <legend class="legend-left">Leased To Back Account</legend>
+                        <div class="row">
+                            <!-- Accumulated Depreciation A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Accumulated Depreciation A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.ltB_ACC_DEPR_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                            <!-- Leased to Back Asset A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Leased to Back Asset A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.ltB_ASSET_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                            <!-- Depreciation Expense A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Depreciation Expense A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.ltB_EXP_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                        </div>
+                    </fieldset>
+                    <br>
+                    <fieldset class="boaderinner-fieldset"   style="border: 1px solid #a3bcd6 !important; background-color: #f5f5f5!important;"> 
+                        <legend class="legend-left">Leased To Own Account</legend>
+                        <div class="row">
+                            <!-- Accumulated Depreciation A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Accumulated Depreciation A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.ltO_ACC_DEPR_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                            <!-- Leased to Back Asset A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Leased to Own Asset A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.ltO_ASSET_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                            <!-- Depreciation Expense A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Depreciation Expense A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.ltO_EXP_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                        </div>
+                    </fieldset>
+                    <br>
+                    <fieldset class="boaderinner-fieldset"   style="border: 1px solid #a3bcd6 !important; background-color: #f5f5f5!important;"> 
+                        <legend class="legend-left">Leased To KDT Account</legend>
+                        <div class="row">
+                            <!-- Leased To KDT Asset A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Leased To KDT Asset A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.ltK_CST_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div>  
+                        </div>
+                    </fieldset>
+                    <br>
+                    <fieldset class="boaderinner-fieldset"   style="border: 1px solid #a3bcd6 !important; background-color: #f5f5f5!important;"> 
+                        <legend class="legend-left">Service Contract Account</legend>
+                        <div class="row">
+                            <!-- Service Contract Liability A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Service Contract Liability A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.sC_LIABILITY_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div>  
+                        </div>
+                    </fieldset>
+                    <br>
+                    <fieldset class="boaderinner-fieldset"   style="border: 1px solid #a3bcd6 !important; background-color: #f5f5f5!important;"> 
+                        <legend class="legend-left">Sales Account</legend>
+                        <div class="row">
+                            <!-- Service Contract -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Service Contract
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.sC_SALES_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                            <!-- Click Contract -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Click Contract
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.clK_SALES_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                            <!-- Laesed to Back -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Laesed to Back
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.ltB_SALES_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                            <!-- Laesed to Own -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Laesed to Own
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.ltO_SALES_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <br>
+                    <fieldset class="boaderinner-fieldset"   style="border: 1px solid #a3bcd6 !important; background-color: #f5f5f5!important;"> 
+                        <legend class="legend-left">Commision Account</legend>
+                        <div class="row">
+                            <!-- Commision A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Commision A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.commissioN_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <!-- Commision Payable A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Commision Payable A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.commissioN_PAY_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div>    
+                        </div>
+                    </fieldset>
+                    <br>
+                    <fieldset class="boaderinner-fieldset"   style="border: 1px solid #a3bcd6 !important; background-color: #f5f5f5!important;"> 
+                        <legend class="legend-left">Other Account</legend>
+                        <div class="row">
+                            <!-- Trade-In A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Trade-In A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.tradE_IN_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                            <!-- Demo/Standby A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Demo/Standby A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.demO_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                            <!-- Exchange Gain/Loss A/c -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Exchange Gain/Loss A/c
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.exchangE_GAIN_AC_CODE" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div> 
+                            <!-- Company Expense -->
+                            <div class="col-md-3">
+                                <div class="label-wrapper d-flex align-items-center">
+                                    <label for="area_id" class="form-label mb-0">Company Expense
+                                    </label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.companY_EXPENSE_AC" class="select-input"
+                                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <br>
+                </div>
+                
+            </div>  
+            <div class="tab-pane fade" id="hraccounts" role="tabpanel">
+                <fieldset class="boaderinner-fieldset"   style="border: 1px solid #a3bcd6 !important; background-color: #f5f5f5!important;"> 
+                    <legend class="legend-left">HR Account</legend>
+                    <div class="row">
+                        <!-- Bank Account -->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Bank Account
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.banK_AC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div> 
+                        <!-- Bank Charges A/c -->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Bank Charges A/c
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.banK_CHARGES_AC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div> 
+                        <!-- Leave Expense A/c -->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Leave Expense A/c
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.leavE_EXPENSE_AC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div> 
+                        <!-- Leave Provision A/c -->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Leave Provision A/c
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.leavE_PROVISION_AC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Indemnity Expense A/c -->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Indemnity Expense A/c
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.indemnitY_EXPENSE_AC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div>
+                        <!-- Indemnity Provision A/c -->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Indemnity Provision A/c
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.indemnitY_PROVISION_AC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <br>
+                <fieldset class="boaderinner-fieldset"   style="border: 1px solid #a3bcd6 !important; background-color: #f5f5f5!important;"> 
+                    <legend class="legend-left">HR-KOC Account</legend>
+                    <div class="row">
+                        <!-- Bank Account  (KOC)-->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Bank Account (KOC)
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.banK_AC_KOC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div> 
+                        <!-- Bank Charges A/c  (KOC)-->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Bank Charges A/c (KOC) 
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.banK_CHARGES_AC_KOC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div> 
+                        <!-- Leave Expense A/c  (KOC)-->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Leave Expense A/c (KOC)
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.leavE_EXPENSE_AC_KOC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div> 
+                        <!-- Leave Provision A/c  (KOC)-->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Leave Provision A/c (KOC)
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.leavE_PROVISION_AC_KOC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Indemnity Expense A/c  (KOC)-->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Indemnity Expense A/c (KOC)
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.indemnitY_EXPENSE_AC_KOC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div>
+                        <!-- Indemnity Provision A/c  (KOC) -->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Indemnity Provision A/c (KOC)
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.indemnitY_PROVISION_AC_KOC" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                 <br>
+                <fieldset class="boaderinner-fieldset"   style="border: 1px solid #a3bcd6 !important; background-color: #f5f5f5!important;"> 
+                    <legend class="legend-left">HR-OIL & GAS Account</legend>
+                    <div class="row">
+                        <!-- Leave Expense A/c (O&G) -->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Leave Expense A/c (O&G)
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.leavE_EXPENSE_AC_OnG" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div>
+                        <!-- Indemnity Expense A/c (O&G) -->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="area_id" class="form-label mb-0">Indemnity Expense A/c (O&G)
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="AccountList" bindLabel="account_name" bindValue="account_code" [(ngModel)]="accountSetupModel.indemnitY_EXPENSE_AC_OnG" class="select-input"
+                                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   > 
+                                </ng-select>
+                            </div>
+                        </div>    
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <br>
+        <!-- Footer Buttons -->
+        <div class="inbox-compose-footer" style="overflow: hidden;">
+            <div class="btn-group pull-right">
+                <div class="badge bg-color-greenLight action mine"></div>
+                <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+                <i class="fa fa-save"></i>Save
+                </button>
+                <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+                <i class="fa fa-ban"></i>Cancel
+                </button>
+            </div>
+        </div>   
+    </form>
+</div>    

@@ -1,0 +1,915 @@
+
+ <div class="container-fluid">
+  <form ngForm #salesInvoiceForm="ngForm" name="form" (ngSubmit)="salesInvoiceForm.form.valid && onSubmit(salesInvoiceForm)" novalidate>
+    <div class="row">
+        <!-- Doc No-->
+        <div class="col-md-1    ">
+            <div class="label-wrapper">
+                <label for="document_number" class="form-label">Doc No
+                    
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="document_number" [disabled]="true"   
+                name="document_number" [(ngModel)]="salesInvoiceModel.document_number" #document_number="ngModel">
+            </div>
+        </div> 
+        <!-- Entry Date -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="voucherDate" class="form-label">Entry Date
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <div class="datepicker-wrapper">
+                    <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="itemDisable"
+                    [bsConfig]="{
+                        dateInputFormat: 'DD/MM/YYYY',
+                        showWeekNumbers: false
+                    }"
+                    (bsValueChange)="onDateSelected($event)" [ngModel]="salesInvoiceModel.voucherDate" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
+                    />
+                    <button type="button" class="btn btn-outline-secondary" (click)="dp.show()" [disabled]="itemDisable">
+                    📅
+                    </button>
+                </div> 
+            </div>
+        </div>
+        <!-- Customer Name-->
+        <div class="col-md-3" >
+            <div class="label-wrapper"  >
+                <label for="cust_code" class="form-label">Customer Name
+                    <span class="required-star">*</span>
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <ng-select  [items]="CustomerList" bindLabel="name" bindValue="creditcustomerid" [(ngModel)]="salesInvoiceModel.cust_code" class="select-input"  
+                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"> 
+                </ng-select>
+            </div>
+        </div>
+
+        <!-- Warehouse Name-->
+        <div class="col-md-3" >
+            <div class="label-wrapper"  >
+                <label for="godown_code" class="form-label">Warehouse Name
+                    <span class="required-star">*</span>
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <ng-select  [items]="warehouseList" bindLabel="godown_name" bindValue="godown_code" [(ngModel)]="salesInvoiceModel.godown_code" class="select-input"  
+                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"> 
+                </ng-select>
+            </div>
+        </div>
+
+        <!-- Narration-->
+        <div class="col-md-3" >
+            <div class="label-wrapper"  >
+                <label for="voucher_reference" class="form-label">Narration
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="voucher_reference" [disabled]="true" name="voucher_reference" [(ngModel)]="salesInvoiceModel.voucher_reference" #voucher_reference="ngModel">
+            </div>
+        </div>
+    </div>
+    <fieldset class="border">
+        <legend class="legend-left">
+            {{ 'Payment Details' }}
+        </legend>
+        <div class="row">
+            <!-- Payment Mode-->
+            <div class="col-md-2" >
+                <div class="label-wrapper"  >
+                    <label for="item_no" class="form-label">Payment Mode
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="payCodeList" bindLabel="pay_name" bindValue="pay_code" [(ngModel)]="salesInvoiceModel.pay_code" class="select-input"  
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"> 
+                    </ng-select>
+                </div>
+            </div> 
+            <!--Cash Invoice-->
+            <!-- <div class="col-md-2"> 
+                <div class="form-group">
+                    <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="salesInvoiceModel.cash_inv" 
+                        name="cash_inv" #cash_inv="ngModel" [disabled]="itemDisable"  style="margin-top:1px" > 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Cash Invoice</span>
+                    </label>
+                </div>
+            </div>  -->
+            <!-- Commission -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="commission" class="form-label">Commission
+                        
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="commission" [disabled]="true"   
+                    name="commission" [(ngModel)]="salesInvoiceModel.commission" #commission="ngModel">
+                </div>
+            </div> 
+            <!-- Total Cost -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="cst" class="form-label">Total Cost
+                        
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="cst" [disabled]="true"   
+                    name="cst" [(ngModel)]="salesInvoiceModel.cst" #cst="ngModel">
+                </div>
+            </div> 
+            <!-- Paid Amount -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="paid_amt" class="form-label">Paid Amount
+                        
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="paid_amt" [disabled]="true"   
+                    name="paid_amt" [(ngModel)]="salesInvoiceModel.paid_amt" #paid_amt="ngModel">
+                </div>
+            </div>
+            <!-- Cust Balance -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="cust_bal" class="form-label">Cust Balance
+                        
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="cust_bal" [disabled]="true"   
+                    name="cust_bal" [(ngModel)]="salesInvoiceModel.cust_bal" #cust_bal="ngModel">
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="componentTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales" type="button" role="tab" (click)="setActiveTab('Sales')">
+          Sales
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="delivery-tab" data-bs-toggle="tab" data-bs-target="#delivery" type="button" role="tab" (click)="setActiveTab('DeliveryDetails')">
+          Delivery Details
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content p-2 border border-top-0" id="componentTabsContent">
+        <div class="tab-pane fade show active" id="sales" role="tabpanel">
+
+            <ngx-datatable
+                class="table table-bordered styled-grid"
+                [rows]="rows"
+                [scrollbarV]="scroll"
+                [virtualization]="true"
+                [style.height.px]="gridHeight"
+                [columnMode]="'force'"
+                [headerHeight]="80"
+                [footerHeight]="60"
+                [rowHeight]="30"
+                [limit]="controls.pageSize"
+                [externalPaging]="false"
+                [selected]="selected"
+                [messages]="{ emptyMessage: 'No data to display' }"
+                [reorderable]="reorderable"
+                [selectionType]="SelectionType.single"
+                [rowIdentity]="getRowIdentity"
+                (activate)="onSubListActivate($event)">
+            
+                <!-- Sl No -->
+                <ngx-datatable-column name="Sl No"  prop="seqno" [maxWidth]="80">
+                    <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                    <input 
+                    type="text" 
+                        class="form-control" 
+                        value ="{{ rowIndex + 1 }}" disabled 
+                        />
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <!-- Item Code -->
+                <ngx-datatable-column name="Item Code" prop="item_no" [width]="200">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                    <ng-select
+                        [items]="ItemList"
+                        bindLabel="item_code"
+                        bindValue="item_no"
+                        [(ngModel)]="row.item_no"
+                        (change)="ItemCodeEnter(row.item_no, row)"
+                        [disabled]="itemDisable"
+                        class="form-control grid-select"
+                        [ngModelOptions]="{ standalone: true }"
+                        [appendTo]="'body'">
+                    </ng-select>
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <!-- Model Name -->
+                <ngx-datatable-column name="Model Name" prop="item_name"  [minWidth]="500">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                        <input
+                        list="ItemList"
+                        type="text"
+                        class="form-control"
+                        [(ngModel)]="row.item_name"
+                        [ngModelOptions]="{standalone: true}"
+                        (change)="ModelNameChange(row)"
+                        [disabled]="itemDisable" />
+
+                        <datalist id="ItemList">
+                        <option *ngFor="let item of ItemList" [value]="item.item_code + ' - ' + item.item_name">
+                        </option>
+                        </datalist>
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <!-- Unit -->
+                <ngx-datatable-column name="Unit" prop="unit_name" >
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                    <input
+                        type="text"
+                        class="form-control grid-input"
+                        [(ngModel)]="row.unit_name"
+                        [disabled]="true"
+                        [ngModelOptions]="{ standalone: true }" 
+                        />
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <!-- Rate -->
+                <ngx-datatable-column name="Rate" prop="enter_rate" >
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                    <input
+                        type="number"
+                        class="form-control grid-input"
+                        [(ngModel)]="row.enter_rate"
+                        [disabled]="itemDisable" 
+                        [ngModelOptions]="{ standalone: true }" 
+                        />
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <!-- Issue Qty -->
+                <ngx-datatable-column name="Issue Qty" prop="issue_quantity" >
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                    <input
+                        type="number"
+                        class="form-control grid-input"
+                        [(ngModel)]="row.issue_quantity"
+                        [disabled]="itemDisable" (input)="QtyChange(row)"
+                        [ngModelOptions]="{ standalone: true }" 
+                        />
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <!-- Receipt Qty -->
+                <ngx-datatable-column name="Receipt Qty" prop="issue_quantity" >
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                    <input
+                        type="number"
+                        class="form-control grid-input"
+                        [(ngModel)]="row.issue_quantity"
+                        [disabled]="itemDisable" (input)="QtyChange(row)"
+                        [ngModelOptions]="{ standalone: true }" 
+                        />
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <!--Cost Rate -->
+                <ngx-datatable-column name="Cost Rate" prop="cost_rate" *ngIf="true">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                    <input
+                        type="number"
+                        class="form-control grid-input"
+                        [(ngModel)]="row.cost_rate"
+                        [disabled]="itemDisable" (input)="QtyChange(row)"
+                        [ngModelOptions]="{ standalone: true }" />
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <!-- Total -->
+                <ngx-datatable-column name="Total" prop="pamount" >
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                    <input
+                        type="number"
+                        class="form-control grid-input"
+                        [(ngModel)]="row.pamount"
+                        [disabled]="itemDisable" (input)="TotalChange(row)"
+                        [ngModelOptions]="{ standalone: true }" />
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <!-- Delete -->
+                <ngx-datatable-column name="Delete" [width]="95">
+                    <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-sm delete-btn"
+                        (click)="deleteRow(rowIndex)"
+                        [disabled]="itemDisable">
+                        🗑️
+                    </button>
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <!-- Footer -->
+                <ngx-datatable-footer>
+                    <ng-template ngx-datatable-footer-template>
+                    <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 datatable-footer-border">
+                        <span>Total Rows: {{ rows.length }}</span>
+                        <div class="btn-group">
+                        <button type="button" class="btn btn-add" (click)="addRow()" [disabled]="itemDisable">➕ Add</button>
+                        </div>
+                    </div>
+                    </ng-template>
+                </ngx-datatable-footer>
+            </ngx-datatable>
+
+            <div class="row">
+                <!-- Approval Status -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                    <label for="approval_status" class="form-label">Status
+                    </label>
+                    </div>
+                    <div class="input-wrapper">
+                    <input type="text" class="label-input" id="approval_status" [disabled]="statusDisable"  
+                        name="approval_status" [(ngModel)]="salesInvoiceModel.approval_status" #approval_status="ngModel">
+                    </div>
+                </div>
+
+                <!-- Total Qty-->
+                <div class="col-md-1 ms-auto">
+                    <div class="label-wrapper">
+                    <label for="totalQty" class="form-label">Total Qty
+                    </label>
+                    </div>
+                    <div class="input-wrapper">
+                    <input type="number" class="label-input" id="totalQty" [disabled]="true"  
+                        name="totalQty" [(ngModel)]="totalQty" #totalQtys="ngModel">
+                    </div>
+                </div>
+
+                <!-- Total Amount-->
+                <div class="col-md-1">
+                    <div class="label-wrapper">
+                    <label for="line_amount" class="form-label">Total Amount
+                    </label>
+                    </div>
+                    <div class="input-wrapper">
+                    <input type="number" class="label-input" id="line_amount" [disabled]="true"  
+                        name="line_amount" [(ngModel)]="salesInvoiceModel.line_amount" #line_amount="ngModel">
+                    </div>
+                </div>
+
+                <!-- Discount-->
+                <div class="col-md-1">
+                    <div class="label-wrapper">
+                    <label for="discount" class="form-label">Discount
+                    </label>
+                    </div>
+                    <div class="input-wrapper">
+                    <input type="number" class="label-input" id="discount" [disabled]="itemDisable"  
+                        name="discount" [(ngModel)]="salesInvoiceModel.discount" #discount="ngModel" >
+                    </div>
+                </div>
+
+                <!-- Net Amount-->
+                <div class="col-md-1">
+                    <div class="label-wrapper">
+                    <label for="enter_amount" class="form-label">Net Amount
+                    </label>
+                    </div>
+                    <div class="input-wrapper">
+                    <input type="number" class="label-input" id="enter_amount" [disabled]="true"  
+                        name="enter_amount" [(ngModel)]="salesInvoiceModel.enter_amount" #enter_amount="ngModel">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="delivery" role="tabpanel">
+            <div class="row">
+                <!-- Engineer Name-->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="engineer" class="form-label">Engineer Name 
+                            <span class="required-star">*</span>
+                        </label>
+                    </div>
+                    <ng-select  [items]="EngineerList" bindLabel="engineer" bindValue="engineer_id" [(ngModel)]="salesInvoiceModel.engineer_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                    </ng-select>
+                </div>
+
+                <!-- Salesman Code -->
+                <div class="col-md-1">
+                    <div class="label-wrapper">
+                        <label for="salesman_id" class="form-label">Salesman Code
+                            <span class="required-star">*</span>
+                        </label>
+                    </div>
+                    <ng-select  [items]="SalesManList" bindLabel="salesman_code" bindValue="salesman_id" [(ngModel)]="salesInvoiceModel.salesman_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                    </ng-select>
+                </div>
+
+                 <!-- Salesman Name -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="salesman_id" class="form-label">Salesman Name 
+                            <span class="required-star">*</span>
+                        </label>
+                    </div>
+                    <ng-select  [items]="SalesManList" bindLabel="salesman_name" bindValue="salesman_id" [(ngModel)]="salesInvoiceModel.salesman_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                    </ng-select>
+                </div>
+
+                <!-- Order Type  -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="order_type" class="form-label">Order Type
+                            
+                        </label>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="text" class="label-input" id="order_type" [disabled]="true" name="order_type" [(ngModel)]="salesInvoiceModel.order_type" #order_type="ngModel">
+                    </div>
+                </div>
+
+                <!-- PO Ref.  -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="po_ref" class="form-label">PO Ref.
+                            
+                        </label>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="text" class="label-input" id="po_ref" [disabled]="true" name="po_ref" [(ngModel)]="salesInvoiceModel.po_ref" #po_ref="ngModel">
+                    </div>
+                </div>
+
+                <!-- Payment Type -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="payment_type" class="form-label">Payment Terms
+                        </label>
+                    </div>
+                    <ng-select  [items]="PaymentTypeList" bindLabel="pay_term" bindValue="payterm_id" [(ngModel)]="salesInvoiceModel.payterm_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"  > 
+                    </ng-select>
+                </div>
+
+                 <div class="col-md-1">
+                    <button type="button" class="btn btn-primary"  style="margin-top: 21px;">
+                         Pay Terms
+                    </button>
+                </div>
+                
+            </div>
+            <div class="row">
+                <!-- Free Request -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="free_req" class="form-label">Free Request
+                        </label>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="text" class="label-input" id="free_req" [disabled]="true"   
+                        name="free_req" [(ngModel)]="salesInvoiceModel.free_req" #free_req="ngModel">
+                    </div>
+                </div> 
+
+                <!-- Tag No-->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="engineer" class="form-label">Tag No
+                        </label>
+                    </div>
+                    <ng-select  [items]="TagList" bindLabel="tag_no" bindValue="tag_id" [(ngModel)]="salesInvoiceModel.tag_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                    </ng-select>
+                </div>
+
+                <!-- Driver Name -->
+                <div class="col-md-2">
+                    <div class="label-wrapper">
+                        <label for="payment_type" class="form-label"> Driver Name 
+                        </label>
+                    </div>
+                    <ng-select  [items]="DriverList" bindLabel="driver_name" bindValue="driver_id" [(ngModel)]="salesInvoiceModel.driver_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"  > 
+                    </ng-select>
+                </div>
+            </div>
+            <br>
+            <fieldset class="border">
+                <legend class="legend-left">
+                    {{ 'Address Details' }}
+                </legend>
+                <div class="row">
+                    <!-- Area Code -->
+                    <div class="col-md-1">
+                        <div class="label-wrapper">
+                            <label for="salesman_id" class="form-label">Area Code
+                                <span class="required-star">*</span>
+                            </label>
+                        </div>
+                        <ng-select  [items]="AreaList" bindLabel="area_code" bindValue="area_id" [(ngModel)]="salesInvoiceModel.area_id" class="select-input"
+                            [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                        </ng-select>
+                    </div>
+
+                    <!-- Area Name -->
+                    <div class="col-md-3">
+                        <div class="label-wrapper">
+                            <label for="salesman_id" class="form-label">Area Name 
+                                <span class="required-star">*</span>
+                            </label>
+                        </div>
+                        <ng-select  [items]="AreaList" bindLabel="area_name" bindValue="area_id" [(ngModel)]="salesInvoiceModel.area_id" class="select-input"
+                            [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                        </ng-select>
+                    </div>
+
+                    <!-- Street -->
+                    <div class="col-md-3">
+                        <div class="label-wrapper">
+                            <label for="street" class="form-label">Street
+                            </label>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" class="label-input" id="street" [disabled]="true" name="street" [(ngModel)]="salesInvoiceModel.street" #street="ngModel">
+                        </div>
+                    </div> 
+
+                    <!-- Block -->
+                    <div class="col-md-1">
+                        <div class="label-wrapper">
+                            <label for="block" class="form-label">Block
+                            </label>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" class="label-input" id="block" [disabled]="true" name="block" [(ngModel)]="salesInvoiceModel.block" #block="ngModel">
+                        </div>
+                    </div> 
+                    
+
+                    <!--Building No-->
+                    <div class="col-md-3">
+                        <div class="label-wrapper">
+                            <label for="flat" class="form-label">Building No
+                            </label>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" class="label-input" id="flat" [disabled]="true" name="flat" [(ngModel)]="salesInvoiceModel.flat" #flat="ngModel">
+                        </div>
+                    </div> 
+
+                    <!--House No-->
+                    <!-- <div class="col-md-2">
+                        <div class="label-wrapper">
+                            <label for="house" class="form-label">House No
+                            </label>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" class="label-input" id="house" [disabled]="true" name="house" [(ngModel)]="salesInvoiceModel.house_no" #house="ngModel">
+                        </div>
+                    </div>  -->
+
+                    <!-- floor -->
+                    <div class="col-md-1">
+                        <div class="label-wrapper">
+                            <label for="floor" class="form-label">Floor
+                            </label>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" class="label-input" id="floor" [disabled]="true" name="floor" [(ngModel)]="salesInvoiceModel.floor" #floor="ngModel">
+                        </div>
+                    </div> 
+                </div>
+                <div class="row">
+                    <!-- address -->
+                    <div class="col-md-4">
+                        <div class="label-wrapper">
+                            <label for="address" class="form-label">Address
+                            </label>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" class="label-input" id="address" [disabled]="true" name="address" [(ngModel)]="salesInvoiceModel.address" #address="ngModel">
+                        </div>
+                    </div> 
+
+                    <!-- Customer Details -->
+                    <div class="col-md-4">
+                        <div class="label-wrapper">
+                            <label for="customer_details" class="form-label">Customer Details
+                            </label>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" class="label-input" id="customer_details" [disabled]="true" name="customer_details" [(ngModel)]="salesInvoiceModel.customer_details" #customer_details="ngModel">
+                        </div>
+                    </div> 
+
+                    <!-- Narration -->
+                    <div class="col-md-4">
+                        <div class="label-wrapper">
+                            <label for="narration" class="form-label">Narration
+                            </label>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" class="label-input" id="narration" [disabled]="true" name="narration" [(ngModel)]="salesInvoiceModel.narration" #narration="ngModel">
+                        </div>
+                    </div> 
+                </div>
+            </fieldset>
+            <br>
+            <div class="row">
+                <!-- First Grid -->
+                <div class="col-md-6">
+                    <ngx-datatable
+                        class="table table-bordered styled-grid"
+                        [rows]="rowsDel"
+                        [scrollbarV]="scroll"
+                        [virtualization]="true"
+                        [style.height.px]="300"
+                        [columnMode]="'force'"
+                        [headerHeight]="80"
+                        [footerHeight]="60"
+                        [rowHeight]="30"
+                        [limit]="controls.pageSize"
+                        [externalPaging]="false"
+                        [selected]="selected"
+                        [messages]="{ emptyMessage: 'No data to display' }"
+                        [reorderable]="reorderable"
+                        [selectionType]="SelectionType.single"
+                        [rowIdentity]="getRowIdentityDel"
+                        (activate)="onSubListActivateDel($event)">
+                    
+                        <!-- Sl No -->
+                        <ngx-datatable-column name="Sl No"  prop="seqno" [maxWidth]="80">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                            <input 
+                            type="text" 
+                                class="form-control" 
+                                value ="{{ rowIndex + 1 }}" disabled 
+                                />
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <!-- Delivery No -->
+                        <ngx-datatable-column name="Delivery No" prop="document_number" >
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                            <!-- <ng-select
+                                [items]="ItemList"
+                                bindLabel="item_code"
+                                bindValue="item_no"
+                                [(ngModel)]="row.item_no"
+                                (change)="ItemCodeEnter(row.item_no, row)"
+                                [disabled]="itemDisable"
+                                class="form-control grid-select"
+                                [ngModelOptions]="{ standalone: true }"
+                                [appendTo]="'body'">
+                            </ng-select> -->
+                            <input
+                                type="text"
+                                class="form-control grid-input"
+                                [(ngModel)]="row.document_number"
+                                [disabled]="true" 
+                                [ngModelOptions]="{ standalone: true }" />
+                            </ng-template>
+                        </ngx-datatable-column>
+                        
+                        <!-- Date -->
+                        <ngx-datatable-column name="Date" prop="voucher_date" >
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                            <input
+                                type="text"
+                                class="form-control grid-input"
+                                [(ngModel)]="row.voucher_date"
+                                [disabled]="true" 
+                                [ngModelOptions]="{ standalone: true }" />
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <!-- Delete -->
+                        <ngx-datatable-column name="Delete" [maxWidth]="75">
+                            <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm delete-btn"
+                                (click)="deleteRowDel(rowIndex)"
+                                [disabled]="itemDisable">
+                                🗑️
+                            </button>
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <!-- Footer -->
+                        <ngx-datatable-footer>
+                            <ng-template ngx-datatable-footer-template>
+                            <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 datatable-footer-border">
+                                <span>Total Rows: {{ rowsDel.length }}</span>
+                                <div class="btn-group">
+                                <button type="button" class="btn btn-add" (click)="addRowDel()" [disabled]="itemDisable">➕ Add</button>
+                                </div>
+                            </div>
+                            </ng-template>
+                        </ngx-datatable-footer>
+                    </ngx-datatable>
+                </div>
+                <div class="col-md-6">
+                    <ngx-datatable
+                        class="table table-bordered styled-grid"
+                        [rows]="rowsEst"
+                        [scrollbarV]="scroll"
+                        [virtualization]="true"
+                        [style.height.px]="300"
+                        [columnMode]="'force'"
+                        [headerHeight]="80"
+                        [footerHeight]="60"
+                        [rowHeight]="30"
+                        [limit]="controls.pageSize"
+                        [externalPaging]="false"
+                        [selected]="selected"
+                        [messages]="{ emptyMessage: 'No data to display' }"
+                        [reorderable]="reorderable"
+                        [selectionType]="SelectionType.single"
+                        [rowIdentity]="getRowIdentityEst"
+                        (activate)="onSubListActivateEst($event)">
+                    
+                        <!-- Sl No -->
+                        <ngx-datatable-column name="Sl No"  prop="seqno" [maxWidth]="80">
+                            <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                            <input 
+                            type="text" 
+                                class="form-control" 
+                                value ="{{ rowIndex + 1 }}" disabled 
+                                />
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <!-- Delivery No -->
+                        <ngx-datatable-column name="Estimation No" prop="document_number" >
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                            <!-- <ng-select
+                                [items]="ItemList"
+                                bindLabel="item_code"
+                                bindValue="item_no"
+                                [(ngModel)]="row.item_no"
+                                (change)="ItemCodeEnter(row.item_no, row)"
+                                [disabled]="itemDisable"
+                                class="form-control grid-select"
+                                [ngModelOptions]="{ standalone: true }"
+                                [appendTo]="'body'">
+                            </ng-select> -->
+                            <input
+                                type="text"
+                                class="form-control grid-input"
+                                [(ngModel)]="row.document_number"
+                                [disabled]="true" 
+                                [ngModelOptions]="{ standalone: true }" />
+                            </ng-template>
+                        </ngx-datatable-column>
+                        
+                        <!-- Date -->
+                        <ngx-datatable-column name="Date" prop="voucher_date" >
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                            <input
+                                type="text"
+                                class="form-control grid-input"
+                                [(ngModel)]="row.voucher_date"
+                                [disabled]="true" 
+                                [ngModelOptions]="{ standalone: true }" />
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <!-- Delete -->
+                        <ngx-datatable-column name="Delete" [maxWidth]="75">
+                            <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm delete-btn"
+                                (click)="deleteRowEst(rowIndex)"
+                                [disabled]="itemDisable">
+                                🗑️
+                            </button>
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <!-- Footer -->
+                        <ngx-datatable-footer>
+                            <ng-template ngx-datatable-footer-template>
+                            <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 datatable-footer-border">
+                                <span>Total Rows: {{ rowsEst.length }}</span>
+                                <div class="btn-group">
+                                <button type="button" class="btn btn-add" (click)="addRowEst()" [disabled]="itemDisable">➕ Add</button>
+                                </div>
+                            </div>
+                            </ng-template>
+                        </ngx-datatable-footer>
+                    </ngx-datatable>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <!-- Created By-->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="created_by" class="form-label">Created By
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="created_by" [disabled]="true"  
+                    name="created_by" [(ngModel)]="salesInvoiceModel.created_by" #created_by="ngModel">
+            </div>
+        </div>
+        <!-- Created On-->
+        <div class="col-md-1">
+            <div class="label-wrapper">
+                <label for="created_date" class="form-label">Created On
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="created_date" [disabled]="true"  
+                    name="created_date" [(ngModel)]="salesInvoiceModel.created_date" #created_date="ngModel">
+            </div>
+        </div>
+        <!-- Updated By -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="modified_by" class="form-label">Modified By
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="modified_by" [disabled]="true"  
+                    name="modified_by" [(ngModel)]="salesInvoiceModel.modified_by" #modified_by="ngModel">
+            </div>
+        </div>
+        <!-- Updated On -->
+        <div class="col-md-1">
+            <div class="label-wrapper">
+                <label for="modified_date" class="form-label">Modified On
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" class="label-input" id="modified_date" [disabled]="true"  
+                    name="modified_date" [(ngModel)]="salesInvoiceModel.modified_date" #modified_date="ngModel">
+            </div>
+        </div>
+        <!-- Approved By -->
+        <div class="col-md-2">
+            <div class="label-wrapper">
+                <label for="approved_by" class="form-label">Approved By
+                </label>
+            </div>
+            <div class="input-wrapper">
+            <input type="text" class="label-input" id="approved_by" [disabled]="true"  
+                name="approved_by" [(ngModel)]="salesInvoiceModel.approved_by" #approved_by="ngModel">
+            </div>
+        </div>
+        <!-- Remarks -->
+        <div class="col-md-4">
+            <div class="label-wrapper">
+                <label for="approver_remarks" class="form-label">Approval Remarks
+                </label>
+            </div>
+            <div class="input-wrapper">
+                <textarea class="label-input" id="approver_remarks" name="approver_remarks" rows="2"
+                [(ngModel)]="salesInvoiceModel.approver_remarks" #approver_remarks="ngModel" [disabled]="true" >
+                </textarea>
+            </div>
+        </div>
+    </div>
+    <br>
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer" style="overflow: hidden;">
+      <div class="btn-group pull-right">
+        <div class="badge bg-color-greenLight action mine"></div>
+        <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+          <i class="fa fa-save"></i>Save
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+          <i class="fa fa-ban"></i>Cancel
+        </button>
+      </div>
+    </div> 
+  </form>
+</div>

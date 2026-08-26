@@ -1,0 +1,392 @@
+<div class="bg-body-secondary text-center py-5 rounded-2"> 
+  <h2 class="display-6 fw-bold">Stock Report</h2> 
+  <!-- List Section -->
+    <fieldset class="border mb-4">
+      <div class="container-fluid">
+        <form ngForm #StockReportForm="ngForm" name="form" (ngSubmit)="StockReportForm.form.valid && onSubmit(StockReportForm)" novalidate>
+          <div class="container-fluid" >
+              <div class="row g-3">
+                <!-- <div class="col-md-1 d-flex align-items-center">
+                  <label for="year" class="form-label mb-0 me-2">Year:</label>
+                  <select class="form-control" id="year"
+                          name="year" [(ngModel)]="stockReportModel.year" #yearid="ngModel"
+                          (change)="yearChange(stockReportModel.year)">
+                    <option *ngFor="let main of years" [value]="main.period_id">{{ main.period_name }}</option>
+                  </select>
+                </div> -->
+
+                <div class="col-md-2 d-flex align-items-center">
+                  <label for="from" class="form-label mb-0 me-2">From:</label>
+                  <div class="input-wrapper">
+                    <div class="datepicker-wrapper">
+                      <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy"
+                        [bsConfig]="{
+                          dateInputFormat: 'DD/MM/YYYY',
+                          showWeekNumbers: false
+                        }"
+                        (bsValueChange)="onDateSelected($event)" [ngModel]="stockReportModel.fromDate" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
+                        />
+                      <button type="button" class="btn btn-outline-secondary" (click)="dp.show()">
+                        📅
+                      </button>
+                    </div> 
+                  </div>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-center">
+                  <label for="to" class="form-label mb-0 me-2">To:</label>
+                  <div class="input-wrapper">
+                    <div class="datepicker-wrapper">
+                      <input type="text" class="form-control" bsDatepicker #dp1="bsDatepicker" placeholder="dd/MM/yyyy"
+                        [bsConfig]="{
+                          dateInputFormat: 'DD/MM/YYYY',
+                          showWeekNumbers: false
+                        }"
+                        (bsValueChange)="onDateSelected1($event)" [ngModel]="stockReportModel.toDate" (ngModelChange)="formatToDateInput1($event)" [ngModelOptions]="{ standalone: true }"
+                        />
+                      <button type="button" class="btn btn-outline-secondary" (click)="dp1.show()">
+                        📅
+                      </button>
+                    </div> 
+                  </div>
+                </div>
+              </div>
+          </div>
+          <br>
+          <fieldset class="border">
+            <!-- <legend class="legend-report">
+              {{ 'Item Wise' }}
+            </legend> -->
+            <div class="filter-row">
+              <div class="filter-card">
+                <h5>Quick Filters</h5>
+                <div class="row">
+                  <!-- Warehouse -->
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="godown_code" class="form-label  mb-0"> Godown
+                      </label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="warehouseList" bindLabel="godown_name" bindValue="godown_code" [(ngModel)]="stockReportModel.godown_code"
+                        dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" [multiple]="true" >
+                      </ng-select>
+                    </div>
+                  </div>
+                  <!-- Main Group -->
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="main_category" class="form-label mb-0">Main Group</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="mainList" 
+                        bindLabel="main_category"
+                        bindValue="main_category"
+                        [(ngModel)]="stockReportModel.main_category_code"
+                        dropdownPanelClass="'black-dropdown'"
+                        [ngModelOptions]="{ standalone: true }"
+                        [multiple]="true"
+                        (change)="mainCategoryChange($event)"
+                        >
+                      </ng-select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <!-- Sub Category -->
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="deptname" class="form-label mb-0">Sub Category</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="subList" [multiple]="true"
+                                bindLabel="deptname"
+                                bindValue="deptname"
+                                [(ngModel)]="stockReportModel.deptno"
+                                dropdownPanelClass="'black-dropdown'"
+                                [ngModelOptions]="{ standalone: true }"
+                                (change)="subCategoryChange($event)">
+                      </ng-select>
+                    </div>
+                  </div>
+
+                  <!-- Product Class -->
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="category_name" class="form-label mb-0">Product Class</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="productList" [multiple]="true"
+                                bindLabel="category_name"
+                                bindValue="category_name" 
+                                [(ngModel)]="stockReportModel.category_code"
+                                dropdownPanelClass="'black-dropdown'"
+                                [ngModelOptions]="{ standalone: true }">
+                      </ng-select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <!-- Brand-->
+                  <div class="col-md-6">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="brand_name" class="form-label  mb-0"> Brand
+                      </label>
+                    </div>
+                    <div class="input-wrapper">
+                        <ng-select [items]="brandList" bindLabel="brand_name" bindValue="brand_name" [(ngModel)]="stockReportModel.brand_id" class="select-modal"
+                            [ngModelOptions]="{ standalone: true }" [appendTo]="'body'">
+                        </ng-select>
+                    </div>
+                  </div>
+                  <!-- Product Type -->
+                  <div class="col-md-6">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="product_type" class="form-label  mb-0">Product Type
+                      </label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select  [items]="categoryList" bindLabel="productType" bindValue="productType" [(ngModel)]="stockReportModel.product_type" class="select-modal" 
+                        [ngModelOptions]="{ standalone: true }"  [appendTo]="'body'">
+                      </ng-select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <!-- Item Code-->
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="item_no" class="form-label mb-0"> Item Name</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="itemList" bindLabel="combinedLabel" bindValue="item_no" [(ngModel)]="stockReportModel.item_no" class="select-modal" 
+                        [ngModelOptions]="{ standalone: true }" 
+                        [appendTo]="'body'">
+                      </ng-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="filter-card advanced-filters">
+                <h5>Advanced Filters</h5>
+                <div class="row">
+                  <!--Current Stock Only -->
+                  <div class="col-md-4"> 
+                    <div class="form-group">
+                      <label class="checkbox-wrapper" tooltip="Hide Opening, Receipt & Issue quantities">
+                        <input type="checkbox" class="checkbox" [(ngModel)]="stockReportModel.bal_col_only" 
+                            name="bal_col_only" #bal_col_only="ngModel"> 
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label"> Current Stock Only</span>
+                      </label>
+                    </div>
+                  </div>
+                  <!--Hide Zero Stock-->
+                  <div class="col-md-4">
+                    <div class="form-group ">
+                      <label class="checkbox-wrapper" tooltip="Excludes items with zero current stock from the report">
+                        <input type="checkbox" class="checkbox" [(ngModel)]="stockReportModel.hide_zero_stock" 
+                        name="hide_zero_stock" #hide_zero_stock="ngModel" > 
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label"> Hide Zero Stock</span> 
+                      </label>
+                    </div>
+                  </div>
+                  <!--Show Only Zero Cost-->
+                  <div class="col-md-4">
+                    <div class="form-group ">
+                      <label class="checkbox-wrapper" tooltip="Show items with stock value is zero">
+                        <input type="checkbox" class="checkbox" [(ngModel)]="stockReportModel.show_only_zero_cost" 
+                        name="show_only_zero_cost" #show_only_zero_cost="ngModel" >
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label"> Show Only Zero Cost</span> 
+                      </label>
+                    </div>
+                  </div>
+                  <!--Show Transfer -->
+                  <!-- <div class="col-md-4">
+                    <div class="form-group ">
+                      <label class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox" [(ngModel)]="stockReportModel.show_transfer" 
+                        name="show_transfer" #show_transfer="ngModel" >
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label"> Show Transfer</span> 
+                      </label>
+                    </div>
+                  </div> -->
+                  <!--Include Stock Value-->
+                  <div class="col-md-4">
+                    <div class="form-group ">
+                      <label class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox" [(ngModel)]="stockReportModel.costing" 
+                        name="costing" #costing="ngModel" >
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label"> Include Stock Value</span> 
+                      </label>
+                    </div>
+                  </div>
+                  <!--Hardware -->
+                  <div class="col-md-4"> 
+                    <div class="form-group">
+                      <label class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox" [(ngModel)]="stockReportModel.hardware" 
+                            name="hardware" #hardware="ngModel" > 
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label"> Hardware Items</span>
+                      </label>
+                    </div>
+                  </div>
+                  <!--Accessories-->
+                  <div class="col-md-4">
+                    <div class="form-group ">
+                      <label class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox" [(ngModel)]="stockReportModel.accessories" 
+                        name="accessories" #accessories="ngModel" >
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label"> Accessories Items</span> 
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- <div class="filter-card costing-options">
+                <h5>Select Costing</h5>
+                <div class="costing-options">
+                <input type="radio" id="avgCost" name="costing" [(ngModel)]="stockReportModel.costing" value="1"  checked>
+                <label for="avgCost">Avg Cost</label>
+
+                <input type="radio" id="noCost" name="costing" [(ngModel)]="stockReportModel.costing" value="2">
+                <label for="noCost">No Cost</label>
+              </div>
+              </div> -->
+            </div>
+            <br>
+            <!-- Footer Buttons -->
+            <div class="inbox-compose-footer">
+              <div class="btn-group">
+                <button type="button" class="email-btn" (click)="printReport('3')">
+                  <i class="fa fa-envelope"></i> Email
+                </button>
+                <button type="button" class="btn-excel" (click)="printReport('1')">
+                  <i class="fa fa-file-excel"></i> Excel
+                </button>
+                <button type="button" class="btn-pdf" (click)="printReport('2')">
+                  <i class="fa fa-file-pdf"></i> PDF
+                </button>
+              </div>
+            </div>
+          </fieldset>
+          <br><br>
+          <!-- <fieldset class="border">
+            <legend class="legend-report">
+              {{ 'Location Wise' }}
+            </legend>
+            <div class="filter-row">
+              <div class="filter-card">
+                <h5>Quick Filters</h5>
+                <div class="row">
+                  <div class="col-md-4"> 
+                    <div class="form-group">
+                      <label class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox" [(ngModel)]="stockReportModel.merge_main_store" 
+                            name="merge_main_store" #merge_main_store="ngModel"> 
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label"> Merge Main Store Also</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group ">
+                      <label class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox" [(ngModel)]="stockReportModel.hide_items" 
+                        name="hide_items" #hide_items="ngModel">
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label">Hide No Movement Items</span> 
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="filter-card advanced-filters">
+                <h5>Advanced Filters</h5>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="godown_code" class="form-label  mb-0"> Godown
+                      </label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="warehouseList" bindLabel="godown_name" bindValue="godown_code" [(ngModel)]="stockReportModel.godown_code_loc"
+                        dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" [multiple]="true" >
+                      </ng-select>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="main_category_code_loc" class="form-label mb-0">Main Group</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="mainList" 
+                        bindLabel="main_category"
+                        bindValue="main_category_code"
+                        [(ngModel)]="stockReportModel.main_category_code_loc"
+                        dropdownPanelClass="'black-dropdown'"
+                        [ngModelOptions]="{ standalone: true }"
+                        [multiple]="true"
+                        (change)="mainCategoryChangeLoc($event)"
+                        >
+                      </ng-select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="deptno_loc" class="form-label mb-0">Sub Category</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="subList" [multiple]="true"
+                                bindLabel="deptname"
+                                bindValue="deptno"
+                                [(ngModel)]="stockReportModel.deptno_loc"
+                                dropdownPanelClass="'black-dropdown'"
+                                [ngModelOptions]="{ standalone: true }"
+                                (change)="subCategoryChangeLoc($event)">
+                      </ng-select>
+                    </div>
+                  </div>
+
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="category_code" class="form-label mb-0">Product Class</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="productList" [multiple]="true"
+                                bindLabel="category_name"
+                                bindValue="category_code" 
+                                [(ngModel)]="stockReportModel.category_code_loc"
+                                dropdownPanelClass="'black-dropdown'"
+                                [ngModelOptions]="{ standalone: true }">
+                      </ng-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br>
+            <div class="inbox-compose-footer">
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary" (click)="okLocationWise()">
+                  <i class="fa fa-print"></i> Print
+                </button>
+              </div>
+            </div>
+          </fieldset> -->
+          <br>
+        </form>
+      </div>
+    </fieldset>
+</div>

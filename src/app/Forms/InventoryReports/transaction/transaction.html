@@ -1,0 +1,198 @@
+<div class="bg-body-secondary text-center py-5 rounded-2"> 
+  <h2 class="display-6 fw-bold">Transaction Report</h2> 
+  <!-- List Section -->
+    <fieldset class="border mb-4">
+      <div class="container-fluid">
+        <form ngForm #TransactionReportForm="ngForm" name="form" (ngSubmit)="TransactionReportForm.form.valid && onSubmit(TransactionReportForm)" novalidate>
+          <div class="container-fluid" >
+              <div class="row g-3">
+                <div class="col-md-2 d-flex align-items-center">
+                  <label for="from" class="form-label mb-0 me-2">From:</label>
+                  <div class="input-wrapper">
+                    <div class="datepicker-wrapper">
+                      <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy"
+                        [bsConfig]="{
+                          dateInputFormat: 'DD/MM/YYYY',
+                          showWeekNumbers: false
+                        }"
+                        (bsValueChange)="onDateSelected($event)" [ngModel]="transactionReportModel.fromDate" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
+                        />
+                      <button type="button" class="btn btn-outline-secondary" (click)="dp.show()">
+                        📅
+                      </button>
+                    </div> 
+                  </div>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-center">
+                  <label for="to" class="form-label mb-0 me-2">To:</label>
+                  <div class="input-wrapper">
+                    <div class="datepicker-wrapper">
+                      <input type="text" class="form-control" bsDatepicker #dp1="bsDatepicker" placeholder="dd/MM/yyyy"
+                        [bsConfig]="{
+                          dateInputFormat: 'DD/MM/YYYY',
+                          showWeekNumbers: false
+                        }"
+                        (bsValueChange)="onDateSelected1($event)" [ngModel]="transactionReportModel.toDate" (ngModelChange)="formatToDateInput1($event)" [ngModelOptions]="{ standalone: true }"
+                        />
+                      <button type="button" class="btn btn-outline-secondary" (click)="dp1.show()">
+                        📅
+                      </button>
+                    </div> 
+                  </div>
+                </div>
+              </div>
+          </div>
+          <br>
+          <fieldset class="border">
+            <br>
+            <!-- Transaction -->
+            <div class="col-md-8" style="margin-left: 40px;">
+              <div class="label-wrapper d-flex align-items-center">
+                <label for="register_code" class="form-label  mb-0" style="font-size: 18px;"> Transaction Type
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <ng-select [items]="registerList" bindLabel="register_name" bindValue="register_code" [(ngModel)]="transactionReportModel.register_code"
+                  dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" [multiple]="true" (change)="TransactionTypeChange(transactionReportModel.register_code)">
+                </ng-select>
+              </div>
+            </div>
+            <br>
+            <div class="filter-row">
+              <br><br>
+              <div class="filter-card">
+                <h5>Common Filters</h5>
+                <div class="row">
+                  <!-- Warehouse -->
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="godown_code" class="form-label  mb-0"> Warehouse
+                      </label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="warehouseList" bindLabel="godown_name" bindValue="godown_code" [(ngModel)]="transactionReportModel.godown_code"
+                        dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" [multiple]="true" >
+                      </ng-select>
+                    </div>
+                  </div>
+                  <!-- Sub Category -->
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="deptname" class="form-label mb-0">Sub Category</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="subList" [multiple]="true"
+                                bindLabel="deptname"
+                                bindValue="deptname"
+                                [(ngModel)]="transactionReportModel.deptname"
+                                dropdownPanelClass="'black-dropdown'"
+                                [ngModelOptions]="{ standalone: true }"
+                                (change)="subCategoryChange($event)">
+                      </ng-select>
+                    </div>
+                  </div>
+                  <!-- Product Class -->
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="category_name" class="form-label mb-0">Product Class</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="productList" [multiple]="true"
+                                bindLabel="category_name"
+                                bindValue="category_name" 
+                                [(ngModel)]="transactionReportModel.category_name"
+                                dropdownPanelClass="'black-dropdown'"
+                                [ngModelOptions]="{ standalone: true }">
+                      </ng-select>
+                    </div>
+                  </div>
+                  <!-- Item Code-->
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="item_no" class="form-label mb-0"> Item Name</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select  [items]="itemList" bindLabel="combinedLabel" bindValue="item_no" [(ngModel)]="transactionReportModel.item_no" class="select-modal" 
+                        [ngModelOptions]="{ standalone: true }"  [appendTo]="'body'">
+                      </ng-select>
+                    </div>
+                  </div>
+                  <!-- Product Type -->
+                  <div class="col-md-6">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="product_type" class="form-label  mb-0">Product Type
+                      </label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select  [items]="categoryList" bindLabel="productType" bindValue="productType" [(ngModel)]="transactionReportModel.product_type" class="select-modal" 
+                        [ngModelOptions]="{ standalone: true }"  [appendTo]="'body'">
+                      </ng-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="filter-card advanced-filters">
+                <h5>Advanced Filters</h5>
+                <div class="row">
+                  <!--Reason -->
+                  <div class="col-md-12" *ngIf="StockCorrection">
+                      <div class="label-wrapper d-flex align-items-center">
+                          <label for="reason" class="form-label mb-0">Reason
+                          </label>
+                      </div>
+                      <div class="input-wrapper">
+                        <ng-select  [items]="reasonList" bindLabel="reason" bindValue="reason" [(ngModel)]="transactionReportModel.reason" class="select-modal" 
+                          [ngModelOptions]="{ standalone: true }"  [appendTo]="'body'">
+                        </ng-select>
+                      </div>
+                  </div>
+                  <!--Vendor -->
+                  <div class="col-md-12" *ngIf="Vendor">
+                      <div class="label-wrapper d-flex align-items-center">
+                          <label for="account_name" class="form-label mb-0">Vendor
+                          </label>
+                      </div>
+                      <div class="input-wrapper">
+                        <ng-select  [items]="vendorList" bindLabel="account_name" bindValue="account_name" [(ngModel)]="transactionReportModel.account_name" class="select-modal" 
+                          [ngModelOptions]="{ standalone: true }"  [appendTo]="'body'">
+                        </ng-select>
+                      </div>
+                  </div>
+                  <!--To Warehouse -->
+                  <div class="col-md-12" *ngIf="ToWarehouse">
+                      <div class="label-wrapper d-flex align-items-center">
+                          <label for="transfer_godown_name" class="form-label mb-0">To Warehouse
+                          </label>
+                      </div>
+                      <div class="input-wrapper">
+                        <ng-select  [items]="warehouseList" bindLabel="godown_name" bindValue="godown_name" [(ngModel)]="transactionReportModel.transfer_godown_name" class="select-modal" 
+                          [ngModelOptions]="{ standalone: true }"  [appendTo]="'body'">
+                        </ng-select>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br>
+            <!-- Footer Buttons -->
+            <div class="inbox-compose-footer">
+              <div class="btn-group">
+                <button type="button" class="email-btn" (click)="printReport('3')">
+                  <i class="fa fa-envelope"></i> Email
+                </button>
+                <button type="button" class="btn-excel" (click)="printReport('1')">
+                  <i class="fa fa-file-excel"></i> Excel
+                </button>
+                <button type="button" class="btn-pdf" (click)="printReport('2')">
+                  <i class="fa fa-file-pdf"></i> PDF
+                </button>
+              </div>
+            </div>
+          </fieldset>
+          <br>
+        </form>
+      </div>
+    </fieldset>
+</div>

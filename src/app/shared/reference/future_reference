@@ -1,0 +1,100 @@
+
+
+/**************************************************************** FILE UPLOAD**************************************************************************/
+
+
+//<input  smartTags type="file" name="file" id="file"  class="inputfile form-control tagsinput" #fileInput 
+ //           value="" (change)="onFilesSelected($event);fileChange($event)" accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,image/*"
+ //             multiple  placeholder="Upload file" data-role="tagsinput" value="filename">
+
+
+  //isAttachValid: boolean = true;
+ // isSizeValid: boolean = true;
+ // isDuplicateEx: boolean = false;
+
+//  fileChange(event: any) {
+//     this.isSizeValid = true;
+//     this.isDuplicateEx = false;
+//     this.isAttachValid = true;
+//     var formData: FormData = new FormData();
+//     let fileList: FileList = event.target.files;
+//     if (fileList.length > 5) {
+//       this.alertService.triggerAlert("You can upload maximum 5 files at a time.", 4000, 'error');
+//       this.isAttachValid = false;
+//     } else if (fileList.length != 0) {
+//       for (var i = 0; i < fileList.length; i++) {
+//         if (fileList[i].size > 512000) {
+//           this.alertService.triggerAlert("File size should not exceed 500 KB.", 4000, 'error');
+//           this.isSizeValid = false;
+//           break;
+//         }
+//         var valueArr = this.AttachmentList.map(function (item) { return item.FileName });
+//         var isDuplicate = valueArr.indexOf(fileList[i].name)
+//         if (isDuplicate != -1) {
+//           this.isDuplicateEx = true;
+//          this.alertService.triggerAlert("Duplicate file name found. Please rename the file and try again.", 4000, 'error');
+//           break;
+//         }
+//       }
+//       this.files.forEach(file => formData.append('files', file));
+//       console.log(formData);
+//     }
+//     if (this.isAttachValid && this.isSizeValid && !this.isDuplicateEx) {
+//       if (fileList.length != 0) { 
+//         this.customerMasterService.uploadFiles(formData).subscribe(posts => {
+//           this.isAttachValid = true;
+//           this.alertService.triggerAlert("File uploaded successfully.", 4000, 'success');
+//          this.GetFileList();
+//         },
+//         error => {
+//           this.isAttachValid = true;
+//           if (error == null) {
+//             this.alertService.triggerAlert("Upload could not completed. Please try again.", 4000, 'error');
+//           }
+//           if (error != null) {
+//             this.alertService.triggerAlert( 'Upload Could not completed. Please try again.', 4000, 'error');
+//           }
+//         });
+//       }
+//     }
+//   }
+
+
+// uploadFiles(formData:any) {
+//     let headers = new HttpHeaders();
+//     headers = headers.set('Content-Type', 'multipart/form-data');
+//     headers = headers.set('Accept', 'application/json');
+//     return this.httpClient.post<Response>(this.endpointService.uploadFiles, formData)
+//   }
+
+//   async fileAttachRefresh() {
+//     return await this.httpClient.get<Attachment[]>(this.endpointService.getAttURL , { observe: 'response' }).toPromise();
+//   }
+
+
+// [HttpPost("UploadFiles")]
+// public async Task<IActionResult> UploadMultiple(List<IFormFile> files)
+// {
+//     try { 
+//         if (files == null || files.Count == 0)
+//             return BadRequest("No files uploaded.");
+//         var uploads = Path.Combine(_env.WebRootPath, "uploads");
+//         if (!Directory.Exists(uploads))
+//             Directory.CreateDirectory(uploads);
+//         var savedFiles = new List<string>();
+//         foreach (var file in files)
+//         {
+//             var filePath = Path.Combine(uploads, file.FileName);
+//             using (var stream = new FileStream(filePath, FileMode.Create))
+//             {
+//                 await file.CopyToAsync(stream);
+//             }
+//             savedFiles.Add($"/uploads/{file.FileName}");
+//         }
+//         return Ok(savedFiles);
+//     }
+//     catch (Exception e)
+//     {
+//         return BadRequest(e.Message);
+//     }
+// }

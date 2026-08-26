@@ -1,0 +1,40 @@
+<div class="bg-body-secondary text-center py-5 rounded-2"> 
+  <h2 class="display-6 fw-bold">Payment Request</h2> 
+  <div class="container-fluid" >
+    <fieldset class="fieldset-custom">
+      <div class="row g-3">
+
+        <!-- Button Group -->
+        <div class="col-md-12 col-12">
+          <div class="btn-toolbar flex-wrap gap-1 justify-content-start" style="margin-top:2px">
+            <select class="label-control" id="year" [disabled]="yearDisable"
+              name="year" [(ngModel)]="year" #yearid="ngModel" (change)="yearChange(year)">
+              <option *ngFor="let main of years" [value]="main.period_id">{{ main.period_name }}</option>
+            </select>
+            <button type="button" class="btn btn-primary" (click)="buttonClick('N')" [disabled]="newDisable" >
+              <i class="fa fa-plus me-1"></i> New
+            </button>
+            <button type="button" class="btn btn-info" (click)="buttonClick('M')" [disabled]="modifyDisable" >
+              <i class="fa fa-edit me-1"></i> Modify
+            </button>
+            <button type="button" class="btn btn-danger" (click)="buttonClick('D')" [disabled]="deleteDisable" >
+              <i class="fa fa-trash me-1"></i> Delete
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="Refresh()" [disabled]="refreshDisable">
+              <i class="fa fa-refresh me-1"></i>
+            </button>
+            <button type="button" class="btn btn-lg d-flex ms-auto shadow-sm" [disabled]="modifyDisable" (click)="toggleValue()"> 
+              <i [ngClass]="gridDisabled ? 'fa fa-eye-slash me-1' : 'fa fa-eye me-1'"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+  <!-- List Section -->
+     <payment-request-list></payment-request-list>
+  <!-- List Section -->
+    <fieldset class="border p-3 mb-4"> 
+      <payment-request-details></payment-request-details>
+    </fieldset>
+</div>

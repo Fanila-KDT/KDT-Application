@@ -1,0 +1,126 @@
+<div class="bg-body-secondary text-center py-5 rounded-2"> 
+  <h2 class="display-6 fw-bold">Inventory Aging Report</h2> 
+  <!-- List Section -->
+    <fieldset class="border mb-4">
+      <div class="container-fluid">
+        <form ngForm #InventoryAgingReportForm="ngForm" name="form" (ngSubmit)="InventoryAgingReportForm.form.valid && onSubmit(InventoryAgingReportForm)" novalidate>
+          <div class="container-fluid" >
+              <div class="row g-3">
+
+                <div class="col-md-4 d-flex align-items-center">
+                  <label for="agingAsOf" class="form-label mb-0 me-2">Aging As Of:</label>
+                  <div class="input-wrapper">
+                    <div class="datepicker-wrapper">
+                      <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy"
+                        [bsConfig]="{
+                          dateInputFormat: 'DD/MM/YYYY',
+                          showWeekNumbers: false
+                        }"
+                        (bsValueChange)="onDateSelected($event)" [ngModel]="inventoryAgingReportModel.agingAsOf" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
+                        />
+                      <button type="button" class="btn btn-outline-secondary" (click)="dp.show()">
+                        📅
+                      </button>
+                    </div> 
+                  </div>
+                </div>
+              </div>
+          </div>
+          <br>
+          <fieldset class="border">
+            <div class="filter-row">
+              <div class="filter-card">
+                <h5>Quick Filters</h5>
+                <div class="row">
+                  <!-- Sub Category -->
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="deptname" class="form-label mb-0">Sub Category</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="subList" [multiple]="true"
+                                bindLabel="deptname"
+                                bindValue="deptname"
+                                [(ngModel)]="inventoryAgingReportModel.deptname"
+                                dropdownPanelClass="'black-dropdown'"
+                                [ngModelOptions]="{ standalone: true }"
+                                (change)="subCategoryChange($event)">
+                      </ng-select>
+                    </div>
+                  </div>
+
+                  <!-- Product Class -->
+                  <div class="col-md-12">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="category_name" class="form-label mb-0">Product Class</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select [items]="productList" [multiple]="true"
+                                bindLabel="category_name"
+                                bindValue="category_name" 
+                                [(ngModel)]="inventoryAgingReportModel.category_name"
+                                dropdownPanelClass="'black-dropdown'"
+                                [ngModelOptions]="{ standalone: true }">
+                      </ng-select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <!-- Product Type -->
+                  <div class="col-md-6">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="product_type" class="form-label  mb-0">Product Type
+                      </label>
+                    </div>
+                    <div class="input-wrapper">
+                      <ng-select  [items]="categoryList" bindLabel="productType" bindValue="productType" [(ngModel)]="inventoryAgingReportModel.product_type" class="select-modal" 
+                        [ngModelOptions]="{ standalone: true }"  [appendTo]="'body'">
+                      </ng-select>
+                    </div>
+                  </div>
+                  <!-- Product Type -->
+                  <div class="col-md-3">
+                    <div class="label-wrapper d-flex align-items-center">
+                      <label for="aboveDays" class="form-label  mb-0">Above(Days)
+                      </label>
+                    </div>
+                    <div class="input-wrapper">
+                      <input type="text" class="form-control" id="aboveDays"  [(ngModel)]="inventoryAgingReportModel.aboveDays" name="aboveDays" [ngModelOptions]="{ standalone: true }">
+                    </div>
+                  </div>
+                  <!-- Item Code-->
+                    <div class="col-md-12">
+                        <div class="label-wrapper d-flex align-items-center">
+                            <label for="item_no" class="form-label mb-0"> Item Name</label>
+                        </div>
+                        <div class="input-wrapper">
+                            <ng-select [items]="itemList" bindLabel="combinedLabel" bindValue="item_no" [(ngModel)]="inventoryAgingReportModel.item_no" class="select-modal" 
+                            [ngModelOptions]="{ standalone: true }" 
+                            [appendTo]="'body'">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <br>
+            <!-- Footer Buttons -->
+            <div class="inbox-compose-footer">
+              <div class="btn-group">
+                <button type="button" class="email-btn" (click)="printReport('3')">
+                  <i class="fa fa-envelope"></i> Email
+                </button>
+                <button type="button" class="btn-excel" (click)="printReport('1')">
+                  <i class="fa fa-file-excel"></i> Excel
+                </button>
+                <button type="button" class="btn-pdf" (click)="printReport('2')">
+                  <i class="fa fa-file-pdf"></i> PDF
+                </button>
+              </div>
+            </div>
+          </fieldset>
+          <br>
+        </form>
+      </div>
+    </fieldset>
+</div>

@@ -1,0 +1,57 @@
+
+ <div class="container-fluid">
+  <form ngForm #AreaMasterForm="ngForm" name="form" (ngSubmit)="AreaMasterForm.form.valid && onSubmit(AreaMasterForm)" novalidate>
+    <div class="row">
+      <!-- Area code-->
+      <div class="col-md-1">
+        <div class="label-wrapper">
+          <label for="id" class="form-label">Area code
+            <span class="required-star">*</span>
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="area_code" [disabled]="itemDisable"   [ngClass]="{'is-invalid': isAreaCodeInvalid}"  
+              name="area_code" [(ngModel)]="areaMasterModel.area_code" #area_code="ngModel">
+        </div>
+      </div> 
+      <!--Area Name-->
+      <div class="col-md-4">
+        <div class="label-wrapper">
+          <label for="area_name" class="form-label">Area Name
+                <span class="required-star">*</span>
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="area_name" [disabled]="itemDisable"  [ngClass]="{'is-invalid': isDescriptionInvalid}"
+              name="area_name" [(ngModel)]="areaMasterModel.area_name" #area_name="ngModel">
+        </div>
+      </div>
+      <!-- Area Name -->
+        <div class="col-md-2">
+          <div class="label-wrapper d-flex align-items-center">
+              <label for="area_id" class="form-label mb-0">Area Name
+                <span class="required-star">*</span>
+              </label>
+          </div>
+          <div class="input-wrapper">
+              <ng-select  [items]="AreaList" bindLabel="group_code" bindValue="group_id" [(ngModel)]="areaMasterModel.group_id" class="select-input" [ngClass]="{'is-invalid': isAreaGroupInvalid}"
+                [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"  > 
+              </ng-select>
+          </div>
+        </div>
+    </div>
+    <br>
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer" style="overflow: hidden;">
+      <div class="btn-group pull-right">
+        <div class="badge bg-color-greenLight action mine"></div>
+        <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+          <i class="fa fa-save"></i>Save
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+          <i class="fa fa-ban"></i>Cancel
+        </button>
+      </div>
+    </div> 
+  </form>
+</div>

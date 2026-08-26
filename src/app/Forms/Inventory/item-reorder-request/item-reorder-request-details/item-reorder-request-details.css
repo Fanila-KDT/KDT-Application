@@ -1,0 +1,15 @@
+/* footer.component.css */
+.app-footer {
+  background-color: #f4f4f4;
+  padding: 1px;
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  border-top: 1px solid #ccc;
+}
+
+ .spaced {
+    display: inline-block; 
+    margin-right: 20px; 
+    height: 2px;
+  }

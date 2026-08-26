@@ -1,0 +1,76 @@
+
+ <div class="container-fluid">
+  <form ngForm #PaymentTermsMasterForm="ngForm" name="form" (ngSubmit)="PaymentTermsMasterForm.form.valid && onSubmit(PaymentTermsMasterForm)" novalidate>
+    <div class="row">
+      <!-- Payment Terms-->
+      <div class="col-md-5">
+        <div class="label-wrapper">
+          <label for="id" class="form-label">Payment Terms
+            <span class="required-star">*</span>
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="pay_term" [disabled]="itemDisable"   [ngClass]="{'is-invalid': isPaymentTermsInvalid}"  
+              name="pay_term" [(ngModel)]="paymentTermsMasterModel.pay_term" #pay_term="ngModel">
+        </div>
+      </div> 
+      <!-- No of Days-->
+      <div class="col-md-1">
+        <div class="label-wrapper">
+          <label for="no_days" class="form-label">No of Days
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="no_days" [disabled]="itemDisable"  
+              name="no_days" [(ngModel)]="paymentTermsMasterModel.no_days" #no_days="ngModel">
+        </div>
+      </div>
+      <!-- Purchase-->
+      <div class="col-md-1"> 
+        <div class="form-group">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" class="checkbox style-0" [(ngModel)]="paymentTermsMasterModel.purchase" 
+                name="purchase" #purchase="ngModel" [disabled]="itemDisable"  style="margin-top:1px" > 
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Purchase</span>
+          </label>
+        </div>
+      </div>
+      <!-- Sales Order -->
+      <div class="col-md-1"> 
+        <div class="form-group">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" class="checkbox style-0" [(ngModel)]="paymentTermsMasterModel.sales_order" 
+                name="sales_order" #sales_order="ngModel" [disabled]="itemDisable"  style="margin-top:1px" > 
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Sales Order</span>
+          </label>
+        </div>
+      </div>
+      <!-- Contract Invoice-->
+      <div class="col-md-2"> 
+        <div class="form-group">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" class="checkbox style-0" [(ngModel)]="paymentTermsMasterModel.contract_invoice" 
+                name="contract_invoice" #contract_invoice="ngModel" [disabled]="itemDisable"  style="margin-top:1px" > 
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Contract Invoice</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <br>
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer" style="overflow: hidden;">
+      <div class="btn-group pull-right">
+        <div class="badge bg-color-greenLight action mine"></div>
+        <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+          <i class="fa fa-save"></i>Save
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+          <i class="fa fa-ban"></i>Cancel
+        </button>
+      </div>
+    </div> 
+  </form>
+</div>

@@ -1,0 +1,98 @@
+
+ <div class="container-fluid">
+  <form ngForm #EngineerMasterForm="ngForm" name="form" (ngSubmit)="EngineerMasterForm.form.valid && onSubmit(EngineerMasterForm)" novalidate>
+    <div class="row">
+      <!-- Engineer Id-->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="id" class="form-label">Engineer Id
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="id" [disabled]="true"  
+              name="id" [(ngModel)]="engineerMasterModel.id" #id="ngModel">
+        </div>
+      </div> 
+      <!-- Name-->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="engineer" class="form-label">Name
+            <span class="required-star">*</span>
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="engineer" [disabled]="itemDisable"  [ngClass]="{'is-invalid': isNameInvalid}"  
+              name="engineer" [(ngModel)]="engineerMasterModel.engineer" #engineer="ngModel">
+        </div>
+      </div> 
+      <!-- Email Id-->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="email_id" class="form-label">Email Id
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="email_id" [disabled]="itemDisable" 
+              name="email_id" [(ngModel)]="engineerMasterModel.email_id" #engineer="ngModel">
+        </div>
+      </div> 
+      <!-- Call Center-->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="orig_user" class="form-label">Call Center
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="orig_user" [disabled]="itemDisable"  
+              name="orig_user" [(ngModel)]="engineerMasterModel.orig_user" #orig_user="ngModel">
+        </div>
+      </div>
+      <!-- Salesman-->
+      <div class="col-md-2">
+        <div class="label-wrapper">
+          <label for="salesman_name" class="form-label">Salesman
+          </label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="label-input" id="salesman_name" [disabled]="true"  
+              name="salesman_name" [(ngModel)]="engineerMasterModel.salesman_name" #salesman_name="ngModel">
+        </div>
+      </div>
+      <!-- Inactive -->
+      <div class="col-md-1"> 
+        <div class="form-group">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" class="checkbox style-0" [(ngModel)]="engineerMasterModel.inactive" 
+                name="inactive" #inactive="ngModel" [disabled]="itemDisable"  style="margin-top:1px" > 
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Inactive</span>
+          </label>
+        </div>
+      </div>
+      <!-- Docuware -->
+      <div class="col-md-1"> 
+        <div class="form-group">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" class="checkbox style-0" [(ngModel)]="engineerMasterModel.docuware_active" 
+                name="docuware_active" #docuware_active="ngModel" [disabled]="itemDisable"  style="margin-top:1px" > 
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Docuware</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <br>
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer" style="overflow: hidden;">
+      <div class="btn-group pull-right">
+        <div class="badge bg-color-greenLight action mine"></div>
+        <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+          <i class="fa fa-save"></i>Save
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+          <i class="fa fa-ban"></i>Cancel
+        </button>
+      </div>
+    </div> 
+  </form>
+</div>

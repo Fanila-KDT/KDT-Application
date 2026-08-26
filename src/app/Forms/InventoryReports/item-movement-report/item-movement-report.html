@@ -1,0 +1,90 @@
+<div class="bg-body-secondary text-center py-5 rounded-2"> 
+  <h2 class="display-6 fw-bold">Item Movement Report</h2> 
+  <!-- List Section -->
+    <fieldset class="border mb-4">
+      <div class="container-fluid">
+        <form ngForm #ItemMovementReportForm="ngForm" name="form" (ngSubmit)="ItemMovementReportForm.form.valid && onSubmit(ItemMovementReportForm)" novalidate>
+            <br>
+            <div class="filter-row">
+                <div class="filter-card">
+                <h5>Quick Filters</h5>
+                    <div class="row">
+                        <!-- Sub Category -->
+                        <div class="col-md-12">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="deptname" class="form-label mb-0">Category</label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select [items]="subList" [multiple]="true"
+                                        bindLabel="deptname"
+                                        bindValue="deptname"
+                                        [(ngModel)]="ItemMovementReportModel.deptname"
+                                        dropdownPanelClass="'black-dropdown'"
+                                        [ngModelOptions]="{ standalone: true }"
+                                        (change)="subCategoryChange($event)">
+                                </ng-select>
+                            </div>
+                        </div>
+
+                        <!-- Product Class -->
+                        <div class="col-md-12">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="category_name" class="form-label mb-0">Product Class</label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select [items]="productList" [multiple]="true"
+                                        bindLabel="category_name"
+                                        bindValue="category_name" 
+                                        [(ngModel)]="ItemMovementReportModel.category_name"
+                                        dropdownPanelClass="'black-dropdown'"
+                                        [ngModelOptions]="{ standalone: true }">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Product Type -->
+                        <div class="col-md-6">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="product_type" class="form-label  mb-0">Product Type
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <ng-select  [items]="categoryList" bindLabel="productType" bindValue="productType" [(ngModel)]="ItemMovementReportModel.product_type" class="select-modal" 
+                                [ngModelOptions]="{ standalone: true }"  [appendTo]="'body'">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <!-- Months -->
+                        <div class="col-md-3">
+                            <div class="label-wrapper d-flex align-items-center">
+                                <label for="months" class="form-label  mb-0">Months
+                                </label>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="text" class="form-control" id="months"  [(ngModel)]="ItemMovementReportModel.months" name="months" [ngModelOptions]="{ standalone: true }">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <!-- Footer Buttons -->
+            <div class="inbox-compose-footer">
+                <div class="btn-group">
+                <button type="button" class="email-btn" (click)="printReport('3')">
+                    <i class="fa fa-envelope"></i> Email
+                </button>
+                <button type="button" class="btn-excel" (click)="printReport('1')">
+                    <i class="fa fa-file-excel"></i> Excel
+                </button>
+                <button type="button" class="btn-pdf" (click)="printReport('2')">
+                    <i class="fa fa-file-pdf"></i> PDF
+                </button>
+                </div>
+            </div>
+            <br>
+        </form>
+      </div>
+    </fieldset>
+</div>

@@ -1,0 +1,710 @@
+<div class="container-fluid">
+  <form ngForm #TagMasterForm="ngForm" name="form" (ngSubmit)="TagMasterForm.form.valid && onSubmit(TagMasterForm)" novalidate>
+     <fieldset class="border" style="border: 2px solid #dee2e6 !important">
+      <legend class="legend-left">
+        {{ 'Machine Details' }}
+      </legend>
+        <div class="row">
+            <!-- Tag No-->
+            <div class="col-md-1">
+                <div class="label-wrapper">
+                    <label for="tag_no" class="form-label">Tag No
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="tag_no" [disabled]="itemDisable"  
+                        name="tag_no" [(ngModel)]="tagMasterModel.tag_no" #tag_no="ngModel"   [ngClass]="{'is-invalid': isTagIdlInvalid}">
+                </div>
+            </div>  
+
+            <!-- Serial No -->
+            <div class="col-md-1">
+                <div class="label-wrapper">
+                    <label for="serial_no" class="form-label">Serial No
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="serial_no" [disabled]="serialDisable"  
+                        name="serial_no" [(ngModel)]="tagMasterModel.serial_no" #serial_no="ngModel" [ngClass]="{'is-invalid': isSerialInvalid}">
+                </div>
+            </div>
+
+            <!-- Model Name -->
+            <div class="col-md-2" *ngIf="ModelDisable">
+                <div class="label-wrapper"  >
+                    <label for="item_no" class="form-label">Model Name
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="ItemList" bindLabel="item_name_abbr" bindValue="item_no" [(ngModel)]="tagMasterModel.item_no" class="select-input" [ngClass]="{'is-invalid': isModelNameInvalid}"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" (change)="ItemCodeEnter(tagMasterModel.item_no)"> 
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Model Name -->
+            <div class="col-md-2" *ngIf="!ModelDisable">
+                <div class="label-wrapper">
+                    <label for="model_name" class="form-label">Model Name 
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="model_name" [disabled]="itemDisable"  
+                        name="model_name" [(ngModel)]="tagMasterModel.model_name" #model_name="ngModel" [ngClass]="{'is-invalid': isModelNameInvalid}">
+                </div>
+            </div>
+
+            <!-- Item Code -->
+            <div class="col-md-2" *ngIf="ModelDisable">
+                <div class="label-wrapper">
+                    <label for="item_no" class="form-label">Item Code
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="ItemList" bindLabel="item_code" bindValue="item_no" [(ngModel)]="tagMasterModel.item_no" class="select-input" 
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" (change)="ItemCodeEnter(tagMasterModel.item_no)"> 
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Brand -->
+            <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                    <label for="brand_name" class="form-label mb-0">Brand
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="BrandList" bindLabel="brand_name" bindValue="brand_id" [(ngModel)]="tagMasterModel.brand_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Product Class -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="category_name" class="form-label">Product Class
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                     <input type="text" class="label-input" id="category_name" [disabled]="true"  
+                        name="category_name" [(ngModel)]="tagMasterModel.category_name" #category_name="ngModel">
+                </div>
+            </div>
+
+            <!-- Contract No -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="last_submit_cont" class="form-label">Contract No   
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="last_submit_cont" [disabled]="true"  
+                        name="last_submit_cont" [(ngModel)]="tagMasterModel.last_submit_cont" #last_submit_cont="ngModel">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            
+            <!-- Engineer Code -->
+            <!-- <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="id" class="form-label">Engineer Code 
+                    </label>
+                </div>
+                 <ng-select  [items]="EngineerList" bindLabel="id" bindValue="engineer_id" [(ngModel)]="tagMasterModel.engineer_id" class="select-input"
+                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                </ng-select>
+            </div> -->
+             <!-- Engineer Name -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="engineer" class="form-label">Engineer Name 
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <ng-select  [items]="EngineerList" bindLabel="engineer" bindValue="engineer_id" [(ngModel)]="tagMasterModel.engineer_id" class="select-input"
+                    [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" [ngClass]="{'is-invalid': isEngineerInvalid}"> 
+                </ng-select>
+            </div>
+
+            <!-- Salesman Code (Area) -->
+            <!-- <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="salesman_id_area" class="form-label">Salesman Code (Area)
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                   <ng-select  [items]="SalesManList" bindLabel="salesman_code" bindValue="salesman_id" [(ngModel)]="tagMasterModel.salesman_id_area" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                    </ng-select>
+                </div>
+            </div> -->
+             <!-- Salesman Name (Area)-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="salesman_id_area" class="form-label">Salesman Name (Area)
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="SalesManList" bindLabel="salesman_name" bindValue="salesman_id" [(ngModel)]="tagMasterModel.salesman_id_area" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                    </ng-select>
+                </div>
+            </div>
+
+            <!--Active Management -->
+            <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                    <label for="active_managment" class="form-label mb-0">Active Management
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="ActiveMngmtList" bindLabel="active_managment" bindValue="active_managment" [(ngModel)]="tagMasterModel.active_managment" class="select-input"
+                        [disabled]="tagAdDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Active Remarks -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="aM_Remarks" class="form-label">Active Remarks
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="aM_Remarks" [disabled]="tagAdDisable"  
+                        name="aM_Remarks" [(ngModel)]="tagMasterModel.aM_Remarks" #aM_Remarks="ngModel">
+                </div>
+            </div>
+            
+            <!-- PM Every (Months) -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="pm_duration" class="form-label">PM Every (Months)
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="pm_duration" [disabled]="true"  
+                        name="pm_duration" [(ngModel)]="tagMasterModel.pm_duration" #pm_duration="ngModel">
+                </div>
+            </div>
+
+            <!-- Day -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="pm_day" class="form-label">Day
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="pm_day" [disabled]="sysAdDisable"  
+                        name="pm_day" [(ngModel)]="tagMasterModel.pm_day" #pm_day="ngModel">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+            <!--Inactive -->
+            <div class="col-md-1"> 
+                <div class="form-group">
+                    <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="tagMasterModel.inactive" 
+                        name="inactive" #inactive="ngModel" [disabled]="tagAdDisable"  style="margin-top:1px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Inactive</span>
+                    </label>
+                </div>
+            </div>
+
+            <!--Dead-->
+            <div class="col-md-1"> 
+                <div class="form-group">
+                    <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="tagMasterModel.dead" 
+                        name="dead" #dead="ngModel" [disabled]="tagAdDisable"  style="margin-top:1px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Dead</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- PM Hold -->
+            <div class="col-md-1"> 
+                <div class="form-group">
+                    <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="tagMasterModel.pm_hold" 
+                        name="pm_hold" #pm_hold="ngModel" [disabled]="sysAdDisable"  style="margin-top:1px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label"> PM Hold</span>
+                    </label>
+                </div>
+            </div>
+
+            <!--Other Company -->
+            <div class="col-md-2"> 
+                <div class="form-group">
+                    <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="tagMasterModel.other_company" 
+                        name="other_company" #other_company="ngModel" [disabled]="itemDisable"  style="margin-top:1px" (change)="OtherCompanyChange($event)"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Other Company</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </fieldset> 
+    <br>
+    <fieldset class="border" style="border: 1px solid #3475b6 !important">
+        <legend class="legend-left">
+            {{ 'Guarantee Information' }}
+        </legend>
+        <div class="row">
+            <!--Machine Status -->
+            <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                    <label for="status_type" class="form-label mb-0">Machine Status
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="MachineStatList" bindLabel="status_type" bindValue="status_type" [(ngModel)]="tagMasterModel.status_type" class="select-input"
+                        [disabled]="sysAdDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Start Date -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="warrantyStartdate" class="form-label">Start Date
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <div class="datepicker-wrapper">
+                        <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="sysAdDisable"
+                        [bsConfig]="{
+                            dateInputFormat: 'DD/MM/YYYY',
+                            showWeekNumbers: false
+                        }"
+                        (bsValueChange)="onDateSelected($event)" [ngModel]="tagMasterModel.warrantyStartdate" (ngModelChange)="formatToDateInput($event)" [ngModelOptions]="{ standalone: true }"
+                        />
+                        <button type="button" class="btn btn-outline-secondary" (click)="dp.show()" [disabled]="sysAdDisable">
+                        📅
+                        </button>
+                    </div> 
+                </div>
+            </div>
+
+            <!-- End Date -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="warrantyEnddate" class="form-label">End Date
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <div class="datepicker-wrapper">
+                        <input type="text" class="form-control" bsDatepicker #dp1="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="sysAdDisable"
+                        [bsConfig]="{
+                            dateInputFormat: 'DD/MM/YYYY',
+                            showWeekNumbers: false
+                        }"
+                        (bsValueChange)="onDateSelected1($event)" [ngModel]="tagMasterModel.warrantyEnddate" (ngModelChange)="formatToDateInput1($event)" [ngModelOptions]="{ standalone: true }"
+                        />
+                        <button type="button" class="btn btn-outline-secondary" (click)="dp1.show()" [disabled]="sysAdDisable">
+                        📅
+                        </button>
+                    </div> 
+                </div>
+            </div>
+
+            <!--Special Tag -->
+            <div class="col-md-1"> 
+                <div class="form-group">
+                    <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="tagMasterModel.special_tag" 
+                        name="special_tag" #special_tag="ngModel" [disabled]="sysAdDisable"  style="margin-top:1px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Special Tag</span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </fieldset>
+    <br>
+    <fieldset class="border" style="border: 2px solid #dee2e6 !important">
+        <legend class="legend-left">
+            {{ 'Customer Details' }}
+        </legend>
+        <div class="row">
+            <!-- Customer Id-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="cardno" class="form-label">Customer Id
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="CustomerList" bindLabel="cardno" bindValue="creditcustomerid" [(ngModel)]="tagMasterModel.customer_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"   [ngClass]="{'is-invalid': isCustomerInvalid}"> 
+                    </ng-select>
+                </div>
+            </div>
+            <!-- Customer Name-->
+            <div class="col-md-4">
+                <div class="label-wrapper">
+                    <label for="customer_id" class="form-label">Customer Name
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="CustomerList" bindLabel="name" bindValue="creditcustomerid" [(ngModel)]="tagMasterModel.customer_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" > 
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Contact Person-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="contact_person" class="form-label">Contact Person
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="contact_person" [disabled]="itemDisable"  
+                        name="contact_person" [(ngModel)]="tagMasterModel.contact_person" #contact_person="ngModel">
+                </div>
+            </div>
+            <!-- Title-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="title" class="form-label">Title
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="title" [disabled]="itemDisable"  
+                        name="title" [(ngModel)]="tagMasterModel.title" #title="ngModel">
+                </div>
+            </div>
+            <!-- Department-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="department" class="form-label">Department
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="department" [disabled]="itemDisable"  
+                        name="department" [(ngModel)]="tagMasterModel.department" #department="ngModel">
+                </div>
+            </div>
+            
+        </div>
+        <div class="row">
+
+            <!-- Mobile No-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="mobile_no" class="form-label">Mobile No
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="mobile_no" [disabled]="itemDisable"  
+                        name="mobile_no" [(ngModel)]="tagMasterModel.mobile_no" #mobile_no="ngModel" [ngClass]="{'is-invalid': isMobileInvalid}">
+                </div>
+            </div>
+
+            <!-- Telephone No-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="telephone_no" class="form-label">Telephone No
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="telephone_no" [disabled]="itemDisable"  
+                        name="telephone_no" [(ngModel)]="tagMasterModel.telephone_no" #telephone_no="ngModel" [ngClass]="{'is-invalid': isTelephoneInvalid}">
+                </div>
+            </div>
+
+            <!-- Fax No-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="fax_no" class="form-label">Fax No
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="fax_no" [disabled]="itemDisable"  
+                        name="fax_no" [(ngModel)]="tagMasterModel.fax_no" #fax_no="ngModel">
+                </div>
+            </div>
+
+             <!--Area Name -->
+            <div class="col-md-2">
+                <div class="label-wrapper d-flex align-items-center">
+                    <label for="area_id" class="form-label mb-0">Area Name
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="AreaList" bindLabel="area_name" bindValue="area_id" [(ngModel)]="tagMasterModel.area_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }" [ngClass]="{'is-invalid': isAreaInvalid}" > 
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Area Code-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="area_id" class="form-label">Area Code
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <ng-select  [items]="AreaList" bindLabel="area_code" bindValue="area_id" [(ngModel)]="tagMasterModel.area_id" class="select-input"
+                        [disabled]="itemDisable" dropdownPanelClass="'black-dropdown'" [ngModelOptions]="{ standalone: true }"  > 
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Building Name-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="building_name" class="form-label">Building Name
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="building_name" [disabled]="itemDisable"  
+                        name="building_name" [(ngModel)]="tagMasterModel.building_name" #building_name="ngModel">
+                </div>
+            </div>
+
+           
+        </div>
+        <div class="row">
+             <!-- Building No-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="building_no" class="form-label">Building No
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="building_no" [disabled]="itemDisable"  
+                        name="building_no" [(ngModel)]="tagMasterModel.building_no" #building_no="ngModel">
+                </div>
+            </div>
+            <!-- PACI No-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="paci" class="form-label">PACI No
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="paci" [disabled]="itemDisable"  
+                        name="paci" [(ngModel)]="tagMasterModel.paci" #paci="ngModel">
+                </div>
+            </div>
+
+             <!-- Block No-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="block_no" class="form-label">Block No
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="block_no" [disabled]="itemDisable"  
+                        name="block_no" [(ngModel)]="tagMasterModel.block_no" #block_no="ngModel">
+                </div>
+            </div>
+
+            <!-- Street-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="street" class="form-label">Street
+                        <span class="required-star">*</span>
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="street" [disabled]="itemDisable"  
+                        name="street" [(ngModel)]="tagMasterModel.street" #street="ngModel" [ngClass]="{'is-invalid': isStreetInvalid}">
+                </div>
+            </div>
+            <!-- House No-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="house_no" class="form-label">House No
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="house_no" [disabled]="itemDisable"  
+                        name="house_no" [(ngModel)]="tagMasterModel.house_no" #house_no="ngModel">
+                </div>
+            </div>
+
+            <!-- Flat No-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="flat_no" class="form-label">Flat No
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="flat_no" [disabled]="itemDisable"  
+                        name="flat_no" [(ngModel)]="tagMasterModel.flat_no" #flat_no="ngModel">
+                </div>
+            </div>
+
+            <!-- Floor No-->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="floor_no" class="form-label">Floor No
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="floor_no" [disabled]="itemDisable"  
+                        name="floor_no" [(ngModel)]="tagMasterModel.floor_no" #floor_no="ngModel">
+                </div>
+            </div>
+
+            
+            <!-- Narration-->
+            <div class="col-md-4">
+                <div class="label-wrapper">
+                    <label for="narration" class="form-label">Narration
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="narration" [disabled]="itemDisable"  
+                        name="narration" [(ngModel)]="tagMasterModel.narration" #narration="ngModel">
+                </div>
+            </div>
+
+             <!--Address Verified-->
+            <div class="col-md-2"> 
+                <div class="form-group">
+                    <label class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox style-0" [(ngModel)]="tagMasterModel.verified" 
+                        name="verified" #verified="ngModel" [disabled]="itemDisable"  style="margin-top:1px"> 
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Address Verified</span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </fieldset>
+    <br>
+    <fieldset class="border" style="border: 2px solid #dee2e6 !important">
+        <legend class="legend-left">
+            {{ 'Reading Details' }}
+        </legend>
+        <div class="row">
+
+        </div>
+    </fieldset>
+    <br>
+     <fieldset class="border" style="border: 2px solid #dee2e6 !important">
+      <legend class="legend-left">
+        {{ 'Invoice Details' }}
+      </legend>
+        <div class="row">
+            <!-- Customer Name -->
+            <div class="col-md-4">
+                <div class="label-wrapper">
+                    <label for="o_CustName" class="form-label">Customer Name
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="o_CustName" [disabled]="true"  
+                        name="o_CustName" [(ngModel)]="tagMasterModel.o_CustName" #o_CustName="ngModel">
+                </div>
+            </div>
+
+            <!-- Invoice No -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="document_number" class="form-label">Invoice No
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="document_number" [disabled]="true"  
+                        name="document_number" [(ngModel)]="tagMasterModel.document_number" #document_number="ngModel">
+                </div>
+            </div>
+
+            <!-- Invoice Date -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="voucher_date" class="form-label">Invoice Date
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <div class="datepicker-wrapper">
+                        <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="true"
+                        [bsConfig]="{
+                            dateInputFormat: 'DD/MM/YYYY',
+                            showWeekNumbers: false
+                        }"
+                        [ngModel]="tagMasterModel.voucher_date"[ngModelOptions]="{ standalone: true }"
+                        />
+                    </div> 
+                </div>
+            </div>
+            <!-- Installation Date -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="voucher_date" class="form-label">Installation Date
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <div class="datepicker-wrapper">
+                        <input type="text" class="form-control" bsDatepicker #dp="bsDatepicker" placeholder="dd/MM/yyyy" [disabled]="true"
+                        [bsConfig]="{
+                            dateInputFormat: 'DD/MM/YYYY',
+                            showWeekNumbers: false
+                        }"
+                        [ngModel]="tagMasterModel.installationDate" [ngModelOptions]="{ standalone: true }"
+                        />
+                    </div> 
+                </div>
+            </div>
+
+            <!-- Salesman Code -->
+            <!-- <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="salesman_code" class="form-label">Salesman Code 
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="salesman_code" [disabled]="true"  
+                        name="salesman_code" [(ngModel)]="tagMasterModel.salesman_code" #salesman_code="ngModel">
+                </div>
+            </div> -->
+
+             <!-- Salesman Name -->
+            <div class="col-md-2">
+                <div class="label-wrapper">
+                    <label for="salesman_name" class="form-label">Salesman Name 
+                    </label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" class="label-input" id="salesman_name" [disabled]="true"  
+                        name="salesman_name" [(ngModel)]="tagMasterModel.salesman_name" #salesman_name="ngModel">
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <!-- Footer Buttons -->
+    <div class="inbox-compose-footer" style="overflow: hidden;">
+        <div class="btn-group pull-right">
+            <div class="badge bg-color-greenLight action mine"></div>
+            <button type="submit" class="btn btn-primary" style="margin-right: 5px" [disabled]="saveDisable">
+            <i class="fa fa-save"></i>Save
+            </button>
+            <button type="button" class="btn btn-danger" [disabled]="cancelDisable" (click)="cancelClickMethod()">
+            <i class="fa fa-ban"></i>Cancel
+            </button>
+        </div>
+    </div> 
+  </form>
+</div>
